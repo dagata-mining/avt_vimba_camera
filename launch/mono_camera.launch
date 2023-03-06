@@ -6,7 +6,7 @@
   <!-- Driver parameters, these parameters affect the way the ROS driver works -->
   <arg name="name"                    default="camera"            doc="The name of the camera"/>
   <arg name="ip"                      default=""                  doc="The IP for the camera to connect to"/>
-  <arg name="guid"                    default="DEV_1AB22C0294EF"  doc="The GUID for the camera to connect to"/>       <!-- Modified. Each camera has its own ID. Can be found using Vimba Viewer. -->
+  <arg name="guid"                    default="DEV_1AB22C026F78"  doc="The GUID for the camera to connect to"/>       <!-- Modified. Each camera has its own ID. Can be found using Vimba Viewer. -->
   <arg name="frame_id"                default="$(arg name)"       doc="The frame id of the camera"/>
   <arg name="use_measurement_time"    default="false"             doc="Use the measurement time from the camera"/>
   <arg name="ptp_offset"              default="-37"               doc="Offset to add to the timestamp from the camera (s). Useful for converting from TAI to UTC time. Only applies if use_measurement_time is true"/>

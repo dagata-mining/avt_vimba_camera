@@ -239,8 +239,9 @@ public:
     return res;
   }
 
+  VimbaSystem& vs;      // Modified by pointlaz. vs is now public
+
 private:
-  VimbaSystem& vs;
 
   void listAvailableCameras()
   {

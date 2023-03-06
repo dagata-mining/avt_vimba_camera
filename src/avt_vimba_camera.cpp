@@ -67,13 +67,14 @@ AvtVimbaCamera::AvtVimbaCamera() : AvtVimbaCamera(ros::this_node::getName().c_st
 {
 }
 
-AvtVimbaCamera::AvtVimbaCamera(const std::string& name)
+AvtVimbaCamera::AvtVimbaCamera(const std::string& name, const int camId)        // Modified by pointlax (camId added)
 {
   // Init global variables
   opened_ = false;     // camera connected to the api
   streaming_ = false;  // capturing frames
   on_init_ = true;     // on initialization phase
   name_ = name;
+  camId_ = camId;       // Added by pointlaz
 
   camera_state_ = OPENING;
 
@@ -153,7 +154,7 @@ void AvtVimbaCamera::start(const std::string& ip_str, const std::string& guid_st
   // Create a frame observer for this camera
   SP_SET(frame_obs_ptr_,
          new FrameObserver(vimba_camera_ptr_,
-                           std::bind(&avt_vimba_camera::AvtVimbaCamera::frameCallback, this, std::placeholders::_1)));
+                           std::bind(&avt_vimba_camera::AvtVimbaCamera::frameCallback, this, std::placeholders::_1, camId_)));        // Modified by pointlaz
   camera_state_ = IDLE;
 
   updater_.update();
@@ -290,14 +291,14 @@ CameraPtr AvtVimbaCamera::openCamera(const std::string& id_str, bool print_all_f
   return camera;
 }
 
-void AvtVimbaCamera::frameCallback(const FramePtr vimba_frame_ptr)
+void AvtVimbaCamera::frameCallback(const FramePtr vimba_frame_ptr, const int camId)
 {
   std::unique_lock<std::mutex> lock(config_mutex_);
   camera_state_ = OK;
   diagnostic_msg_ = "Camera operating normally";
 
   // Call the callback implemented by other classes
-  std::thread thread_callback = std::thread(userFrameCallback, vimba_frame_ptr);
+  std::thread thread_callback = std::thread(userFrameCallback, vimba_frame_ptr, camId);     // Modified by pointlaz (camId parameter added)
   thread_callback.join();
 
   updater_.update();
@@ -555,6 +556,28 @@ bool AvtVimbaCamera::getFeatureValue(const std::string& feature_str, std::string
   return (err == VmbErrorSuccess);
 }
 
+//Load camera settings (Added by pointlaz)
+void AvtVimbaCamera::loadCameraSettings(const std::string& settingPath)
+{
+    std::unique_lock<std::mutex> lock(config_mutex_);
+
+    if (streaming_)
+    {
+        stopImaging();
+        ROS_INFO_STREAM(" - Sreaming " << settingPath);
+        ros::Duration(0.5).sleep();  // sleep for half a second
+
+    }
+    VmbFeaturePersistSettings_t  config;
+    config.loggingLevel = 4;
+    config.maxIterations = 4;
+    config.persistType = 0;
+    vimba_camera_ptr_->LoadCameraSettings(settingPath, &config);
+
+    ROS_INFO_STREAM(" - Setting Path " << settingPath);
+    diagnostic_msg_ = "Updating configuration";
+}
+
 // Tries to configure a camera feature.
 // Updates the config value passed in if a different config is in use by the camera.
 template <typename Vimba_Type, typename Std_Type>
@@ -797,6 +820,7 @@ void AvtVimbaCamera::updateConfig(Config& config)
 
   if (on_init_)
   {
+    ROS_WARN("----- ON INIT");          // Added by pointlaz
     config_ = config;
   }
   diagnostic_msg_ = "Updating configuration";
@@ -1169,7 +1193,7 @@ void AvtVimbaCamera::updateBandwidthConfig(Config& config)
   if (config.stream_bytes_per_second != config_.stream_bytes_per_second || on_init_)
   {
     configureFeature("DeviceLinkThroughputLimit", static_cast<VmbInt64_t>(config.stream_bytes_per_second),
-                     config.stream_bytes_per_second);
+                     config.stream_bytes_per_second);       // Modified by pointlaz. "StreamBytesPerSecond" modified into "DeviceLinkThroughputLimit" for our cameras
   }
 }
 

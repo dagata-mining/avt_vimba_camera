@@ -92,6 +92,15 @@ add_executable(trigger_node
 )
 add_dependencies_and_linkings(trigger_node)
 
+# Node added by pointlaz
+add_executable(multi_camera_node
+        src/nodes/multi_camera_node.cpp
+        src/multi_camera.cpp
+        src/avt_vimba_camera.cpp
+        src/frame_observer.cpp
+        )
+add_dependencies_and_linkings(multi_camera_node)
+
 # Nodelets
 add_library(avt_camera_nodelets
   src/nodes/mono_camera_nodelet.cpp
@@ -108,6 +117,7 @@ add_dependencies_and_linkings(avt_camera_nodelets)
 ## Mark executables and/or libraries for installation
 install(TARGETS
   mono_camera_node
+  multi_camera_node     # Added by pointlaz
   trigger_node
   avt_camera_nodelets
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}

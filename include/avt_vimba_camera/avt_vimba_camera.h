@@ -66,16 +66,17 @@ class AvtVimbaCamera
 {
 public:
   typedef avt_vimba_camera::AvtVimbaCameraConfig Config;
-  typedef std::function<void(const FramePtr)> frameCallbackFunc;
+  typedef std::function<void(const FramePtr, const int)> frameCallbackFunc;         // Modified by pointlaz. camId as parameter
 
   AvtVimbaCamera();
-  AvtVimbaCamera(const std::string& name);
+  AvtVimbaCamera(const std::string& name, const int camId = 0);         // Modified by pointlaz. camId as parameter
 
   void start(const std::string& ip_str, const std::string& guid_str, const std::string& frame_id,
              bool print_all_features = false);
   void stop();
 
   void updateConfig(Config& config);
+  void loadCameraSettings(const std::string& settingPath);          // Created by pointlaz
   void startImaging();
   void stopImaging();
 
@@ -97,6 +98,8 @@ public:
   {
     userFrameCallback = callback;
   }
+
+  int getCamId(){return camId_;}            // Created by pointlaz
 
 private:
   Config config_;
@@ -121,6 +124,7 @@ private:
   std::string name_;
   std::string guid_;
   std::string frame_id_;
+  int camId_=0;             // Created by pointlaz to store camId
 
   diagnostic_updater::Updater updater_;
   std::string diagnostic_msg_;
@@ -128,7 +132,7 @@ private:
   CameraPtr openCamera(const std::string& id_str, bool print_all_features);
 
   frameCallbackFunc userFrameCallback;
-  void frameCallback(const FramePtr vimba_frame_ptr);
+  void frameCallback(const FramePtr vimba_frame_ptr, const int camId =0);       // Modified by pointlaz. camId as parameter
 
   template <typename T>
   VmbErrorType setFeatureValue(const std::string& feature_str, const T& val);
