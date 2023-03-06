@@ -1168,7 +1168,7 @@ void AvtVimbaCamera::updateBandwidthConfig(Config& config)
 
   if (config.stream_bytes_per_second != config_.stream_bytes_per_second || on_init_)
   {
-    configureFeature("StreamBytesPerSecond", static_cast<VmbInt64_t>(config.stream_bytes_per_second),
+    configureFeature("DeviceLinkThroughputLimit", static_cast<VmbInt64_t>(config.stream_bytes_per_second),
                      config.stream_bytes_per_second);
   }
 }
