@@ -55,6 +55,7 @@ namespace avt_vimba_camera
     {
         for (int i = 0 ; i < cam_.size(); i++)
         {
+
             cam_[i]->stop();
             cam_[i].reset();
             pub_[i].shutdown();

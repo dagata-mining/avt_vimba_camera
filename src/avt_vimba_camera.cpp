@@ -164,6 +164,15 @@ void AvtVimbaCamera::stop()
 {
   if (!opened_)
     return;
+  // Added by pointlaz
+  FeaturePtr feature;
+  vimba_camera_ptr_->GetFeatureByName("AcauisitionStop",feature);
+  feature->RunCommand();
+  vimba_camera_ptr_->EndCapture();
+  vimba_camera_ptr_->FlushQueue();
+  vimba_camera_ptr_->RevokeAllFrames();
+  vimba_frame_ptr_->UnregisterObserver();
+  //
   vimba_camera_ptr_->Close();
   opened_ = false;
 }

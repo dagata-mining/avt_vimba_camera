@@ -4,7 +4,7 @@
 
 <launch>
     <!-- Driver parameters, these parameters affect the way the ROS driver works -->
-    <arg name="number_of_cameras"       default="2"/>
+    <arg name="number_of_cameras"       default="3"/>
     <!-- Camera_0 -->
     <arg name="camera_0_name"           default="camera_0"              doc="The name of the camera"/>
     <arg name="camera_0_guid"           default="DEV_1AB22C026F7B"      doc="The GUID for the camera to connect to"/>       <!-- Each camera has its own ID. Can be found using Vimba Viewer. -->
@@ -15,7 +15,7 @@
     <arg name="camera_1_frame_id"       default="$(arg camera_1_name)"  doc="The frame id of the camera"/>
     <!-- Camera_2 -->
     <arg name="camera_2_name"           default="camera_2"              doc="The name of the camera"/>
-    <arg name="camera_2_guid"           default="DEV_1AB22C026F7F"      doc="The GUID for the camera to connect to"/>       <!-- Each camera has its own ID. Can be found using Vimba Viewer. -->
+    <arg name="camera_2_guid"           default="DEV_1AB22C026F78"      doc="The GUID for the camera to connect to"/>       <!-- Each camera has its own ID. Can be found using Vimba Viewer. -->
     <arg name="camera_2_frame_id"       default="$(arg camera_2_name)"  doc="The frame id of the camera"/>
     <!-- Camera_3 -->
     <arg name="camera_3_name"           default="camera_3"              doc="The name of the camera"/>
