@@ -34,6 +34,7 @@
 #define AVT_VIMBA_API_H
 
 #include <VimbaCPP/Include/VimbaCPP.h>
+#include "VimbaCPP/Include/VmbTransform.h"
 
 #include <ros/ros.h>
 #include <sensor_msgs/Image.h>
@@ -224,12 +225,18 @@ public:
     if (encoding == "")
       return false;
 
+
     VmbUchar_t* buffer_ptr;
-    VmbErrorType err = vimba_frame_ptr->GetImage(buffer_ptr);
+    std::vector<VmbUchar_t> TransformedData;
+    VmbErrorType err = TransformImage( vimba_frame_ptr, TransformedData, "RGB24" );
+    buffer_ptr =reinterpret_cast<VmbUchar_t*>(TransformedData.data());
+
     bool res = false;
     if (VmbErrorSuccess == err)
     {
-      res = sensor_msgs::fillImage(image, encoding, height, width, step, buffer_ptr);
+        encoding = sensor_msgs::image_encodings::RGB8;
+        VmbUint32_t step = TransformedData.size() / height;
+        res = sensor_msgs::fillImage(image, encoding, height, width, step, buffer_ptr);
     }
     else
     {
@@ -322,6 +329,61 @@ private:
       ROS_WARN("Could not start Vimba System");
     }
   }
+    VmbErrorType TransformImage( const FramePtr & SourceFrame, std::vector<VmbUchar_t> & DestinationData, const std::string &DestinationFormat )
+    {
+        if( SP_ISNULL( SourceFrame) )
+        {
+            return VmbErrorBadParameter;
+        }
+        VmbErrorType        Result;
+        VmbPixelFormatType  InputFormat;
+        VmbUint32_t         InputWidth,InputHeight;
+        Result = SP_ACCESS( SourceFrame )->GetPixelFormat( InputFormat ) ;
+        if( VmbErrorSuccess != Result )
+        {
+            return Result;
+        }
+        Result = SP_ACCESS( SourceFrame )->GetWidth( InputWidth );
+        if( VmbErrorSuccess != Result )
+        {
+            return Result;
+        }
+        Result = SP_ACCESS( SourceFrame )->GetHeight( InputHeight );
+        if( VmbErrorSuccess != Result )
+        {
+            return Result;
+        }
+        // Prepare source image
+        VmbImage SourceImage;
+        SourceImage.Size = sizeof( SourceImage );
+        Result = static_cast<VmbErrorType>( VmbSetImageInfoFromPixelFormat( InputFormat, InputWidth, InputHeight, &SourceImage ));
+        if( VmbErrorSuccess != Result )
+        {
+            return Result;
+        }
+        VmbUchar_t *DataBegin = NULL;
+        Result = SP_ACCESS( SourceFrame )->GetBuffer( DataBegin );
+        if( VmbErrorSuccess != Result )
+        {
+            return Result;
+        }
+        SourceImage.Data = DataBegin;
+        // Prepare destination image
+        VmbImage DestinationImage;
+        DestinationImage.Size = sizeof( DestinationImage );
+        Result = static_cast<VmbErrorType>( VmbSetImageInfoFromString( DestinationFormat.c_str(), static_cast<VmbUint32_t>(DestinationFormat.size()), InputWidth, InputHeight, &DestinationImage) );
+        if ( VmbErrorSuccess != Result )
+        {
+            return Result;
+        }
+        const size_t ByteCount = ( DestinationImage.ImageInfo.PixelInfo.BitsPerPixel * InputWidth* InputHeight ) / 8 ;
+        DestinationData.resize( ByteCount );
+        DestinationImage.Data = &*DestinationData.begin();
+        // Transform data
+        Result = static_cast<VmbErrorType>( VmbImageTransform( &SourceImage, &DestinationImage, NULL , 0 ));
+        return Result;
+    }
+
 };
 }  // namespace avt_vimba_camera
 #endif

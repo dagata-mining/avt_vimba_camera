@@ -59,6 +59,7 @@ function(add_dependencies_and_linkings arg)
       ${catkin_LIBRARIES}
       ${CMAKE_CURRENT_SOURCE_DIR}/lib/64bit/libVimbaC.so
       ${CMAKE_CURRENT_SOURCE_DIR}/lib/64bit/libVimbaCPP.so
+      ${CMAKE_CURRENT_SOURCE_DIR}/lib/64bit/libVimbaImageTransform.so
     )
   elseif("${ARCH}" STREQUAL armv7)
     target_link_libraries(${arg}
