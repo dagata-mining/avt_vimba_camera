@@ -85,7 +85,9 @@
     <node name="image_proc" pkg="image_proc" type="image_proc"/>
   </group>
 
+  <!-- Run the mono_camera_node -->
   <node name="$(arg name)" pkg="avt_vimba_camera" type="mono_camera_node" output="screen">
+    <!-- Driver parameters -->
     <param name="ip"                        value="$(arg ip)"/>
     <param name="guid"                      value="$(arg guid)"/>
     <param name="frame_id"                  value="$(arg frame_id)"/>
@@ -93,16 +95,16 @@
     <param name="ptp_offset"                value="$(arg ptp_offset)"/>
     <param name="camera_info_url"           value="$(arg camera_info_url)"/>
     <param name="print_all_features"        value="$(arg print_all_features)"/>
-
+    <!-- Acquisition -->
     <param name="acquisition_mode"          value="$(arg acquisition_mode)"/>
     <param name="acquisition_rate"          value="$(arg acquisition_rate)"/>
-
+    <!-- Trigger -->
     <param name="trigger_source"            value="$(arg trigger_source)"/>
     <param name="trigger_mode"              value="$(arg trigger_mode)"/>
     <param name="trigger_selector"          value="$(arg trigger_selector)"/>
     <param name="trigger_activation"        value="$(arg trigger_activation)"/>
     <param name="trigger_delay"             value="$(arg trigger_delay)"/>
-
+    <!-- Exposure -->
     <param name="exposure"                  value="$(arg exposure)"/>
     <param name="exposure_auto"             value="$(arg exposure_auto)"/>
     <param name="exposure_auto_alg"         value="$(arg exposure_auto_alg)"/>
@@ -112,7 +114,7 @@
     <param name="exposure_auto_outliers"    value="$(arg exposure_auto_outliers)"/>
     <param name="exposure_auto_rate"        value="$(arg exposure_auto_rate)"/>
     <param name="exposure_auto_target"      value="$(arg exposure_auto_target)"/>
-
+    <!-- Gain -->
     <param name="gain"                  value="$(arg gain)"/>
     <param name="gain_auto"             value="$(arg gain_auto)"/>
     <param name="gain_auto_adjust_tol"  value="$(arg gain_auto_adjust_tol)"/>
@@ -121,40 +123,41 @@
     <param name="gain_auto_outliers"    value="$(arg gain_auto_outliers)"/>
     <param name="gain_auto_rate"        value="$(arg gain_auto_rate)"/>
     <param name="gain_auto_target"      value="$(arg gain_auto_target)"/>
-
+    <!-- White Balance -->
     <param name="balance_ratio_abs"         value="$(arg balance_ratio_abs)"/>
     <param name="balance_ratio_selector"    value="$(arg balance_ratio_selector)"/>
     <param name="whitebalance_auto"         value="$(arg whitebalance_auto)"/>
     <param name="whitebalance_auto_tol"     value="$(arg whitebalance_auto_tol)"/>
     <param name="whitebalance_auto_rate"    value="$(arg whitebalance_auto_rate)"/>
-
+    <!-- Binning and Decimation -->
     <param name="binning_x"         value="$(arg binning_x)"/>
     <param name="binning_y"         value="$(arg binning_y)"/>
     <param name="decimation_x"      value="$(arg decimation_x)"/>
     <param name="decimation_y"      value="$(arg decimation_y)"/>
-
+    <!-- ROI -->
     <param name="width"         value="$(arg width)"/>
     <param name="height"        value="$(arg height)"/>
     <param name="offset_x"      value="$(arg offset_x)"/>
     <param name="offset_y"      value="$(arg offset_y)"/>
-
+    <!-- Pixel Format -->
     <param name="pixel_format"  value="$(arg pixel_format)"/>
-
+    <!-- Bandwidth -->
     <param name="stream_bytes_per_second"   value="$(arg stream_bytes_per_second)"/>
-
+    <!-- PTP Synchronization -->
     <param name="ptp_mode"      value="$(arg ptp_mode)"/>
-
+    <!-- GPIO -->
     <param name="sync_in_selector"      value="$(arg sync_in_selector)"/>
     <param name="sync_out_polarity"     value="$(arg sync_out_polarity)"/>
     <param name="sync_out_selector"     value="$(arg sync_out_selector)"/>
     <param name="sync_out_source"       value="$(arg sync_out_source)"/>
-
+    <!-- USB GPIO -->
     <param name="line_selector"     value="$(arg line_selector)"/>
     <param name="line_mode"         value="$(arg line_mode)"/>
-
+    <!-- Iris -->
     <param name="iris_auto_target"      value="$(arg iris_auto_target)"/>
     <param name="iris_mode"             value="$(arg iris_mode)"/>
     <param name="iris_video_level_min"  value="$(arg iris_video_level_min)"/>
     <param name="iris_video_level_max"  value="$(arg iris_video_level_max)"/>
+
   </node>
 </launch>

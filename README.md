@@ -5,30 +5,93 @@ The driver relies on libraries provided by AVT as part of their [Vimba SDK](http
 
 *See the ROS2 version of this README [here](https://github.com/astuff/avt_vimba_camera/blob/ros2_master/README.md).*
 
+___
 ## This is the Pointlaz modified version
-Last modification 2023-03-06 by CASL and Antoine Gruet.
+Last modification 2023-04-07 by CASL and Antoine Gruet.
 ### How to update this version
-Since this the pointlaz modifications are contained on a branch, it is possible to isolate the modifications from the update.
--While working on this fork, start by checking out on the master branch
+Since the PointLaz modifications are contained on a branch, it is possible to isolate the modifications from the update.
+- While working on this fork, start by checking out on the master branch
 ```
 git checkout ros1_master
 ```
--Then sync the fork with the update source version by using the method of your choice (see https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/syncing-a-fork)
--Then checkout back to the Pointlaz branch and merge the updated master into the branch.
+- Then sync the fork with the update source version by using the method of your choice (see https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/syncing-a-fork)
+- Then checkout back to the Pointlaz branch and merge the updated master into the branch.
 ```
 git checkout Pointlaz
 git merge ros1_master
 git push
 ```
--It's possible that the merge doesn't complete automatically depending on the complexity of Pointlaz's modifications. In this case, be prepared to do a manual merge. You can use the method of your choice, by example using CLION: check https://www.jetbrains.com/help/clion/resolving-conflicts.html#distributed-version-control-systems
+- It's possible that the merge doesn't complete automatically depending on the complexity of Pointlaz's modifications. In this case, be prepared to do a manual merge. You can use the method of your choice, by example using CLION: check https://www.jetbrains.com/help/clion/resolving-conflicts.html#distributed-version-control-systems
 
-### How to launch multiple cameras in one node
-Run the following command:
-```
-roslaunch avt_vimba_camera multi_camera_node.launch
-```
-*NOTE: Do not forget to change the number of cameras you want to use and their IDs in the **multi_camera_node.launch** file.*
+___
+## Vimba cameras configuration
 
+### Vimba Tools
+Vimba has 2 useful tools to help us configure our cameras:
+- **Vimba Viewer**: to configure your cameras and capture images with them. The **Vimba Viewer manual** is stored in */RosScan/Vimba/Vimba_Viewer_Guide.pdf* or can be found in the Vimba installation folders at */opt/Vimba_6_0/Documentation/'Vimba Viewer Guide.pdf'* or online at [this link](https://cdn.alliedvision.com/fileadmin/content/documents/products/software/software/Vimba/docu/manuals/Vimba_Viewer_Guide.pdf).
+- **Vimba Firmware Updater**: to update the firmware of your cameras. The **Vimba Firmware Updater manual** is part of the Vimba manual (page 24 to 28). The **Vimba manual** is stored in */RosScan/Vimba/'Vimba Manual.pdf'* or can be found can be found in the Vimba installation folders at */opt/Vimba_6_0/Documentation/'Vimba Manual.pdf'*.
+
+It may be useful to create desktop shortcuts for Vimba Tools, using the next commands:
+```console
+    ln -sf "/opt/Vimba_6_0/Tools/Viewer/Bin/x86_64bit/VimbaViewer" "$HOME/Desktop"
+    ln -sf "/opt/Vimba_6_0/Tools/FirmwareUpdater/Bin/x86_64bit/VimbaFirmwareUpdater" "$HOME/Desktop"
+```
+
+### Update your cameras firmwares
+To update your cameras' firmwares:
+1. Go to */RosScan/Vimba* and extract **Alvium_U3V_Camera_00.11.00.9cf0c21e.zip**, the firmware we are currently using. You can also go to [this link](https://www.alliedvision.com/en/support/firmware-downloads/) and download the last firmware version available for **Alvium USB**, and then extract it.
+2. Plug your cameras into you computer using the USB ports.
+3. Open the **Vimba Firmware Updater** by double-clicking the link on your desktop.
+4. You should see all your cameras in the list of cameras. If not, click the **Update camera list** button.
+5. You should see the current firmwares of you cameras under **Current firmware**.
+6. Click the **Open** button and select the new firmware version you just extracted.
+7. For each camera in the camera list, select your new firmware version under **New firmware**.
+8. Click **Update cameras**, then click **OK**.
+9. **WARNING! Do not unplug any cameras during the update process!**
+10. Once it is finished, click **Close**, then click **Update camera list**. You should see the new firmware under the **Current firmware** of your cameras.
+
+### Launch files configuration
+The ROS package used to operate the Vimba cameras is the **avt_vimba_camera** package.  
+Even if multiple launch exist in */RosScan/Projects/avt_vimba_camera/launch*. only 2 are useful for us:
+- **multi_camera_node.launch**: To operate multiple Vimba cameras using ROS.
+- **mono_camera.launch**: To operate one Vimba camera using ROS.
+
+#### Cameras ID configuration in **multi_camera_node.launch**
+You will have to configure the ID of your cameras in the launch files. Without this configuration, the node will not be able to find and operate your camera:
+1. Plug your cameras into you computer using the USB ports.
+2. Open **multi_camera_node.launch**, and enter your number of cameras in **default** field of **camera_qty** (line 10):
+```
+    <arg name="camera_qty"                default="7" />
+```
+3. Open the **Vimba Viewer** by double-clicking the link on your desktop.
+4. You should see all your cameras under **Detected Cameras**.
+5. Click once on your first camera. Wait for a new window to open.
+6. In the new window, go to the black window at the bottom, and copy the **ID** (it must look like DEV_XXXXXXXXXXXX).
+7. Paste this **ID** in **multi_camera_node.launch**, in the **default** field of **guid_0** arg (line 12):
+```
+    <arg name="guid_0"                    default="DEV_XXXXXXXXXXXX"/>
+```
+8. Repeat step 5. to 7. for each one of your cameras, to fill **guid_1**, **guid_2** and so on.
+
+*NOTE: If you have less than 7 cameras, do not bother with the arguments you don't need, the node will only use the one needed, depending on the value of **camera_qty**.*
+
+#### Cameras ID configuration in **mono_camera.launch**
+To configure the **mono_camera.launch** to work with your camera, follow the same steps as for the **multi_camera_node.launch**.  
+You just do not have any *camera_qty* to set.  
+The next line is an example of where to set your camera ID (line 9):
+```
+    <arg name="guid"                    default="DEV_XXXXXXXXXXXX"  doc="The GUID for the camera to connect to"/> 
+```
+
+#### Other important parameters in **multi_camera_node.launch** and **mono_camera.launch**
+Several other parameters than the *guid* are important.  
+You may not need to tune them as they are already set to work with our Scanner configuration, but in case, here is the list:
+- **trigger_source**: The GPIO Line you are using to trigger de camera.
+- **trigger_mode**: *True* if you want your camera to capture image on trigger signal, *False* otherwise.
+- **pixel_format**: To choose the type of compression you want to use.
+- **stream_bytes_per_second**: To choose the bandwidth allowed to the camera.
+
+___
 ## Installation
 
 ### Dependencies
