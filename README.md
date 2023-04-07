@@ -50,9 +50,8 @@ To update your cameras' firmwares:
 9. **WARNING! Do not unplug any cameras during the update process!**
 10. Once it is finished, click **Close**, then click **Update camera list**. You should see the new firmware under the **Current firmware** of your cameras.
 
-### Launch files configuration
-The ROS package used to operate the Vimba cameras is the **avt_vimba_camera** package.  
-Even if multiple launch exist in */RosScan/Projects/avt_vimba_camera/launch*. only 2 are useful for us:
+### Launch files configuration 
+Even if multiple launch exist in */RosScan/Projects/avt_vimba_camera/launch*. Only 2 are useful for us:
 - **multi_camera_node.launch**: To operate multiple Vimba cameras using ROS.
 - **mono_camera.launch**: To operate one Vimba camera using ROS.
 
