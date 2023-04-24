@@ -9,37 +9,37 @@
   <!-- Quantity of cameras -->
   <arg name="camera_qty"                default="7" />
   <!-- Camera 0 -->
-  <arg name="guid_0"                    default="DEV_1AB22C026F7B"/>
+  <arg name="guid_0"                    default="DEV_1AB22C00D5C2"/>
   <arg name="name_0"                    default="camera_0"/>
   <arg name="frame_id_0"                default="camera_0"/>
   <arg name="camera_info_url_0"         default="/home/pointlaz/catkin_ws/src/avt_vimba_camera/calibrations/calibration_example.yaml"/>
   <!-- Camera 1 -->
-  <arg name="guid_1"                    default="DEV_1AB22C026F7D"/>
+  <arg name="guid_1"                    default="DEV_1AB22C00D5C3"/>
   <arg name="name_1"                    default="camera_1"/>
   <arg name="frame_id_1"                default="camera_1"/>
   <arg name="camera_info_url_1"         default="/home/pointlaz/catkin_ws/src/avt_vimba_camera/calibrations/calibration_example.yaml"/>
   <!-- Camera 2 -->
-  <arg name="guid_2"                    default="DEV_1AB22C026F78"/>
+  <arg name="guid_2"                    default="DEV_1AB22C00D5C4"/>
   <arg name="name_2"                    default="camera_2"/>
   <arg name="frame_id_2"                default="camera_2"/>
   <arg name="camera_info_url_2"         default="/home/pointlaz/catkin_ws/src/avt_vimba_camera/calibrations/calibration_example.yaml"/>
   <!-- Camera 3 -->
-  <arg name="guid_3"                    default="DEV_1AB22C026F7A"/>
+  <arg name="guid_3"                    default="DEV_1AB22C00D5C5"/>
   <arg name="name_3"                    default="camera_3"/>
   <arg name="frame_id_3"                default="camera_3"/>
   <arg name="camera_info_url_3"         default="/home/pointlaz/catkin_ws/src/avt_vimba_camera/calibrations/calibration_example.yaml"/>
   <!-- Camera 4 -->
-  <arg name="guid_4"                    default="DEV_1AB22C026F7F"/>
+  <arg name="guid_4"                    default="DEV_1AB22C00D5C6"/>
   <arg name="name_4"                    default="camera_4"/>
   <arg name="frame_id_4"                default="camera_4"/>
   <arg name="camera_info_url_4"         default="/home/pointlaz/catkin_ws/src/avt_vimba_camera/calibrations/calibration_example.yaml"/>
   <!-- Camera 5 -->
-  <arg name="guid_5"                    default="DEV_1AB22C0294EF"/>
+  <arg name="guid_5"                    default="DEV_1AB22C00D5C7"/>
   <arg name="name_5"                    default="camera_5"/>
   <arg name="frame_id_5"                default="camera_5"/>
   <arg name="camera_info_url_5"         default="/home/pointlaz/catkin_ws/src/avt_vimba_camera/calibrations/calibration_example.yaml"/>
   <!-- Camera 6 -->
-  <arg name="guid_6"                    default="DEV_1AB22C026F77"/>
+  <arg name="guid_6"                    default="DEV_1AB22C00D5C9"/>
   <arg name="name_6"                    default="camera_6"/>
   <arg name="frame_id_6"                default="camera_6"/>
   <arg name="camera_info_url_6"         default="/home/pointlaz/catkin_ws/src/avt_vimba_camera/calibrations/calibration_example.yaml"/>
