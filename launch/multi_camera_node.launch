@@ -110,7 +110,7 @@
   <arg name="line_mode"                 default="Input"/>
   <!-- Compression parameters -->       <!-- See parameters description at http://wiki.ros.org/compressed_image_transport -->
   <arg name="format"                    default="jpeg"/>
-  <arg name="jpeg_quality"              default="100"/>
+  <arg name="jpeg_quality"              default="99"/>
   <arg name="jpeg_progressive"          default="false"/>
   <arg name="jpeg_optimize"             default="false"/>
   <arg name="jpeg_restart_interval"     default="0"/>
