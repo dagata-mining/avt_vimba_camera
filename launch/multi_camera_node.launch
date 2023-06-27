@@ -109,12 +109,12 @@
   <arg name="line_selector"             default="Line0"/>
   <arg name="line_mode"                 default="Input"/>
   <!-- Compression parameters -->       <!-- See parameters description at http://wiki.ros.org/compressed_image_transport -->
-  <arg name="format"                    default="jpeg"/>
-  <arg name="jpeg_quality"              default="99"/>
-  <arg name="jpeg_progressive"          default="false"/>
-  <arg name="jpeg_optimize"             default="false"/>
-  <arg name="jpeg_restart_interval"     default="0"/>
-  <arg name="png_level"                 default="9"/>
+  <arg name="compression_format"                    default="jpeg"/>
+  <arg name="compression_jpeg_quality"              default="99"/>
+  <arg name="compression_jpeg_progressive"          default="false"/>
+  <arg name="compression_jpeg_optimize"             default="false"/>
+  <arg name="compression_jpeg_restart_interval"     default="0"/>
+  <arg name="compression_png_level"                 default="9"/>
 
   <group if="$(arg image_proc)" ns="$(arg name)">
     <node name="image_proc" pkg="image_proc" type="image_proc"/>
@@ -220,54 +220,54 @@
     <param name="line_mode"                 value="$(arg line_mode)"/>
     <!-- Compression parameters -->
     <!-- Camera 0 -->
-    <param name="image_raw_0/compressed/format"                     value="$(arg format)"/>
-    <param name="image_raw_0/compressed/jpeg_quality"               value="$(arg jpeg_quality)"/>
-    <param name="image_raw_0/compressed/jpeg_progressive"           value="$(arg jpeg_progressive)"/>
-    <param name="image_raw_0/compressed/jpeg_optimize"              value="$(arg jpeg_optimize)"/>
-    <param name="image_raw_0/compressed/jpeg_restart_interval"      value="$(arg jpeg_restart_interval)"/>
-    <param name="image_raw_0/compressed/png_level"                  value="$(arg png_level)"/>
+    <param name="image_raw_0/compressed/format"                     value="$(arg compression_format)"/>
+    <param name="image_raw_0/compressed/jpeg_quality"               value="$(arg compression_jpeg_quality)"/>
+    <param name="image_raw_0/compressed/jpeg_progressive"           value="$(arg compression_jpeg_progressive)"/>
+    <param name="image_raw_0/compressed/jpeg_optimize"              value="$(arg compression_jpeg_optimize)"/>
+    <param name="image_raw_0/compressed/jpeg_restart_interval"      value="$(arg compression_jpeg_restart_interval)"/>
+    <param name="image_raw_0/compressed/png_level"                  value="$(arg compression_png_level)"/>
     <!-- Camera 1 -->
-    <param name="image_raw_1/compressed/format"                     value="$(arg format)"/>
-    <param name="image_raw_1/compressed/jpeg_quality"               value="$(arg jpeg_quality)"/>
-    <param name="image_raw_1/compressed/jpeg_progressive"           value="$(arg jpeg_progressive)"/>
-    <param name="image_raw_1/compressed/jpeg_optimize"              value="$(arg jpeg_optimize)"/>
-    <param name="image_raw_1/compressed/jpeg_restart_interval"      value="$(arg jpeg_restart_interval)"/>
-    <param name="image_raw_1/compressed/png_level"                  value="$(arg png_level)"/>
+    <param name="image_raw_1/compressed/format"                     value="$(arg compression_format)"/>
+    <param name="image_raw_1/compressed/jpeg_quality"               value="$(arg compression_jpeg_quality)"/>
+    <param name="image_raw_1/compressed/jpeg_progressive"           value="$(arg compression_jpeg_progressive)"/>
+    <param name="image_raw_1/compressed/jpeg_optimize"              value="$(arg compression_jpeg_optimize)"/>
+    <param name="image_raw_1/compressed/jpeg_restart_interval"      value="$(arg compression_jpeg_restart_interval)"/>
+    <param name="image_raw_1/compressed/png_level"                  value="$(arg compression_png_level)"/>
     <!-- Camera 2 -->
-    <param name="image_raw_2/compressed/format"                     value="$(arg format)"/>
-    <param name="image_raw_2/compressed/jpeg_quality"               value="$(arg jpeg_quality)"/>
-    <param name="image_raw_2/compressed/jpeg_progressive"           value="$(arg jpeg_progressive)"/>
-    <param name="image_raw_2/compressed/jpeg_optimize"              value="$(arg jpeg_optimize)"/>
-    <param name="image_raw_2/compressed/jpeg_restart_interval"      value="$(arg jpeg_restart_interval)"/>
-    <param name="image_raw_2/compressed/png_level"                  value="$(arg png_level)"/>
+    <param name="image_raw_2/compressed/format"                     value="$(arg compression_format)"/>
+    <param name="image_raw_2/compressed/jpeg_quality"               value="$(arg compression_jpeg_quality)"/>
+    <param name="image_raw_2/compressed/jpeg_progressive"           value="$(arg compression_jpeg_progressive)"/>
+    <param name="image_raw_2/compressed/jpeg_optimize"              value="$(arg compression_jpeg_optimize)"/>
+    <param name="image_raw_2/compressed/jpeg_restart_interval"      value="$(arg compression_jpeg_restart_interval)"/>
+    <param name="image_raw_2/compressed/png_level"                  value="$(arg compression_png_level)"/>
     <!-- Camera 3 -->
-    <param name="image_raw_3/compressed/format"                     value="$(arg format)"/>
-    <param name="image_raw_3/compressed/jpeg_quality"               value="$(arg jpeg_quality)"/>
-    <param name="image_raw_3/compressed/jpeg_progressive"           value="$(arg jpeg_progressive)"/>
-    <param name="image_raw_3/compressed/jpeg_optimize"              value="$(arg jpeg_optimize)"/>
-    <param name="image_raw_3/compressed/jpeg_restart_interval"      value="$(arg jpeg_restart_interval)"/>
-    <param name="image_raw_3/compressed/png_level"                  value="$(arg png_level)"/>
+    <param name="image_raw_3/compressed/format"                     value="$(arg compression_format)"/>
+    <param name="image_raw_3/compressed/jpeg_quality"               value="$(arg compression_jpeg_quality)"/>
+    <param name="image_raw_3/compressed/jpeg_progressive"           value="$(arg compression_jpeg_progressive)"/>
+    <param name="image_raw_3/compressed/jpeg_optimize"              value="$(arg compression_jpeg_optimize)"/>
+    <param name="image_raw_3/compressed/jpeg_restart_interval"      value="$(arg compression_jpeg_restart_interval)"/>
+    <param name="image_raw_3/compressed/png_level"                  value="$(arg compression_png_level)"/>
     <!-- Camera 4 -->
-    <param name="image_raw_4/compressed/format"                     value="$(arg format)"/>
-    <param name="image_raw_4/compressed/jpeg_quality"               value="$(arg jpeg_quality)"/>
-    <param name="image_raw_4/compressed/jpeg_progressive"           value="$(arg jpeg_progressive)"/>
-    <param name="image_raw_4/compressed/jpeg_optimize"              value="$(arg jpeg_optimize)"/>
-    <param name="image_raw_4/compressed/jpeg_restart_interval"      value="$(arg jpeg_restart_interval)"/>
-    <param name="image_raw_4/compressed/png_level"                  value="$(arg png_level)"/>
+    <param name="image_raw_4/compressed/format"                     value="$(arg compression_format)"/>
+    <param name="image_raw_4/compressed/jpeg_quality"               value="$(arg compression_jpeg_quality)"/>
+    <param name="image_raw_4/compressed/jpeg_progressive"           value="$(arg compression_jpeg_progressive)"/>
+    <param name="image_raw_4/compressed/jpeg_optimize"              value="$(arg compression_jpeg_optimize)"/>
+    <param name="image_raw_4/compressed/jpeg_restart_interval"      value="$(arg compression_jpeg_restart_interval)"/>
+    <param name="image_raw_4/compressed/png_level"                  value="$(arg compression_png_level)"/>
     <!-- Camera 5 -->
-    <param name="image_raw_5/compressed/format"                     value="$(arg format)"/>
-    <param name="image_raw_5/compressed/jpeg_quality"               value="$(arg jpeg_quality)"/>
-    <param name="image_raw_5/compressed/jpeg_progressive"           value="$(arg jpeg_progressive)"/>
-    <param name="image_raw_5/compressed/jpeg_optimize"              value="$(arg jpeg_optimize)"/>
-    <param name="image_raw_5/compressed/jpeg_restart_interval"      value="$(arg jpeg_restart_interval)"/>
-    <param name="image_raw_5/compressed/png_level"                  value="$(arg png_level)"/>
+    <param name="image_raw_5/compressed/format"                     value="$(arg compression_format)"/>
+    <param name="image_raw_5/compressed/jpeg_quality"               value="$(arg compression_jpeg_quality)"/>
+    <param name="image_raw_5/compressed/jpeg_progressive"           value="$(arg compression_jpeg_progressive)"/>
+    <param name="image_raw_5/compressed/jpeg_optimize"              value="$(arg compression_jpeg_optimize)"/>
+    <param name="image_raw_5/compressed/jpeg_restart_interval"      value="$(arg compression_jpeg_restart_interval)"/>
+    <param name="image_raw_5/compressed/png_level"                  value="$(arg compression_png_level)"/>
     <!-- Camera 6 -->
-    <param name="image_raw_6/compressed/format"                     value="$(arg format)"/>
-    <param name="image_raw_6/compressed/jpeg_quality"               value="$(arg jpeg_quality)"/>
-    <param name="image_raw_6/compressed/jpeg_progressive"           value="$(arg jpeg_progressive)"/>
-    <param name="image_raw_6/compressed/jpeg_optimize"              value="$(arg jpeg_optimize)"/>
-    <param name="image_raw_6/compressed/jpeg_restart_interval"      value="$(arg jpeg_restart_interval)"/>
-    <param name="image_raw_6/compressed/png_level"                  value="$(arg png_level)"/>
+    <param name="image_raw_6/compressed/format"                     value="$(arg compression_format)"/>
+    <param name="image_raw_6/compressed/jpeg_quality"               value="$(arg compression_jpeg_quality)"/>
+    <param name="image_raw_6/compressed/jpeg_progressive"           value="$(arg compression_jpeg_progressive)"/>
+    <param name="image_raw_6/compressed/jpeg_optimize"              value="$(arg compression_jpeg_optimize)"/>
+    <param name="image_raw_6/compressed/jpeg_restart_interval"      value="$(arg compression_jpeg_restart_interval)"/>
+    <param name="image_raw_6/compressed/png_level"                  value="$(arg compression_png_level)"/>
 
   </node>
 </launch>

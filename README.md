@@ -89,6 +89,9 @@ You may not need to tune them as they are already set to work with our Scanner c
 - **trigger_mode**: *True* if you want your camera to capture image on trigger signal, *False* otherwise.
 - **pixel_format**: To choose the type of compression you want to use.
 - **stream_bytes_per_second**: To choose the bandwidth allowed to the camera.
+- **width** and **height**: To choose the size of the images (in number of pixels).
+- **compression_format**: To choose the type of image compression you want to use (jpeg or png).
+- **compression_jpeg_quality**: To choose the quality of jpeg compression you want to use.
 
 ___
 ## Installation

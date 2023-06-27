@@ -80,6 +80,13 @@
   <arg name="iris_mode"               default="Off"/>           <!-- Modified. Iris auto deactivated for framerate improvement -->
   <arg name="iris_video_level_min"    default="110"/>
   <arg name="iris_video_level_max"    default="110"/>
+  <!-- Compression parameters -->       <!-- See parameters description at http://wiki.ros.org/compressed_image_transport -->
+  <arg name="compression_format"                    default="jpeg"/>
+  <arg name="compression_jpeg_quality"              default="99"/>
+  <arg name="compression_jpeg_progressive"          default="false"/>
+  <arg name="compression_jpeg_optimize"             default="false"/>
+  <arg name="compression_jpeg_restart_interval"     default="0"/>
+  <arg name="compression_png_level"                 default="9"/>
 
   <group if="$(arg image_proc)" ns="$(arg name)">
     <node name="image_proc" pkg="image_proc" type="image_proc"/>
@@ -158,6 +165,13 @@
     <param name="iris_mode"             value="$(arg iris_mode)"/>
     <param name="iris_video_level_min"  value="$(arg iris_video_level_min)"/>
     <param name="iris_video_level_max"  value="$(arg iris_video_level_max)"/>
+    <!-- Compression parameters -->
+    <param name="image_raw/compressed/format"                     value="$(arg compression_format)"/>
+    <param name="image_raw/compressed/jpeg_quality"               value="$(arg compression_jpeg_quality)"/>
+    <param name="image_raw/compressed/jpeg_progressive"           value="$(arg compression_jpeg_progressive)"/>
+    <param name="image_raw/compressed/jpeg_optimize"              value="$(arg compression_jpeg_optimize)"/>
+    <param name="image_raw/compressed/jpeg_restart_interval"      value="$(arg compression_jpeg_restart_interval)"/>
+    <param name="image_raw/compressed/png_level"                  value="$(arg compression_png_level)"/>
 
   </node>
 </launch>
