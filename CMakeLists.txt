@@ -5,6 +5,7 @@ find_package(catkin REQUIRED COMPONENTS
   camera_info_manager
   diagnostic_updater
   dynamic_reconfigure
+  cv_bridge
   image_transport
   message_filters
   roscpp
