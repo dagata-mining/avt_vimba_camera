@@ -108,40 +108,32 @@ namespace avt_vimba_camera
 
                 if (compressJPG_ || calculateColorIntensity_)
                 {
-                    try
+                    ROS_INFO("-------------IN 1");
+                    cv_ptr = cv_bridge::toCvCopy(img, sensor_msgs::image_encodings::RGB8);
+                    ROS_INFO("-------------IN 2");
+                    if (calculateColorIntensity_)
                     {
-                        ROS_INFO("-------------IN 1");
-                        cv_ptr = cv_bridge::toCvCopy(img, sensor_msgs::image_encodings::RGB8);
-                        ROS_INFO("-------------IN 2");
-                        if (calculateColorIntensity_)
-                        {
-                            ROS_INFO("-------------IN 3");
-                            std_msgs::UInt8 colorIntensityMsg;
-                            colorIntensityMsg.data = calculateColorIntensity(cv_ptr->image);
-                            colorPub_[camId].publish(colorIntensityMsg);
-                        }
-
-                        if (compressJPG_)
-                        {
-                            ROS_INFO("-------------IN 4");
-                            // Compress the image using OpenCV
-                            std::vector<int> compression_params;
-                            compression_params.push_back(cv::IMWRITE_JPEG_QUALITY);  // You can use other parameters like PNG compression
-                            compression_params.push_back(qualityJPG_);  // Set the desired image quality (0-100)
-                            cv::imencode(".jpg", cv_ptr->image, img.data, compression_params);
-                            ROS_INFO("-------------FRAME Size %d", img.data.size());
-                            img.encoding = "jpg";
-                            pub_[camId].publish(img, ci);
-                        }
-                        else
-                        {
-                            pub_[camId].publish(img, ci);
-                        }
-
+                        ROS_INFO("-------------IN 3");
+                        std_msgs::UInt8 colorIntensityMsg;
+                        colorIntensityMsg.data = calculateColorIntensity(cv_ptr->image);
+                        colorPub_[camId].publish(colorIntensityMsg);
                     }
-                    catch (cv_bridge::Exception &e)
+
+                    if (compressJPG_)
                     {
-                        ROS_ERROR("cv_bridge exception: %s", e.what());
+                        ROS_INFO("-------------IN 4");
+                        // Compress the image using OpenCV
+                        std::vector<int> compression_params;
+                        compression_params.push_back(cv::IMWRITE_JPEG_QUALITY);  // You can use other parameters like PNG compression
+                        compression_params.push_back(qualityJPG_);  // Set the desired image quality (0-100)
+                        cv::imencode(".jpg", cv_ptr->image, img.data, compression_params);
+                        ROS_INFO("-------------FRAME Size %d", img.data.size());
+                        img.encoding = "jpg";
+                        pub_[camId].publish(img, ci);
+                    }
+                    else
+                    {
+                        pub_[camId].publish(img, ci);
                     }
                 }
                 else
