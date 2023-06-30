@@ -253,7 +253,7 @@ namespace avt_vimba_camera
         int sum = 0;
         cv::Vec3b vecRGB;
         ROS_INFO("-----steps  %d",colorIntensityPxSteps_);
-        int step
+
         if (sumRGB)
         {
             ROS_INFO("-----IN 3");
