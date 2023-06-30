@@ -110,9 +110,12 @@ namespace avt_vimba_camera
                 {
                     try
                     {
+                        ROS_INFO("-------------IN 1");
                         cv_ptr = cv_bridge::toCvCopy(img, sensor_msgs::image_encodings::RGB8);
+                        ROS_INFO("-------------IN 2");
                         if (calculateColorIntensity_)
                         {
+                            ROS_INFO("-------------IN 3");
                             std_msgs::UInt8 colorIntensityMsg;
                             colorIntensityMsg.data = calculateColorIntensity(cv_ptr->image);
                             colorPub_[camId].publish(colorIntensityMsg);
@@ -120,6 +123,7 @@ namespace avt_vimba_camera
 
                         if (compressJPG_)
                         {
+                            ROS_INFO("-------------IN 4");
                             // Compress the image using OpenCV
                             std::vector<int> compression_params;
                             compression_params.push_back(cv::IMWRITE_JPEG_QUALITY);  // You can use other parameters like PNG compression
