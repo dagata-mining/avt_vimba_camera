@@ -16,7 +16,7 @@ namespace avt_vimba_camera
 
         nhp_.param("camera_qty", camQty_,1);
         nhp_.param("compress_jpeg_vimba", compressJPG_,true);
-        std::string topicName = "image_";
+        std::string topicName = "image_raw_";
         nhp_.param("compress_jpeg_quality", qualityJPG_,90);
         nhp_.param("calculate_color_intensity", calculateColorIntensity_,true);
         nhp_.param("color_intensity_pixel_steps", colorIntensityPxSteps_,10);

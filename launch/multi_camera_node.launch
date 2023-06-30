@@ -128,39 +128,6 @@
     <node name="image_proc" pkg="image_proc" type="image_proc"/>
   </group>
 
-  <!-- Compression parameters -->
-  <group if="$(eval (compression_jpeg_vimba) or (not (compression_jpeg_imageTransport)))">
-    <!-- Prevent Image_transport from exporting to jpeg using imageTransport-->
-    <rosparam ns="image_0" param="disable_pub_plugins" >
-      - 'image_transport/compressed'
-      - 'image_transport/compressedDepth'
-    </rosparam>
-    <rosparam ns="image_1" param="disable_pub_plugins" >
-      - 'image_transport/compressed'
-      - 'image_transport/compressedDepth'
-    </rosparam>
-    <rosparam ns="image_2" param="disable_pub_plugins" >
-      - 'image_transport/compressed'
-      - 'image_transport/compressedDepth'
-    </rosparam>
-    <rosparam ns="image_3" param="disable_pub_plugins" >
-      - 'image_transport/compressed'
-      - 'image_transport/compressedDepth'
-    </rosparam>
-    <rosparam ns="image_4" param="disable_pub_plugins" >
-      - 'image_transport/compressed'
-      - 'image_transport/compressedDepth'
-    </rosparam>
-    <rosparam ns="image_5" param="disable_pub_plugins" >
-      - 'image_transport/compressed'
-      - 'image_transport/compressedDepth'
-    </rosparam>
-    <rosparam ns="image_6" param="disable_pub_plugins" >
-      - 'image_transport/compressed'
-      - 'image_transport/compressedDepth'
-    </rosparam>
-  </group>
-
 
   <!-- Run the multi_camera_node -->
   <node name="multi_camera" pkg="avt_vimba_camera" type="multi_camera_node" output="screen">
@@ -270,56 +237,89 @@
     <param name="compress_jpeg_vimba"                             value="$(arg compression_jpeg_vimba)"/>
 
     <!-- Camera 0 -->
-    <param name="image_0/compressed/format"                     value="$(arg compression_format)"/>
-    <param name="image_0/compressed/jpeg_quality"               value="$(arg compression_jpeg_quality)"/>
-    <param name="image_0/compressed/jpeg_progressive"           value="$(arg compression_jpeg_progressive)"/>
-    <param name="image_0/compressed/jpeg_optimize"              value="$(arg compression_jpeg_optimize)"/>
-    <param name="image_0/compressed/jpeg_restart_interval"      value="$(arg compression_jpeg_restart_interval)"/>
-    <param name="image_0/compressed/png_level"                  value="$(arg compression_png_level)"/>
+    <param name="image_raw_0/compressed/format"                     value="$(arg compression_format)"/>
+    <param name="image_raw_0/compressed/jpeg_quality"               value="$(arg compression_jpeg_quality)"/>
+    <param name="image_raw_0/compressed/jpeg_progressive"           value="$(arg compression_jpeg_progressive)"/>
+    <param name="image_raw_0/compressed/jpeg_optimize"              value="$(arg compression_jpeg_optimize)"/>
+    <param name="image_raw_0/compressed/jpeg_restart_interval"      value="$(arg compression_jpeg_restart_interval)"/>
+    <param name="image_raw_0/compressed/png_level"                  value="$(arg compression_png_level)"/>
     <!-- Camera 1 -->
-    <param name="image_1/compressed/format"                     value="$(arg compression_format)"/>
-    <param name="image_1/compressed/jpeg_quality"               value="$(arg compression_jpeg_quality)"/>
-    <param name="image_1/compressed/jpeg_progressive"           value="$(arg compression_jpeg_progressive)"/>
-    <param name="image_1/compressed/jpeg_optimize"              value="$(arg compression_jpeg_optimize)"/>
-    <param name="image_1/compressed/jpeg_restart_interval"      value="$(arg compression_jpeg_restart_interval)"/>
-    <param name="image_1/compressed/png_level"                  value="$(arg compression_png_level)"/>
+    <param name="image_raw_1/compressed/format"                     value="$(arg compression_format)"/>
+    <param name="image_raw_1/compressed/jpeg_quality"               value="$(arg compression_jpeg_quality)"/>
+    <param name="image_raw_1/compressed/jpeg_progressive"           value="$(arg compression_jpeg_progressive)"/>
+    <param name="image_raw_1/compressed/jpeg_optimize"              value="$(arg compression_jpeg_optimize)"/>
+    <param name="image_raw_1/compressed/jpeg_restart_interval"      value="$(arg compression_jpeg_restart_interval)"/>
+    <param name="image_raw_1/compressed/png_level"                  value="$(arg compression_png_level)"/>
     <!-- Camera 2 -->
-    <param name="image_2/compressed/format"                     value="$(arg compression_format)"/>
-    <param name="image_2/compressed/jpeg_quality"               value="$(arg compression_jpeg_quality)"/>
-    <param name="image_2/compressed/jpeg_progressive"           value="$(arg compression_jpeg_progressive)"/>
-    <param name="image_2/compressed/jpeg_optimize"              value="$(arg compression_jpeg_optimize)"/>
-    <param name="image_2/compressed/jpeg_restart_interval"      value="$(arg compression_jpeg_restart_interval)"/>
-    <param name="image_2/compressed/png_level"                  value="$(arg compression_png_level)"/>
+    <param name="image_raw_2/compressed/format"                     value="$(arg compression_format)"/>
+    <param name="image_raw_2/compressed/jpeg_quality"               value="$(arg compression_jpeg_quality)"/>
+    <param name="image_raw_2/compressed/jpeg_progressive"           value="$(arg compression_jpeg_progressive)"/>
+    <param name="image_raw_2/compressed/jpeg_optimize"              value="$(arg compression_jpeg_optimize)"/>
+    <param name="image_raw_2/compressed/jpeg_restart_interval"      value="$(arg compression_jpeg_restart_interval)"/>
+    <param name="image_raw_2/compressed/png_level"                  value="$(arg compression_png_level)"/>
     <!-- Camera 3 -->
-    <param name="image_3/compressed/format"                     value="$(arg compression_format)"/>
-    <param name="image_3/compressed/jpeg_quality"               value="$(arg compression_jpeg_quality)"/>
-    <param name="image_3/compressed/jpeg_progressive"           value="$(arg compression_jpeg_progressive)"/>
-    <param name="image_3/compressed/jpeg_optimize"              value="$(arg compression_jpeg_optimize)"/>
-    <param name="image_3/compressed/jpeg_restart_interval"      value="$(arg compression_jpeg_restart_interval)"/>
-    <param name="image_3/compressed/png_level"                  value="$(arg compression_png_level)"/>
+    <param name="image_raw_3/compressed/format"                     value="$(arg compression_format)"/>
+    <param name="image_raw_3/compressed/jpeg_quality"               value="$(arg compression_jpeg_quality)"/>
+    <param name="image_raw_3/compressed/jpeg_progressive"           value="$(arg compression_jpeg_progressive)"/>
+    <param name="image_raw_3/compressed/jpeg_optimize"              value="$(arg compression_jpeg_optimize)"/>
+    <param name="image_raw_3/compressed/jpeg_restart_interval"      value="$(arg compression_jpeg_restart_interval)"/>
+    <param name="image_raw_3/compressed/png_level"                  value="$(arg compression_png_level)"/>
     <!-- Camera 4 -->
-    <param name="image_4/compressed/format"                     value="$(arg compression_format)"/>
-    <param name="image_4/compressed/jpeg_quality"               value="$(arg compression_jpeg_quality)"/>
-    <param name="image_4/compressed/jpeg_progressive"           value="$(arg compression_jpeg_progressive)"/>
-    <param name="image_4/compressed/jpeg_optimize"              value="$(arg compression_jpeg_optimize)"/>
-    <param name="image_4/compressed/jpeg_restart_interval"      value="$(arg compression_jpeg_restart_interval)"/>
-    <param name="image_4/compressed/png_level"                  value="$(arg compression_png_level)"/>
+    <param name="image_raw_4/compressed/format"                     value="$(arg compression_format)"/>
+    <param name="image_raw_4/compressed/jpeg_quality"               value="$(arg compression_jpeg_quality)"/>
+    <param name="image_raw_4/compressed/jpeg_progressive"           value="$(arg compression_jpeg_progressive)"/>
+    <param name="image_raw_4/compressed/jpeg_optimize"              value="$(arg compression_jpeg_optimize)"/>
+    <param name="image_raw_4/compressed/jpeg_restart_interval"      value="$(arg compression_jpeg_restart_interval)"/>
+    <param name="image_raw_4/compressed/png_level"                  value="$(arg compression_png_level)"/>
     <!-- Camera 5 -->
-    <param name="image_5/compressed/format"                     value="$(arg compression_format)"/>
-    <param name="image_5/compressed/jpeg_quality"               value="$(arg compression_jpeg_quality)"/>
-    <param name="image_5/compressed/jpeg_progressive"           value="$(arg compression_jpeg_progressive)"/>
-    <param name="image_5/compressed/jpeg_optimize"              value="$(arg compression_jpeg_optimize)"/>
-    <param name="image_5/compressed/jpeg_restart_interval"      value="$(arg compression_jpeg_restart_interval)"/>
-    <param name="image_5/compressed/png_level"                  value="$(arg compression_png_level)"/>
+    <param name="image_raw_5/compressed/format"                     value="$(arg compression_format)"/>
+    <param name="image_raw_5/compressed/jpeg_quality"               value="$(arg compression_jpeg_quality)"/>
+    <param name="image_raw_5/compressed/jpeg_progressive"           value="$(arg compression_jpeg_progressive)"/>
+    <param name="image_raw_5/compressed/jpeg_optimize"              value="$(arg compression_jpeg_optimize)"/>
+    <param name="image_raw_5/compressed/jpeg_restart_interval"      value="$(arg compression_jpeg_restart_interval)"/>
+    <param name="image_raw_5/compressed/png_level"                  value="$(arg compression_png_level)"/>
     <!-- Camera 6 -->
-    <param name="image_6/compressed/format"                     value="$(arg compression_format)"/>
-    <param name="image_6/compressed/jpeg_quality"               value="$(arg compression_jpeg_quality)"/>
-    <param name="image_6/compressed/jpeg_progressive"           value="$(arg compression_jpeg_progressive)"/>
-    <param name="image_6/compressed/jpeg_optimize"              value="$(arg compression_jpeg_optimize)"/>
-    <param name="image_6/compressed/jpeg_restart_interval"      value="$(arg compression_jpeg_restart_interval)"/>
-    <param name="image_6/compressed/png_level"                  value="$(arg compression_png_level)"/>
-
+    <param name="image_raw_6/compressed/format"                     value="$(arg compression_format)"/>
+    <param name="image_raw_6/compressed/jpeg_quality"               value="$(arg compression_jpeg_quality)"/>
+    <param name="image_raw_6/compressed/jpeg_progressive"           value="$(arg compression_jpeg_progressive)"/>
+    <param name="image_raw_6/compressed/jpeg_optimize"              value="$(arg compression_jpeg_optimize)"/>
+    <param name="image_raw_6/compressed/jpeg_restart_interval"      value="$(arg compression_jpeg_restart_interval)"/>
+    <param name="image_raw_6/compressed/png_level"                  value="$(arg compression_png_level)"/>
 
   </node>
+
+  <!-- Prevent to compress data with image transport -->
+  <group if="$(eval (compression_jpeg_vimba) or (not (compression_jpeg_imageTransport)))">
+    <!-- Prevent image_raw_transport from exporting to jpeg using imageTransport-->
+    <rosparam ns="/multi_camera/image_raw_0" param="disable_pub_plugins" >
+      - 'image_transport/compressed'
+      - 'image_transport/compressedDepth'
+    </rosparam>
+    <rosparam ns="/multi_camera/image_raw_1" param="disable_pub_plugins" >
+      - 'image_transport/compressed'
+      - 'image_transport/compressedDepth'
+    </rosparam>
+    <rosparam ns="/multi_camera/image_raw_2" param="disable_pub_plugins" >
+      - 'image_transport/compressed'
+      - 'image_transport/compressedDepth'
+    </rosparam>
+    <rosparam ns="/multi_camera/image_raw_3" param="disable_pub_plugins" >
+      - 'image_transport/compressed'
+      - 'image_transport/compressedDepth'
+    </rosparam>
+    <rosparam ns="/multi_camera/image_raw_4" param="disable_pub_plugins" >
+      - 'image_transport/compressed'
+      - 'image_transport/compressedDepth'
+    </rosparam>
+    <rosparam ns="/multi_camera/image_raw_5" param="disable_pub_plugins" >
+      - 'image_transport/compressed'
+      - 'image_transport/compressedDepth'
+    </rosparam>
+    <rosparam ns="/multi_camera/image_raw_6" param="disable_pub_plugins" >
+      - 'image_transport/compressed'
+      - 'image_transport/compressedDepth'
+    </rosparam>
+  </group>
+
 </launch>
 
