@@ -241,18 +241,20 @@ namespace avt_vimba_camera
     }
     uint8_t MultiCamera::calculateColorIntensity(cv::Mat &img)
     {
+        ROS_INFO("-----IN 1");
         bool sumRGB = false;
         int colorId = 0;
         if (colorIntensityRGB_ == "R" || colorIntensityRGB_ == "r") colorId = 0;
         if (colorIntensityRGB_ == "G" || colorIntensityRGB_ == "g") colorId = 1;
         if (colorIntensityRGB_ == "B" || colorIntensityRGB_ == "b") colorId = 2;
         else sumRGB=true;
-
+        ROS_INFO("-----IN 2");
         int count = 0;
         int sum = 0;
         cv::Vec3b vecRGB;
         if (sumRGB)
         {
+            ROS_INFO("-----IN 3");
             for (int row = 0 ; row < img.rows; ++colorIntensityPxSteps_)
             {
                 for (int col = 0 ; col < img.cols; ++colorIntensityPxSteps_)
@@ -266,6 +268,7 @@ namespace avt_vimba_camera
         }
         else
         {
+            ROS_INFO("-----IN 4");
             for (int row = 0 ; row < img.rows; ++colorIntensityPxSteps_)
             {
                 for (int col = 0 ; col < img.cols; ++colorIntensityPxSteps_)
@@ -275,16 +278,9 @@ namespace avt_vimba_camera
                 }
             }
         }
-
+        ROS_INFO("-----IN 5");
         uint8_t colorIntensity = 255;
-        try
-        {
-            colorIntensity = (uint8_t)sum/count;
-        }
-        catch (const std::exception& e)
-        {
-            ROS_ERROR_STREAM("ColorIntensity not found : " << e.what());
-        }
+        colorIntensity = (uint8_t)sum/count;
         return colorIntensity;
     }
 
