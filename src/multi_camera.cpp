@@ -247,18 +247,19 @@ namespace avt_vimba_camera
         if (colorIntensityRGB_ == "R" || colorIntensityRGB_ == "r") colorId = 0;
         if (colorIntensityRGB_ == "G" || colorIntensityRGB_ == "g") colorId = 1;
         if (colorIntensityRGB_ == "B" || colorIntensityRGB_ == "b") colorId = 2;
-        else sumRGB=true;
+        else sumRGB=false;
         ROS_INFO("-----IN 2");
         int count = 0;
         int sum = 0;
         cv::Vec3b vecRGB;
         ROS_INFO("-----steps  %d",colorIntensityPxSteps_);
+        int step
         if (sumRGB)
         {
             ROS_INFO("-----IN 3");
-            for (int row = 0 ; row < img.rows; ++colorIntensityPxSteps_)
+            for (int row = 0 ; row < img.rows; row +=  colorIntensityPxSteps_)
             {
-                for (int col = 0 ; col < img.cols; ++colorIntensityPxSteps_)
+                for (int col = 0 ; col < img.cols; col +=  colorIntensityPxSteps_)
                 {
                     vecRGB = img.at<cv::Vec3b>(row,col);
                     sum += (vecRGB[0]+vecRGB[2]+vecRGB[1]);
@@ -271,9 +272,9 @@ namespace avt_vimba_camera
         else
         {
             ROS_INFO("-----IN 4");
-            for (int row = 0 ; row < img.rows; ++colorIntensityPxSteps_)
+            for (int row = 0 ; row < img.rows; row +=  colorIntensityPxSteps_)
             {
-                for (int col = 0 ; col < img.cols; ++colorIntensityPxSteps_)
+                for (int col = 0 ; col < img.cols; col +=  colorIntensityPxSteps_)
                 {
                     sum += img.at<cv::Vec3b>(row,col)[colorId];
                     count++;
