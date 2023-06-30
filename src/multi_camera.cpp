@@ -119,12 +119,13 @@ namespace avt_vimba_camera
                         try
                         {
                             colorIntensityMsg.data = calculateColorIntensity(cv_ptr->image);
+                            ROS_INFO("-----Color intensity %d ", colorIntensityMsg.data);
                         }
                         catch (std::exception &e)
                         {
                             ROS_INFO("-----Could not calculate color intensity cam %d because %s", camId, e.what());
                         }
-                        colorPub_[camId].publish(colorIntensityMsg);
+                        //colorPub_[camId].publish(colorIntensityMsg);
                     }
 
                     if (compressJPG_)
