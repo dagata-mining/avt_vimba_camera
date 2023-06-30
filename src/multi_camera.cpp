@@ -81,6 +81,7 @@ namespace avt_vimba_camera
     void MultiCamera::frameCallback(const FramePtr& vimba_frame_ptr, const int camId)
     {
         ROS_INFO("-------------FRAME %d", camId);
+        ROS_INFO("-------------FRAMING %d", camId);
         ros::Time ros_time = ros::Time::now();
         if (pub_[camId].getNumSubscribers() > 0)
         {
@@ -104,10 +105,10 @@ namespace avt_vimba_camera
                 }
 
                 img.header.stamp = ci.header.stamp;
-                cv_bridge::CvImagePtr cv_ptr;
 
                 if (compressJPG_ || calculateColorIntensity_)
                 {
+                    cv_bridge::CvImagePtr cv_ptr;
                     ROS_INFO("-------------IN 1");
                     cv_ptr = cv_bridge::toCvCopy(img, sensor_msgs::image_encodings::RGB8);
                     ROS_INFO("-------------IN 2");
@@ -133,6 +134,7 @@ namespace avt_vimba_camera
                     }
                     else
                     {
+                        ROS_INFO("-------------IN 5");
                         pub_[camId].publish(img, ci);
                     }
                 }
