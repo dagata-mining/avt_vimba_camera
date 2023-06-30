@@ -109,12 +109,21 @@ namespace avt_vimba_camera
                 if (compressJPG_ || calculateColorIntensity_)
                 {
                     cv_bridge::CvImagePtr cv_ptr;
+
                     cv_ptr = cv_bridge::toCvCopy(img, sensor_msgs::image_encodings::RGB8);
 
                     if (calculateColorIntensity_)
                     {
                         std_msgs::UInt8 colorIntensityMsg;
-                        colorIntensityMsg.data = calculateColorIntensity(cv_ptr->image);
+                        colorIntensityMsg.data = 0;
+                        try
+                        {
+                            colorIntensityMsg.data = calculateColorIntensity(cv_ptr->image);
+                        }
+                        catch (std::exception &e)
+                        {
+                            ROS_INFO("-----Could not calculate color intensity cam %d because %s", camId, e.what());
+                        }
                         colorPub_[camId].publish(colorIntensityMsg);
                     }
 
