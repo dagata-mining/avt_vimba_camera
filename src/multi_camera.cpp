@@ -135,7 +135,6 @@ namespace avt_vimba_camera
                         compression_params.push_back(cv::IMWRITE_JPEG_QUALITY);  // You can use other parameters like PNG compression
                         compression_params.push_back(qualityJPG_);  // Set the desired image quality (0-100)
                         cv::imencode(".jpg", cv_ptr->image, img.data, compression_params);
-
                         img.encoding = "jpg";
                         pub_[camId].publish(img, ci);
                     }
@@ -244,9 +243,9 @@ namespace avt_vimba_camera
         bool sumRGB = false;
         int colorId = 0;
         if (colorIntensityRGB_ == "R" || colorIntensityRGB_ == "r") colorId = 0;
-        if (colorIntensityRGB_ == "G" || colorIntensityRGB_ == "g") colorId = 1;
-        if (colorIntensityRGB_ == "B" || colorIntensityRGB_ == "b") colorId = 2;
-        else sumRGB=false;
+        else if (colorIntensityRGB_ == "G" || colorIntensityRGB_ == "g") colorId = 1;
+        else if (colorIntensityRGB_ == "B" || colorIntensityRGB_ == "b") colorId = 2;
+        else sumRGB=true;
 
         int count = 0;
         int sum = 0;
@@ -254,7 +253,6 @@ namespace avt_vimba_camera
 
         if (sumRGB)
         {
-            ROS_INFO("-----IN 3");
             for (int row = 0 ; row < img.rows; row +=  colorIntensityPxSteps_)
             {
                 for (int col = 0 ; col < img.cols; col +=  colorIntensityPxSteps_)
@@ -268,7 +266,6 @@ namespace avt_vimba_camera
         }
         else
         {
-            ROS_INFO("-----IN 4");
             for (int row = 0 ; row < img.rows; row +=  colorIntensityPxSteps_)
             {
                 for (int col = 0 ; col < img.cols; col +=  colorIntensityPxSteps_)
@@ -278,9 +275,7 @@ namespace avt_vimba_camera
                 }
             }
         }
-        ROS_INFO("-----IN 5");
-        uint8_t colorIntensity = 255;
-        colorIntensity = (uint8_t)(sum/count);
+        uint8_t colorIntensity = (uint8_t)(sum/count);
         return colorIntensity;
     }
 
