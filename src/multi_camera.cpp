@@ -58,8 +58,6 @@ namespace avt_vimba_camera
                     new camera_info_manager::CameraInfoManager(nhp_, name_[i], camera_info_url_[i]));
         }
 
-
-
         // Start dynamic_reconfigur & run configure()
         reconfigure_server_.setCallback(
                 std::bind(&avt_vimba_camera::MultiCamera::configure, this, std::placeholders::_1, std::placeholders::_2));
@@ -81,7 +79,6 @@ namespace avt_vimba_camera
     void MultiCamera::frameCallback(const FramePtr& vimba_frame_ptr, const int camId)
     {
         ROS_INFO("-------------FRAME %d", camId);
-        ROS_INFO("-------------FRAMING %d", camId);
         ros::Time ros_time = ros::Time::now();
         if (pub_[camId].getNumSubscribers() >= 0)
         {
@@ -119,7 +116,6 @@ namespace avt_vimba_camera
                         try
                         {
                             colorIntensityMsg.data = calculateColorIntensity(cv_ptr->image);
-                            ROS_INFO("-----Color intensity %d ", colorIntensityMsg.data);
                         }
                         catch (std::exception &e)
                         {
