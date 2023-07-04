@@ -7,7 +7,7 @@ The driver relies on libraries provided by AVT as part of their [Vimba SDK](http
 
 ___
 ## This is the Pointlaz modified version
-Last modification 2023-04-07 by CASL and Antoine Gruet.
+ Last modification 2023-04-07 by CASL and Antoine Gruet.
 ### How to update this version
 Since the PointLaz modifications are contained on a branch, it is possible to isolate the modifications from the update.
 - While working on this fork, start by checking out on the master branch

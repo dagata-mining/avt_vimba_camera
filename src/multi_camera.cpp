@@ -15,6 +15,13 @@ namespace avt_vimba_camera
         // Set the params
 
         nhp_.param("camera_qty", camQty_,1);
+        nhp_.param("compress_jpeg_vimba", compressJPG_,true);
+        std::string topicName = "image_raw_";
+        nhp_.param("compress_jpeg_quality", qualityJPG_,90);
+        nhp_.param("calculate_color_intensity", calculateColorIntensity_,true);
+        nhp_.param("color_intensity_pixel_steps", colorIntensityPxSteps_,10);
+        nhp_.param("color_intensity_RGB", colorIntensityRGB_);
+
         guid_.resize(camQty_);
         pub_.resize(camQty_);
         camera_info_url_.resize(camQty_);
@@ -22,10 +29,17 @@ namespace avt_vimba_camera
         cam_.resize(camQty_);
         name_.resize(camQty_);
         info_man_.resize(camQty_);
+        if (calculateColorIntensity_) colorPub_.resize(camQty_);
+
 
         for (int i = 0 ; i < camQty_; i++)
         {
-            pub_[i] = it_.advertiseCamera("image_raw_"+std::to_string(i), 1);
+            pub_[i] = it_.advertiseCamera(topicName+std::to_string(i), 1);
+            if (calculateColorIntensity_)
+            {
+                ROS_INFO("-------------Color Intensity");
+                colorPub_[i] = nh_.advertise<std_msgs::UInt8>("/multi_camera/color_intensity_"+std::to_string(i),1);
+            }
             nhp_.param("guid_"+std::to_string(i), guid_[i], std::string(""));
             nhp_.param("camera_info_url_"+std::to_string(i), camera_info_url_[i], std::string(""));
             nhp_.param("frame_id_"+std::to_string(i), frame_id_[i], std::string(""));
@@ -43,8 +57,6 @@ namespace avt_vimba_camera
             info_man_[i] = std::shared_ptr<camera_info_manager::CameraInfoManager>(
                     new camera_info_manager::CameraInfoManager(nhp_, name_[i], camera_info_url_[i]));
         }
-
-
 
         // Start dynamic_reconfigur & run configure()
         reconfigure_server_.setCallback(
@@ -68,9 +80,11 @@ namespace avt_vimba_camera
     {
         ROS_INFO("-------------FRAME %d", camId);
         ros::Time ros_time = ros::Time::now();
-        if (pub_[camId].getNumSubscribers() > 0)
+        if (pub_[camId].getNumSubscribers() >= 0)
         {
             sensor_msgs::Image img;
+            sensor_msgs::CompressedImage compressed;
+
             if (api_.frameToImage(vimba_frame_ptr, img))
             {
                 sensor_msgs::CameraInfo ci = info_man_[camId]->getCameraInfo();
@@ -86,9 +100,49 @@ namespace avt_vimba_camera
                 {
                     ci.header.stamp = ros_time;
                 }
-                img.header.frame_id = ci.header.frame_id;
+
                 img.header.stamp = ci.header.stamp;
-                pub_[camId].publish(img, ci);
+
+                if (compressJPG_ || calculateColorIntensity_)
+                {
+                    cv_bridge::CvImagePtr cv_ptr;
+
+                    cv_ptr = cv_bridge::toCvCopy(img, sensor_msgs::image_encodings::RGB8);
+
+                    if (calculateColorIntensity_)
+                    {
+                        std_msgs::UInt8 colorIntensityMsg;
+                        colorIntensityMsg.data = 0;
+                        try
+                        {
+                            colorIntensityMsg.data = calculateColorIntensity(cv_ptr->image);
+                        }
+                        catch (std::exception &e)
+                        {
+                            ROS_INFO("-----Could not calculate color intensity cam %d because %s", camId, e.what());
+                        }
+                        //colorPub_[camId].publish(colorIntensityMsg);
+                    }
+
+                    if (compressJPG_)
+                    {
+                        // Compress the image using OpenCV
+                        std::vector<int> compression_params;
+                        compression_params.push_back(cv::IMWRITE_JPEG_QUALITY);  // You can use other parameters like PNG compression
+                        compression_params.push_back(qualityJPG_);  // Set the desired image quality (0-100)
+                        cv::imencode(".jpg", cv_ptr->image, img.data, compression_params);
+                        img.encoding = "jpg";
+                        pub_[camId].publish(img, ci);
+                    }
+                    else
+                    {
+                        pub_[camId].publish(img, ci);
+                    }
+                }
+                else
+                {
+                    pub_[camId].publish(img, ci);
+                }
             }
             else
             {
@@ -180,6 +234,45 @@ namespace avt_vimba_camera
         // push the changes to manager
         info_man_[camId]->setCameraInfo(ci);
     }
+    uint8_t MultiCamera::calculateColorIntensity(cv::Mat &img)
+    {
+        bool sumRGB = false;
+        int colorId = 0;
+        if (colorIntensityRGB_ == "R" || colorIntensityRGB_ == "r") colorId = 0;
+        else if (colorIntensityRGB_ == "G" || colorIntensityRGB_ == "g") colorId = 1;
+        else if (colorIntensityRGB_ == "B" || colorIntensityRGB_ == "b") colorId = 2;
+        else sumRGB=true;
 
+        int count = 0;
+        int sum = 0;
+        cv::Vec3b vecRGB;
+
+        if (sumRGB)
+        {
+            for (int row = 0 ; row < img.rows; row +=  colorIntensityPxSteps_)
+            {
+                for (int col = 0 ; col < img.cols; col +=  colorIntensityPxSteps_)
+                {
+                    vecRGB = img.at<cv::Vec3b>(row,col);
+                    sum += (vecRGB[0]+vecRGB[2]+vecRGB[1]);
+                    count++;
+                }
+            }
+            count *=3;
+        }
+        else
+        {
+            for (int row = 0 ; row < img.rows; row +=  colorIntensityPxSteps_)
+            {
+                for (int col = 0 ; col < img.cols; col +=  colorIntensityPxSteps_)
+                {
+                    sum += img.at<cv::Vec3b>(row,col)[colorId];
+                    count++;
+                }
+            }
+        }
+        uint8_t colorIntensity = (uint8_t)(sum/count);
+        return colorIntensity;
+    }
 
 };  // namespace avt_vimba_camera

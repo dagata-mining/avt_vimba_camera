@@ -9,10 +9,14 @@
 
 #include <ros/ros.h>
 #include <sensor_msgs/Image.h>
+#include <sensor_msgs/CompressedImage.h>
 #include <sensor_msgs/CameraInfo.h>
+#include <std_msgs/UInt8.h>
 #include <camera_info_manager/camera_info_manager.h>
 #include <image_transport/image_transport.h>
 #include <dynamic_reconfigure/server.h>
+#include <cv_bridge/cv_bridge.h>
+#include <opencv2/opencv.hpp>
 
 #include <string>
 
@@ -45,8 +49,20 @@ namespace avt_vimba_camera
         int action_group_key_;
         int action_group_mask_;
 
+        //Compressing
+        bool compressJPG_;
+        int qualityJPG_;
+
+        //Calculating color intensity
+        bool calculateColorIntensity_;
+        std::string colorIntensityRGB_;
+        int colorIntensityPxSteps_;
+        uint8_t calculateColorIntensity(cv::Mat &img);
+
+
         image_transport::ImageTransport it_;
         std::vector<image_transport::CameraPublisher> pub_;
+        std::vector<ros::Publisher> colorPub_;
 
         std::vector<std::shared_ptr<camera_info_manager::CameraInfoManager>> info_man_;
 
