@@ -946,7 +946,7 @@ void AvtVimbaCamera::updateExposureConfig(Config& config)
 
   if (config.exposure != config_.exposure || on_init_)
   {
-    configureFeature("ExposureTimeAbs", static_cast<float>(config.exposure), config.exposure);
+    configureFeature("ExposureTime", static_cast<float>(config.exposure), config.exposure);
   }
   if (config.exposure_auto != config_.exposure_auto || on_init_)
   {
