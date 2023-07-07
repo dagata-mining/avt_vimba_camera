@@ -55,22 +55,30 @@ Even if multiple launch exist in */RosScan/Projects/avt_vimba_camera/launch*. On
 - **multi_camera_node.launch**: To operate multiple Vimba cameras using ROS.
 - **mono_camera.launch**: To operate one Vimba camera using ROS.
 
-#### Cameras ID configuration in **multi_camera_node.launch**
-You will have to configure the ID of your cameras in the launch files. Without this configuration, the node will not be able to find and operate your camera:
-1. Plug your cameras into you computer using the USB ports.
-2. Open **multi_camera_node.launch**, and enter your number of cameras in **default** field of **camera_qty** (line 10):
+#### Cameras IDs configuration for **multi_camera_node.launch**
+You will have to configure the IDs of your cameras in the **cameras_ids.yaml** config file specific for your system. Without this configuration, the node will not be able to find and operate your cameras:
+1. In **config** directory, create a copy of **cameras_ids_example.yaml**, named **cameras_ids.yaml**.
+2. Plug your cameras into you computer using the USB ports.
+3. Open **cameras_ids.yaml**, and change the **0** by your number of cameras in:
 ```
-    <arg name="camera_qty"                default="7" />
+camera_qty: 0
 ```
-3. Open the **Vimba Viewer** by double-clicking the link on your desktop.
-4. You should see all your cameras under **Detected Cameras**.
-5. Click once on your first camera. Wait for a new window to open.
-6. In the new window, go to the black window at the bottom, and copy the **ID** (it must look like DEV_XXXXXXXXXXXX).
-7. Paste this **ID** in **multi_camera_node.launch**, in the **default** field of **guid_0** arg (line 12):
+4. Open the **Vimba Viewer** by double-clicking the link on your desktop. 
+5. You should see all your cameras under **Detected Cameras**. 
+6. Click once on your first camera. Wait for a new window to open. 
+7. In the new window, go to the black window at the bottom, and copy the **ID** (it must look like DEV_XXXXXXXXXXXX). 
+8. Paste this **ID** to replace "DEV_XXXXXXXXXXXX" in **cameras_ids.yaml**, for **guid_0**:
 ```
-    <arg name="guid_0"                    default="DEV_XXXXXXXXXXXX"/>
+guid_0: "DEV_XXXXXXXXXXXX"
 ```
-8. Repeat step 5. to 7. for each one of your cameras, to fill **guid_1**, **guid_2** and so on.
+9. Repeat step 6. to 8. for each one of your cameras, to fill **guid_1**, **guid_2** and so on.
+
+The **cameras_ids.yaml** will be called in **multi_camera_node.launch** using the lines:
+```
+<arg name="cameras_ids_config_file"   default="$(find avt_vimba_camera)/config/cameras_ids.yaml" />    
+    ...
+    <rosparam command="load" file="$(arg cameras_ids_config_file)" />
+```
 
 *NOTE: If you have less than 7 cameras, do not bother with the arguments you don't need, the node will only use the one needed, depending on the value of **camera_qty**.*
 
@@ -90,6 +98,7 @@ You may not need to tune them as they are already set to work with our Scanner c
 - **pixel_format**: To choose the type of compression you want to use.
 - **stream_bytes_per_second**: To choose the bandwidth allowed to the camera.
 - **width** and **height**: To choose the size of the images (in number of pixels).
+- **exposure**: To set the ExposureTime of your cameras.
 - **compression_format**: To choose the type of image compression you want to use (jpeg or png).
 - **compression_jpeg_quality**: To choose the quality of jpeg compression you want to use.
 

@@ -6,8 +6,8 @@
   <!-- multi_camera_node parameters, these parameters define the cameras parameters -->
   <!-- Change these parameters using the quantity and ID of your cameras -->
 
-  <!-- Quantity of cameras -->
-  <arg name="camera_qty"                default="7" />
+  <!-- Cameras IDs config file -->
+  <arg name="cameras_ids_config_file"   default="$(find avt_vimba_camera)/config/cameras_ids.yaml" />
   <!-- Camera 0 -->
   <arg name="guid_0"                    default="DEV_1AB22C00D5C3"/>
   <arg name="name_0"                    default="camera_0"/>
@@ -131,40 +131,33 @@
 
   <!-- Run the multi_camera_node -->
   <node name="multi_camera" pkg="avt_vimba_camera" type="multi_camera_node" output="screen">
-    <!-- Quantity of cameras -->
-    <param name="camera_qty"                value="$(arg camera_qty)" />
+    <!-- Cameras IDs config file -->
+    <rosparam command="load"                file="$(arg cameras_ids_config_file)" />
     <!-- Camera 0 -->
-    <param name="guid_0"                    value="$(arg guid_0)"/>
     <param name="name_0"                    value="$(arg name_0)"/>
     <param name="frame_id_0"                value="$(arg frame_id_0)"/>
     <param name="camera_info_url_0"         value="$(arg camera_info_url_0)"/>
     <!-- Camera 1 -->
-    <param name="guid_1"                    value="$(arg guid_1)"/>
     <param name="name_1"                    value="$(arg name_1)"/>
     <param name="frame_id_1"                value="$(arg frame_id_1)"/>
     <param name="camera_info_url_1"         value="$(arg camera_info_url_1)"/>
     <!-- Camera 2 -->
-    <param name="guid_2"                    value="$(arg guid_2)"/>
     <param name="name_2"                    value="$(arg name_2)"/>
     <param name="frame_id_2"                value="$(arg frame_id_2)"/>
     <param name="camera_info_url_2"         value="$(arg camera_info_url_2)"/>
     <!-- Camera 3 -->
-    <param name="guid_3"                    value="$(arg guid_3)"/>
     <param name="name_3"                    value="$(arg name_3)"/>
     <param name="frame_id_3"                value="$(arg frame_id_3)"/>
     <param name="camera_info_url_3"         value="$(arg camera_info_url_3)"/>
     <!-- Camera 4 -->
-    <param name="guid_4"                    value="$(arg guid_4)"/>
     <param name="name_4"                    value="$(arg name_4)"/>
     <param name="frame_id_4"                value="$(arg frame_id_4)"/>
     <param name="camera_info_url_4"         value="$(arg camera_info_url_4)"/>
     <!-- Camera 5 -->
-    <param name="guid_5"                    value="$(arg guid_5)"/>
     <param name="name_5"                    value="$(arg name_5)"/>
     <param name="frame_id_5"                value="$(arg frame_id_5)"/>
     <param name="camera_info_url_5"         value="$(arg camera_info_url_5)"/>
     <!-- Camera 6 -->
-    <param name="guid_6"                    value="$(arg guid_6)"/>
     <param name="name_6"                    value="$(arg name_6)"/>
     <param name="frame_id_6"                value="$(arg frame_id_6)"/>
     <param name="camera_info_url_6"         value="$(arg camera_info_url_6)"/>

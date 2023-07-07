@@ -30,4 +30,7 @@ src/*/CMakeFiles/
 .tags*
 */.tags*
 
+# cameras_ids
+config/cameras_ids.yaml
+
 
