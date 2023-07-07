@@ -944,7 +944,7 @@ void AvtVimbaCamera::updateExposureConfig(Config& config)
     ROS_INFO("Updating Exposure config:");
   }
 
-  if (config.exposure != config_.exposure || on_init_)
+  if (on_init_)
   {
     configureFeature("ExposureTime", static_cast<float>(config.exposure), config.exposure);
   }
@@ -999,6 +999,11 @@ void AvtVimbaCamera::updateExposureConfig(Config& config)
   if (config.exposure_threshold_PWL1 != config_.exposure_threshold_PWL1 || on_init_) {
       configureFeature("ThresholdPWL1",
                       static_cast<VmbInt64_t>(config.exposure_threshold_PWL1), config.exposure_threshold_PWL1);
+  }
+
+  if (config.exposure != config_.exposure)
+  {
+      configureFeature("ExposureTime", static_cast<float>(config.exposure), config.exposure);
   }
 }
 

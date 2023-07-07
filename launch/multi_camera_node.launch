@@ -109,8 +109,8 @@
   <arg name="line_selector"             default="Line0"/>
   <arg name="line_mode"                 default="Input"/>
   <!-- Compression parameters -->       <!-- See parameters description at http://wiki.ros.org/compressed_image_transport -->
-  <arg name="compression_jpeg_vimba"                   default="false"/>
-  <arg name="compression_jpeg_imageTransport"          default="true"/>
+  <arg name="compression_jpeg_vimba"                   default="true"/>
+  <arg name="compression_jpeg_imageTransport"          default="false"/>
 
   <arg name="compression_format"                    default="jpeg"/>
   <arg name="compression_jpeg_quality"              default="99"/>
