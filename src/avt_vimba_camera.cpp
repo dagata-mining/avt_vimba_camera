@@ -1054,7 +1054,7 @@ void AvtVimbaCamera::updateGainConfig(Config& config)
     ROS_INFO("Updating Gain config:");
   }
 
-  if (config.gain != config_.gain || on_init_)
+  if (on_init_)
   {
     configureFeature("Gain", static_cast<float>(config.gain), config.gain);
   }
@@ -1086,6 +1086,10 @@ void AvtVimbaCamera::updateGainConfig(Config& config)
   if (config.gain_auto_target != config_.gain_auto_target || on_init_)
   {
     configureFeature("GainAutoTarget", static_cast<VmbInt64_t>(config.gain_auto_target), config.gain_auto_target);
+  }
+  if (config.gain != config_.gain)
+  {
+      configureFeature("Gain", static_cast<float>(config.gain), config.gain);
   }
 }
 
