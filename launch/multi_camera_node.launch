@@ -106,7 +106,7 @@
   <arg name="compression_jpeg_imageTransport"          default="false"/>
 
   <arg name="compression_format"                    default="jpeg"/>
-  <arg name="compression_jpeg_quality"              default="99"/>
+  <arg name="compression_jpeg_quality"              default="90"/>
   <arg name="compression_jpeg_progressive"          default="false"/>
   <arg name="compression_jpeg_optimize"             default="false"/>
   <arg name="compression_jpeg_restart_interval"     default="0"/>
