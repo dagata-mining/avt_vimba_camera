@@ -70,13 +70,12 @@ AvtVimbaCamera::AvtVimbaCamera() : AvtVimbaCamera(ros::this_node::getName().c_st
 AvtVimbaCamera::AvtVimbaCamera(const std::string& name, const int camId)        // Modified by pointlax (camId added)
 {
   // Init global variables
-  std::unique_lock<std::mutex> lock(config_mutex_);
   opened_ = false;     // camera connected to the api
   streaming_ = false;  // capturing frames
   on_init_ = true;     // on initialization phase
   name_ = name;
   camId_ = camId;       // Added by pointlaz
-
+  initialized_ = true;
   camera_state_ = OPENING;
 
   //updater_.setHardwareID("unknown");

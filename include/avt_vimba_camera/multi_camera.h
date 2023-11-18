@@ -53,6 +53,8 @@ namespace avt_vimba_camera
         bool compressJPG_;
         int qualityJPG_;
 
+
+
         //Calculating color intensity
         bool calculateColorIntensity_;
         std::string colorIntensityRGB_;

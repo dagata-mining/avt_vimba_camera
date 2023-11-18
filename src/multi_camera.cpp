@@ -89,6 +89,8 @@ namespace avt_vimba_camera
         {
             try
             {
+                if (!cam_[i]->configured_ && !cam_[i]->initialized_)
+                    continue;
                 cam_[i]->startImaging();
                 cam_[i]->setCallback(std::bind(&avt_vimba_camera::MultiCamera::frameCallback,
                                                this,
@@ -242,6 +244,10 @@ namespace avt_vimba_camera
  **/
     void MultiCamera::configure(Config& newconfig, uint32_t level)
     {
+        for (int i = 0 ; i < cam_.size();i++)
+        {
+            if (!cam_[i]->initialized_) return;
+        }
         ROS_WARN_STREAM("-------------Configure");
         for (int i = 0 ; i < cam_.size();i++)
         {
@@ -260,6 +266,7 @@ namespace avt_vimba_camera
                     cam_[i]->updateConfig(config);
 //                    updateCameraInfo(config,i);
                     ROS_WARN_STREAM("------------- CONFIGURED");
+                    cam_[i]->configured_=true;
                 }
 
 //                else
