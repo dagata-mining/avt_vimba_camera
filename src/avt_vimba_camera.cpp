@@ -151,9 +151,6 @@ void AvtVimbaCamera::start(const std::string& ip_str, const std::string& guid_st
     runCommand("GVSPAdjustPacketSize");
   }
 
-  int throughput;
-  configureFeature("DeviceLinkThroughputLimit", static_cast<VmbInt64_t>(50000000),throughput);
-  ROS_INFO("------------DeviceThroughput Setted to %i", throughput);
 
   // Create a frame observer for this camera
   SP_SET(frame_obs_ptr_,
@@ -284,6 +281,9 @@ CameraPtr AvtVimbaCamera::openCamera(const std::string& id_str, bool print_all_f
       return camera;
     }
   }
+    int throughput;
+    configureFeature("DeviceLinkThroughputLimit", static_cast<VmbInt64_t>(50000000),throughput);
+    ROS_INFO("------------DeviceThroughput Setted to %i", throughput);
 
   // set previous handler back
   signal(SIGINT, oldHandler);

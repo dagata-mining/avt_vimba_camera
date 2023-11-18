@@ -21,12 +21,12 @@ namespace avt_vimba_camera
 
         // Set the params
 
-        nhp_.param("camera_qty", camQty_,1);
-        nhp_.param("compress_jpeg_vimba", compressJPG_,true);
+        nhp_.param("camera_qty", camQty_, 1);
+        nhp_.param("compress_jpeg_vimba", compressJPG_, true);
         std::string topicName = "image_raw_";
-        nhp_.param("compress_jpeg_quality", qualityJPG_,90);
-        nhp_.param("calculate_color_intensity", calculateColorIntensity_,true);
-        nhp_.param("color_intensity_pixel_steps", colorIntensityPxSteps_,10);
+        nhp_.param("compress_jpeg_quality", qualityJPG_, 90);
+        nhp_.param("calculate_color_intensity", calculateColorIntensity_, true);
+        nhp_.param("color_intensity_pixel_steps", colorIntensityPxSteps_, 10);
         nhp_.param("color_intensity_RGB", colorIntensityRGB_);
 
         guid_.resize(camQty_);
@@ -36,52 +36,36 @@ namespace avt_vimba_camera
         cam_.resize(camQty_);
         name_.resize(camQty_);
         info_man_.resize(camQty_);
-        if (calculateColorIntensity_) colorPub_.resize(camQty_);
+        if (calculateColorIntensity_)
+            colorPub_.resize(camQty_);
 
-
-        for (int i = 0 ; i < camQty_; i++)
+        for (int i = 0; i < camQty_; i++)
         {
-            pub_[i] = it_.advertiseCamera(topicName+std::to_string(i), 1);
+            pub_[i] = it_.advertiseCamera(topicName + std::to_string(i), 1);
             if (calculateColorIntensity_)
             {
                 ROS_INFO("-------------Color Intensity");
-                colorPub_[i] = nh_.advertise<std_msgs::UInt8>("/multi_camera/color_intensity_"+std::to_string(i),1);
+                colorPub_[i] = nh_.advertise<std_msgs::UInt8>("/multi_camera/color_intensity_" + std::to_string(i), 1);
             }
-            nhp_.param("guid_"+std::to_string(i), guid_[i], std::string(""));
-            nhp_.param("camera_info_url_"+std::to_string(i), camera_info_url_[i], std::string(""));
-            nhp_.param("frame_id_"+std::to_string(i), frame_id_[i], std::string(""));
-            nhp_.param("name_"+std::to_string(i), name_[i], std::string(""));
+            nhp_.param("guid_" + std::to_string(i), guid_[i], std::string(""));
+            nhp_.param("camera_info_url_" + std::to_string(i), camera_info_url_[i], std::string(""));
+            nhp_.param("frame_id_" + std::to_string(i), frame_id_[i], std::string(""));
+            nhp_.param("name_" + std::to_string(i), name_[i], std::string(""));
             nhp_.param("print_all_features", print_all_features_, false);
             nhp_.param("use_measurement_time", use_measurement_time_, false);
             nhp_.param("ptp_offset", ptp_offset_, 0);
-
-
 
             try
             {
                 std::shared_ptr<AvtVimbaCamera>
                     cam = std::shared_ptr<AvtVimbaCamera>(new AvtVimbaCamera(frame_id_[i], i));
                 cam_[i] = cam;
-                cam_[i]->setCallback(std::bind(&avt_vimba_camera::MultiCamera::frameCallback,
-                                               this,
-                                               std::placeholders::_1,
-                                               i));
             }
             catch (std::exception &e)
             {
-                ROS_ERROR("Initializing cam %d error because %s",i, e.what());
+                ROS_ERROR("Creating cam %d error because %s", i, e.what());
             }
 
-            // Set camera info manager
-            try
-            {
-                info_man_[i] = std::shared_ptr<camera_info_manager::CameraInfoManager>(
-                    new camera_info_manager::CameraInfoManager(nhp_, name_[i], camera_info_url_[i]));
-            }
-            catch (std::exception &e)
-            {
-                ROS_ERROR("Publishing error cam %d error because %s",i, e.what());
-            }
         }
 
         // Start dynamic_reconfigur & run configure()
@@ -97,6 +81,33 @@ namespace avt_vimba_camera
         {
             ROS_ERROR("Reconfiguring error because %s", e.what());
         }
+
+        for (int i = 0; i < camQty_; i++)
+        {
+            try
+            {
+                cam_[i]->setCallback(std::bind(&avt_vimba_camera::MultiCamera::frameCallback,
+                                               this,
+                                               std::placeholders::_1,
+                                               i));
+            }
+            catch (std::exception &e)
+            {
+                ROS_ERROR("Set call backe cam %d error because %s", i, e.what());
+            }
+
+            // Set camera info manager
+            try
+            {
+                info_man_[i] = std::shared_ptr<camera_info_manager::CameraInfoManager>(
+                    new camera_info_manager::CameraInfoManager(nhp_, name_[i], camera_info_url_[i]));
+            }
+            catch (std::exception &e)
+            {
+                ROS_ERROR("Publishing error cam %d error because %s", i, e.what());
+            }
+        }
+
     }
 
     MultiCamera::~MultiCamera(void)
@@ -143,7 +154,6 @@ namespace avt_vimba_camera
         {
             sensor_msgs::Image img;
             sensor_msgs::CompressedImage compressed;
-
             if (api_.frameToImage(vimba_frame_ptr, img))
             {
                 sensor_msgs::CameraInfo ci = info_man_[camId]->getCameraInfo();
