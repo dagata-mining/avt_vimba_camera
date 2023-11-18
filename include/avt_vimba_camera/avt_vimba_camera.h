@@ -103,6 +103,11 @@ public:
 
   int getCamId(){return camId_;}            // Created by pointlaz
 
+    //state
+    bool initialized_ = false;
+    bool configured_ = false;
+    bool imaging_ = false;
+
 private:
   Config config_;
 
@@ -126,7 +131,9 @@ private:
   std::string name_;
   std::string guid_;
   std::string frame_id_;
-  int camId_=0;             // Created by pointlaz to store camId
+  int camId_=0;
+
+  // Created by pointlaz to store camId
 
   diagnostic_updater::Updater updater_;
   std::string diagnostic_msg_;
