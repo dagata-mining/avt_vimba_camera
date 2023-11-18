@@ -75,11 +75,11 @@ AvtVimbaCamera::AvtVimbaCamera(const std::string& name, const int camId)        
   on_init_ = true;     // on initialization phase
   name_ = name;
   camId_ = camId;       // Added by pointlaz
-
   camera_state_ = OPENING;
 
   updater_.setHardwareID("unknown");
   updater_.update();
+  initialized_ =true;
 }
 
 void AvtVimbaCamera::start(const std::string& ip_str, const std::string& guid_str, const std::string& frame_id,

@@ -93,6 +93,8 @@ public:
   int getSensorWidth();
   int getSensorHeight();
 
+  bool initialized_ = false;
+
   // Setters
   void setCallback(frameCallbackFunc callback)
   {

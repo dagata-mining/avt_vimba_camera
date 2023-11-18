@@ -241,6 +241,10 @@ namespace avt_vimba_camera
  **/
     void MultiCamera::configure(Config& newconfig, uint32_t level)
     {
+        for (int i = 0 ; i < cam_.size();i++)
+        {
+            if (!cam_[i]->initialized_) return;
+        }
         ROS_WARN_STREAM("-------------Configure");
         for (int i = 0 ; i < cam_.size();i++)
         {
