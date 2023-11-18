@@ -89,9 +89,7 @@ namespace avt_vimba_camera
         {
             try
             {
-                if (!cam_[i]->configured_ && !cam_[i]->initialized_)
-                    continue;
-                cam_[i]->startImaging();
+
                 cam_[i]->setCallback(std::bind(&avt_vimba_camera::MultiCamera::frameCallback,
                                                this,
                                                std::placeholders::_1,
@@ -155,6 +153,27 @@ namespace avt_vimba_camera
 
     void MultiCamera::frameCallback(const FramePtr& vimba_frame_ptr, const int camId)
     {
+        if (!allConfigure_)
+        {
+            for (int i = 0 ; i < camQty_ ; i++)
+            {
+                if (!cam_[i]->configured_)return;
+            }
+            allConfigure_ = true;
+        }
+        if (allConfigure_ && !allReady_)
+        {
+            for (int i = 0 ; i < camQty_ ; i++)
+            {
+                if (!cam_[i]->imaging_)
+                {
+                    cam_[i]->startImaging();
+                    cam_[i]->imaging_ = true;
+                    return;
+                }
+            }
+            allReady_ = true;
+        }
         ros::Time ros_time = ros::Time::now();
         if (pub_[camId].getNumSubscribers() >= 0)
         {

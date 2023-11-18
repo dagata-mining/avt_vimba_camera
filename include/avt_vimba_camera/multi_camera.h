@@ -52,6 +52,8 @@ namespace avt_vimba_camera
         //Compressing
         bool compressJPG_;
         int qualityJPG_;
+        bool allReady_ = false;
+        bool allConfigure_ = false;
 
 
 

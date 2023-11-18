@@ -104,6 +104,7 @@ public:
     //state
     bool initialized_ = false;
     bool configured_ = false;
+    bool imaging_ = false;
 
 private:
   Config config_;
