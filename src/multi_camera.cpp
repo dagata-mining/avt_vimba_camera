@@ -41,6 +41,7 @@ namespace avt_vimba_camera
 
         for (int i = 0; i < camQty_; i++)
         {
+            ROS_INFO("-------------Iterating %i / %i", i, camQty_);
             pub_[i] = it_.advertiseCamera(topicName + std::to_string(i), 1);
             if (calculateColorIntensity_)
             {
