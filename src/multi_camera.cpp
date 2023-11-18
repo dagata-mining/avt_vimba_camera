@@ -257,7 +257,7 @@ namespace avt_vimba_camera
                     cam_[i]->updateConfig(config);
 //                    updateCameraInfo(config,i);
                     ROS_WARN_STREAM("------------- CONFIGURED");
-//                    cam_[i]->startImaging();
+                    cam_[i]->startImaging();
                 }
 
 //                else
