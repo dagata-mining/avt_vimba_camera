@@ -150,7 +150,9 @@ void AvtVimbaCamera::start(const std::string& ip_str, const std::string& guid_st
   {
     runCommand("GVSPAdjustPacketSize");
   }
-
+    int throughput;
+    configureFeature("DeviceLinkThroughputLimit", static_cast<VmbInt64_t>(50000000),throughput);
+    ROS_INFO("------------DeviceThroughput Setted to %i", throughput);
 
   // Create a frame observer for this camera
   SP_SET(frame_obs_ptr_,
@@ -292,10 +294,6 @@ CameraPtr AvtVimbaCamera::openCamera(const std::string& id_str, bool print_all_f
   ROS_INFO_STREAM("Opened connection to camera named " << cam_name << " with ID " << cam_id);
 
   ros::Duration(2.0).sleep();
-
-//    int throughput;
-//    configureFeature("DeviceLinkThroughputLimit", static_cast<VmbInt64_t>(50000000),throughput);
-//    ROS_INFO("------------DeviceThroughput Setted to %i", throughput);
 
   if (print_all_features)
   {
