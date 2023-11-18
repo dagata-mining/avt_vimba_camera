@@ -57,6 +57,7 @@ namespace avt_vimba_camera
 
             try
             {
+                ROS_INFO("-------------New Cam");
                 std::shared_ptr<AvtVimbaCamera>
                     cam = std::shared_ptr<AvtVimbaCamera>(new AvtVimbaCamera(frame_id_[i], i));
                 cam_[i] = cam;
@@ -71,6 +72,7 @@ namespace avt_vimba_camera
         // Start dynamic_reconfigur & run configure()
         try
         {
+            ROS_INFO("-------------Reconfig");
             reconfigure_server_.setCallback(
                 std::bind(&avt_vimba_camera::MultiCamera::configure,
                           this,
