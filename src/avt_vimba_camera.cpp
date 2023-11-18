@@ -858,8 +858,6 @@ void AvtVimbaCamera::updateConfig(Config& config)
   {
     on_init_ = false;
   }
-
-  startImaging();
 }
 
 /** Change the Trigger configuration */
