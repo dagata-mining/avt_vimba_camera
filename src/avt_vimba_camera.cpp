@@ -281,9 +281,7 @@ CameraPtr AvtVimbaCamera::openCamera(const std::string& id_str, bool print_all_f
       return camera;
     }
   }
-    int throughput;
-    configureFeature("DeviceLinkThroughputLimit", static_cast<VmbInt64_t>(50000000),throughput);
-    ROS_INFO("------------DeviceThroughput Setted to %i", throughput);
+
 
   // set previous handler back
   signal(SIGINT, oldHandler);
@@ -294,6 +292,10 @@ CameraPtr AvtVimbaCamera::openCamera(const std::string& id_str, bool print_all_f
   ROS_INFO_STREAM("Opened connection to camera named " << cam_name << " with ID " << cam_id);
 
   ros::Duration(2.0).sleep();
+
+//    int throughput;
+//    configureFeature("DeviceLinkThroughputLimit", static_cast<VmbInt64_t>(50000000),throughput);
+//    ROS_INFO("------------DeviceThroughput Setted to %i", throughput);
 
   if (print_all_features)
   {
