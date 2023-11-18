@@ -10,7 +10,14 @@ namespace avt_vimba_camera
             : nh_(nh), nhp_(nhp), it_(nhp)
     {
         // Start Vimba & list all available cameras
-        api_.start();
+        try
+        {
+            api_.start();
+        }
+        catch (std::exception &e)
+        {
+            ROS_ERROR("api start error because %s", e.what());
+        }
 
         // Set the params
 
@@ -49,18 +56,47 @@ namespace avt_vimba_camera
             nhp_.param("ptp_offset", ptp_offset_, 0);
 
 
-            std::shared_ptr<AvtVimbaCamera> cam = std::shared_ptr<AvtVimbaCamera>(new AvtVimbaCamera(frame_id_[i], i));
-            cam_[i]=cam;
-            cam->setCallback(std::bind(&avt_vimba_camera::MultiCamera::frameCallback, this, std::placeholders::_1, i));
+
+            try
+            {
+                std::shared_ptr<AvtVimbaCamera>
+                    cam = std::shared_ptr<AvtVimbaCamera>(new AvtVimbaCamera(frame_id_[i], i));
+                cam_[i] = cam;
+                cam_[i]->setCallback(std::bind(&avt_vimba_camera::MultiCamera::frameCallback,
+                                               this,
+                                               std::placeholders::_1,
+                                               i));
+            }
+            catch (std::exception &e)
+            {
+                ROS_ERROR("Initializing cam %d error because %s",i, e.what());
+            }
 
             // Set camera info manager
-            info_man_[i] = std::shared_ptr<camera_info_manager::CameraInfoManager>(
+            try
+            {
+                info_man_[i] = std::shared_ptr<camera_info_manager::CameraInfoManager>(
                     new camera_info_manager::CameraInfoManager(nhp_, name_[i], camera_info_url_[i]));
+            }
+            catch (std::exception &e)
+            {
+                ROS_ERROR("Publishing error cam %d error because %s",i, e.what());
+            }
         }
 
         // Start dynamic_reconfigur & run configure()
-        reconfigure_server_.setCallback(
-                std::bind(&avt_vimba_camera::MultiCamera::configure, this, std::placeholders::_1, std::placeholders::_2));
+        try
+        {
+            reconfigure_server_.setCallback(
+                std::bind(&avt_vimba_camera::MultiCamera::configure,
+                          this,
+                          std::placeholders::_1,
+                          std::placeholders::_2));
+        }
+        catch (std::exception &e)
+        {
+            ROS_ERROR("Reconfiguring error because %s", e.what());
+        }
     }
 
     MultiCamera::~MultiCamera(void)
@@ -68,9 +104,33 @@ namespace avt_vimba_camera
         for (int i = 0 ; i < cam_.size(); i++)
         {
 
-            cam_[i]->stop();
-            cam_[i].reset();
-            pub_[i].shutdown();
+            try
+            {
+                cam_[i]->stop();
+            }
+            catch (std::exception &e)
+            {
+                ROS_ERROR("Stopping cam %d error because %s",i, e.what());
+            }
+
+            try
+            {
+                cam_[i].reset();
+            }
+            catch (std::exception &e)
+            {
+                ROS_ERROR("Reseting cam %d error because %s",i, e.what());
+            }
+
+            try
+            {
+                pub_[i].shutdown();
+            }
+            catch (std::exception &e)
+            {
+                ROS_ERROR("Publishing shutdown error cam %d error because %s",i, e.what());
+            }
+
         }
 
 
@@ -92,7 +152,14 @@ namespace avt_vimba_camera
                 if (use_measurement_time_)
                 {
                     VmbUint64_t frame_timestamp;
-                    vimba_frame_ptr->GetTimestamp(frame_timestamp);
+                    try
+                    {
+                        vimba_frame_ptr->GetTimestamp(frame_timestamp);
+                    }
+                    catch (std::exception &e)
+                    {
+                        ROS_ERROR("Frame callback gettimestamp error cam %d error because %s",camId, e.what());
+                    }
                     ci.header.stamp = ros::Time(cam_[camId]->getTimestampRealTime(frame_timestamp)) + ros::Duration(ptp_offset_, 0);
                 }
                 else

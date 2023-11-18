@@ -228,7 +228,16 @@ public:
 
     VmbUchar_t* buffer_ptr;
     std::vector<VmbUchar_t> TransformedData;
-    VmbErrorType err = TransformImage( vimba_frame_ptr, TransformedData, "RGB24" );
+    VmbErrorType err;
+    try
+    {
+
+        VmbErrorType err = TransformImage(vimba_frame_ptr, TransformedData, "RGB24");
+    }
+    catch (std::exception &e)
+    {
+        ROS_ERROR("Frame callback transformingImage error because %s", e.what());
+    }
     buffer_ptr =reinterpret_cast<VmbUchar_t*>(TransformedData.data());
 
     bool res = false;
