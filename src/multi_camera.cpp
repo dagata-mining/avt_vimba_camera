@@ -152,15 +152,7 @@ namespace avt_vimba_camera
 
     void MultiCamera::frameCallback(const FramePtr& vimba_frame_ptr, const int camId)
     {
-        if (!allConfigure_)
-        {
-            for (int i = 0 ; i < camQty_ ; i++)
-            {
-                if (!cam_[i]->configured_)return;
-            }
-            ROS_INFO("All FRAME CONFIGURED");
-            allConfigure_ = true;
-        }
+        if (!cam_[camId]->configured_) return;
         ros::Time ros_time = ros::Time::now();
         if (pub_[camId].getNumSubscribers() >= 0)
         {
@@ -276,6 +268,7 @@ namespace avt_vimba_camera
                     if (cam_[i]->isOpened()) {
                         cam_[i]->configured_=true;
                         cam_[i]->startImaging();
+                        ROS_INFO("-------------IMAGING STARTED");
                     }
                 }
 
