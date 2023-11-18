@@ -152,7 +152,7 @@ namespace avt_vimba_camera
 
     void MultiCamera::frameCallback(const FramePtr& vimba_frame_ptr, const int camId)
     {
-        if (!cam_[camId]->configured_) return;
+        if (!cam_[camId]->configured_ || !cam_[camId]->initialized_) return;
         ros::Time ros_time = ros::Time::now();
         if (pub_[camId].getNumSubscribers() >= 0)
         {
