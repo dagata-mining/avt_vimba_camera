@@ -821,11 +821,9 @@ void AvtVimbaCamera::updateConfig(Config& config)
 {
   std::unique_lock<std::mutex> lock(config_mutex_);
 
-  if (streaming_)
-  {
-    stopImaging();
-    ros::Duration(0.5).sleep();  // sleep for half a second
-  }
+  stopImaging();
+  ros::Duration(0.5).sleep();
+
 
   if (on_init_)
   {
