@@ -79,7 +79,6 @@ AvtVimbaCamera::AvtVimbaCamera(const std::string& name, const int camId)        
   camera_state_ = OPENING;
 
   updater_.setHardwareID("unknown");
-  updater_.add(name_, this, &AvtVimbaCamera::getCurrentState);
   updater_.update();
 }
 
