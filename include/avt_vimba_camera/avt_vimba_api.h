@@ -231,8 +231,7 @@ public:
     VmbErrorType err;
     try
     {
-
-        VmbErrorType err = TransformImage(vimba_frame_ptr, TransformedData, "RGB24");
+        err = TransformImage(vimba_frame_ptr, TransformedData, "RGB24");
     }
     catch (std::exception &e)
     {
