@@ -166,7 +166,7 @@ void AvtVimbaCamera::stop()
     return;
   // Added by pointlaz
   FeaturePtr feature;
-  vimba_camera_ptr_->GetFeatureByName("AcauisitionStop",feature);
+  vimba_camera_ptr_->GetFeatureByName("AcquisitionStop",feature);
   feature->RunCommand();
   vimba_camera_ptr_->EndCapture();
   vimba_camera_ptr_->FlushQueue();
@@ -820,7 +820,7 @@ void AvtVimbaCamera::printAllCameraFeatures(const CameraPtr& camera)
 void AvtVimbaCamera::updateConfig(Config& config)
 {
   std::unique_lock<std::mutex> lock(config_mutex_);
-
+    ROS_INFO("--------------------------Updating config:");
   stopImaging();
   ros::Duration(0.5).sleep();
 
