@@ -89,7 +89,6 @@ namespace avt_vimba_camera
         {
             try
             {
-
                 cam_[i]->setCallback(std::bind(&avt_vimba_camera::MultiCamera::frameCallback,
                                                this,
                                                std::placeholders::_1,
@@ -159,20 +158,8 @@ namespace avt_vimba_camera
             {
                 if (!cam_[i]->configured_)return;
             }
+            ROS_INFO("All FRAME CONFIGURED");
             allConfigure_ = true;
-        }
-        if (allConfigure_ && !allReady_)
-        {
-            for (int i = 0 ; i < camQty_ ; i++)
-            {
-                if (!cam_[i]->imaging_)
-                {
-                    cam_[i]->startImaging();
-                    cam_[i]->imaging_ = true;
-                    return;
-                }
-            }
-            allReady_ = true;
         }
         ros::Time ros_time = ros::Time::now();
         if (pub_[camId].getNumSubscribers() >= 0)
@@ -267,7 +254,7 @@ namespace avt_vimba_camera
         {
             if (!cam_[i]->initialized_) return;
         }
-        ROS_WARN_STREAM("-------------Configure");
+        ROS_WARN_STREAM("-------------Configuring");
         for (int i = 0 ; i < cam_.size();i++)
         {
             ROS_INFO("-------------------------------CAMERA %d", i);
@@ -285,6 +272,7 @@ namespace avt_vimba_camera
                     cam_[i]->updateConfig(config);
 //                    updateCameraInfo(config,i);
                     ROS_WARN_STREAM("------------- CONFIGURED");
+                    cam_[i]->startImaging();
                     cam_[i]->configured_=true;
                 }
 
