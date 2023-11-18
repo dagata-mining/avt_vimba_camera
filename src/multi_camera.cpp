@@ -245,6 +245,7 @@ namespace avt_vimba_camera
         for (int i = 0 ; i < cam_.size();i++)
         {
             ROS_INFO("-------------------------------CAMERA %d", i);
+
             try
             {
                 // The camera already stops & starts acquisition
