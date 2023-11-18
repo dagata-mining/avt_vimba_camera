@@ -827,7 +827,7 @@ void AvtVimbaCamera::updateConfig(Config& config)
 {
   std::unique_lock<std::mutex> lock(config_mutex_);
     ROS_INFO("--------------------------Updating config:");
-  stopImaging();
+//  stopImaging();
   ros::Duration(0.5).sleep();
 
 
@@ -858,6 +858,8 @@ void AvtVimbaCamera::updateConfig(Config& config)
   {
     on_init_ = false;
   }
+
+    ROS_INFO("--------------------------config done");
 }
 
 /** Change the Trigger configuration */
