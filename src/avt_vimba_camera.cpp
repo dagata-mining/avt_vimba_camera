@@ -288,11 +288,9 @@ void AvtVimbaCamera::frameCallback(const FramePtr vimba_frame_ptr)
 {
   std::unique_lock<std::mutex> lock(config_mutex_);
   camera_state_ = OK;
-  ROS_INFO("Before THREAD JOINED CAM %i", camId_);
   // Call the callback implemented by other classes
   std::thread thread_callback = std::thread(&AvtVimbaCamera::compress,this, vimba_frame_ptr);     // Modified by pointlaz (camId parameter added)
   thread_callback.join();
-  ROS_INFO("THREAD JOINED CAM %i",camId_);
 }
 
 void AvtVimbaCamera::compress(const FramePtr& vimba_frame_ptr)
