@@ -124,17 +124,15 @@ public:
   bool on_init_ = false ;
   bool connected_ = false;
 
-    ~ AvtVimbaCamera()
+  ~AvtVimbaCamera()
   {
-        std::cout << "exit cam stream" << std::endl;
-        stop();
-      std::cout << "stopped" << std::endl;
+      stop();
       if(frame_obs_ptr_) frame_obs_ptr_.reset();
       if (vimba_frame_ptr_) vimba_frame_ptr_.reset();
       if (vimba_camera_ptr_) vimba_camera_ptr_.reset();
       std::cout<< "cam clean finish" << std::endl;
-
   }
+
     void compress(const FramePtr& vimba_frame_ptr);
 
     Config config_;

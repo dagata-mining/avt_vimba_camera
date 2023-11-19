@@ -157,13 +157,9 @@ void AvtVimbaCamera::stop()
     if (vimba_camera_ptr_)
     {
         vimba_camera_ptr_->EndCapture();
-        std::cout << "capture" << std::endl;
         vimba_camera_ptr_->FlushQueue();
-        std::cout << "flush" << std::endl;
         vimba_camera_ptr_->RevokeAllFrames();
-        std::cout << "revoke" << std::endl;
         vimba_camera_ptr_->Close();
-        std::cout << "close" << std::endl;
 
     }
       if (pub_)
@@ -171,13 +167,11 @@ void AvtVimbaCamera::stop()
           pub_->shutdown();
           pub_.reset();
       }
-        std::cout << "pubdown" << std::endl;
       if (colorPub_)
       {
           colorPub_->shutdown();
           colorPub_.reset();
       }
-        std::cout << "colordown" << std::endl;
 }
 
 void AvtVimbaCamera::startImaging()
