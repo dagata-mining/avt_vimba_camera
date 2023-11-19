@@ -118,6 +118,7 @@ namespace avt_vimba_camera
 
             try
             {
+                cam_[i]->~AvtVimbaCamera();
                 cam_[i].reset();
             }
             catch (std::exception &e)
@@ -136,6 +137,7 @@ namespace avt_vimba_camera
             reconfigure_server_.clearCallback();
 
         }
+        cam_.clear();
 
 
     }
