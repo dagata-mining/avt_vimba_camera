@@ -61,9 +61,9 @@ namespace avt_vimba_camera
                 ROS_INFO("-------------New Cam");
                 std::shared_ptr<AvtVimbaCamera>
                     cam = std::shared_ptr<AvtVimbaCamera>(new AvtVimbaCamera(frame_id_[i], i));
-                cam->setCallback(std::bind(&avt_vimba_camera::MultiCamera::compressCallback,
-                                           this,
-                                           std::placeholders::_1, std::placeholders::_2));
+//                cam->setCallback(std::bind(&avt_vimba_camera::MultiCamera::compressCallback,
+//                                           this,
+//                                           std::placeholders::_1, std::placeholders::_2));
                 cam_[i] = cam;
             }
             catch (std::exception &e)
