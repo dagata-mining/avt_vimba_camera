@@ -151,9 +151,9 @@ void AvtVimbaCamera::stop()
   if (!opened_)
     return;
   // Added by pointlaz
-  FeaturePtr feature;
-  vimba_camera_ptr_->GetFeatureByName("AcquisitionStop",feature);
-  feature->RunCommand();
+//  FeaturePtr feature;
+//  vimba_camera_ptr_->GetFeatureByName("AcquisitionStop",feature);
+//  feature->RunCommand();
   vimba_camera_ptr_->EndCapture();
   vimba_camera_ptr_->FlushQueue();
   vimba_camera_ptr_->RevokeAllFrames();
