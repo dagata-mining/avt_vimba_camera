@@ -305,7 +305,7 @@ CameraPtr AvtVimbaCamera::openCamera(const std::string& id_str, bool print_all_f
 
 void AvtVimbaCamera::frameCallback(const FramePtr vimba_frame_ptr, const int camId)
 {
-  std::unique_lock<std::mutex> lock(config_mutex_);
+//  std::unique_lock<std::mutex> lock(config_mutex_);
   camera_state_ = OK;
   diagnostic_msg_ = "Camera operating normally";
 
@@ -572,7 +572,7 @@ bool AvtVimbaCamera::getFeatureValue(const std::string& feature_str, std::string
 //Load camera settings (Added by pointlaz)
 void AvtVimbaCamera::loadCameraSettings(const std::string& settingPath)
 {
-    std::unique_lock<std::mutex> lock(config_mutex_);
+//    std::unique_lock<std::mutex> lock(config_mutex_);
 
     if (streaming_)
     {
@@ -823,7 +823,7 @@ void AvtVimbaCamera::printAllCameraFeatures(const CameraPtr& camera)
 
 void AvtVimbaCamera::updateConfig(Config& config)
 {
-  std::unique_lock<std::mutex> lock(config_mutex_);
+//  std::unique_lock<std::mutex> lock(config_mutex_);
     ROS_INFO("--------------------------Updating config:");
 //  stopImaging();
   ros::Duration(0.5).sleep();
