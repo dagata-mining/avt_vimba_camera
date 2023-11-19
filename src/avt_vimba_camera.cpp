@@ -329,7 +329,7 @@ void AvtVimbaCamera::compress(const FramePtr& vimba_frame_ptr)
                     }
                     catch (std::exception &e)
                     {
-                        ROS_INFO("-----Could not calculate color intensity cam %d because %s", camId, e.what());
+                        ROS_INFO("-----Could not calculate color intensity cam %d because %s", camId_, e.what());
                     }
                     //colorPub_[camId].publish(colorIntensityMsg);
                 }
