@@ -308,7 +308,7 @@ void AvtVimbaCamera::frameCallback(const FramePtr vimba_frame_ptr, const int cam
   std::unique_lock<std::mutex> lock(config_mutex_);
   camera_state_ = OK;
   diagnostic_msg_ = "Camera operating normally";
-
+    ROS_INFO("Before THREAD JOINED CAM %i",camId);
   // Call the callback implemented by other classes
   std::thread thread_callback = std::thread(userFrameCallback, vimba_frame_ptr, camId);     // Modified by pointlaz (camId parameter added)
   thread_callback.join();
