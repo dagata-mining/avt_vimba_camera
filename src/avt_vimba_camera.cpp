@@ -148,29 +148,40 @@ void AvtVimbaCamera::start(const std::string& ip_str, const std::string& guid_st
 
 void AvtVimbaCamera::stop()
 {
-  if (!opened_)
-    return;
-  // Added by pointlaz
-//  FeaturePtr feature;
-//  vimba_camera_ptr_->GetFeatureByName("AcquisitionStop",feature);
-//  feature->RunCommand();
-  vimba_camera_ptr_->EndCapture();
-  vimba_camera_ptr_->FlushQueue();
-  vimba_camera_ptr_->RevokeAllFrames();
-  vimba_frame_ptr_->UnregisterObserver();
-  //
-  vimba_camera_ptr_->Close();
-  opened_ = false;
-  if (pub_)
-  {
-      pub_->shutdown();
-      pub_.reset();
-  }
-  if (colorPub_)
-  {
-      colorPub_->shutdown();
-      colorPub_.reset();
-  }
+      if (!opened_)
+        return;
+      // Added by pointlaz
+    //  FeaturePtr feature;
+    //  vimba_camera_ptr_->GetFeatureByName("AcquisitionStop",feature);
+    //  feature->RunCommand();
+    if (vimba_camera_ptr_)
+    {
+        vimba_camera_ptr_->EndCapture();
+        std::cout << "capture" << std::endl;
+        vimba_camera_ptr_->FlushQueue();
+        std::cout << "flush" << std::endl;
+        vimba_camera_ptr_->RevokeAllFrames();
+        std::cout << "revoke" << std::endl;
+        vimba_frame_ptr_->UnregisterObserver();
+        std::cout << "unregister" << std::endl;
+        //
+        vimba_camera_ptr_->Close();
+        std::cout << "close" << std::endl;
+        opened_ = false;
+        std::cout << "cameradown" << std::endl;
+    }
+      if (pub_)
+      {
+          pub_->shutdown();
+          pub_.reset();
+      }
+        std::cout << "pubdown" << std::endl;
+      if (colorPub_)
+      {
+          colorPub_->shutdown();
+          colorPub_.reset();
+      }
+        std::cout << "colordown" << std::endl;
 }
 
 void AvtVimbaCamera::startImaging()
