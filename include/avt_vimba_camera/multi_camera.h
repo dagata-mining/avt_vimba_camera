@@ -65,10 +65,9 @@ namespace avt_vimba_camera
 
 
         image_transport::ImageTransport it_;
-        std::vector<image_transport::CameraPublisher> pub_;
-        std::vector<ros::Publisher> colorPub_;
+        std::vector<std::shared_ptr<image_transport::CameraPublisher>> pub_;
+        std::vector<std::shared_ptr<ros::Publisher>> colorPub_;
 
-        std::vector<std::shared_ptr<camera_info_manager::CameraInfoManager>> info_man_;
 
         // Dynamic reconfigure
         typedef avt_vimba_camera::AvtVimbaCameraConfig Config;

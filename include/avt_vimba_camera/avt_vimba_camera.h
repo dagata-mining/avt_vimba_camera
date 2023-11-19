@@ -38,6 +38,14 @@
 #include <avt_vimba_camera/AvtVimbaCameraConfig.h>
 #include <avt_vimba_camera/frame_observer.h>
 #include <avt_vimba_camera/avt_vimba_api.h>
+#include <camera_info_manager/camera_info_manager.h>
+#include <image_transport/image_transport.h>
+#include <sensor_msgs/Image.h>
+#include <sensor_msgs/CompressedImage.h>
+#include <sensor_msgs/CameraInfo.h>
+#include <std_msgs/UInt8.h>
+#include <cv_bridge/cv_bridge.h>
+#include <opencv2/opencv.hpp>
 
 #include <string>
 #include <mutex>
@@ -66,7 +74,25 @@ public:
   typedef std::function<void(const FramePtr,const int i)> compressCallbackFunc;         // Modified by pointlaz. camId as parameter
 
   AvtVimbaCamera();
-  AvtVimbaCamera(const std::string& name, const int camId = 0, std::shared_ptr<AvtVimbaApi> api = nullptr);         // Modified by pointlaz. camId as parameter
+  AvtVimbaCamera(const std::string& name, const int camId = 0, std::shared_ptr<AvtVimbaApi> api = nullptr,
+                 std::shared_ptr<image_transport::CameraPublisher> pub = nullptr,
+                 std::shared_ptr<ros::Publisher> colorPub = nullptr);         // Modified by pointlaz. camId as parameter
+
+ //Publishers
+  std::shared_ptr<image_transport::CameraPublisher> pub_;
+  std::shared_ptr<ros::Publisher> colorPub_;
+
+
+  //Compressing
+  bool compressJPG_ = true;
+  int qualityJPG_ = 90;
+
+  //intensity
+  bool calculateColorIntensity_ = false;
+  std::string colorIntensityRGB_ = "R";
+  int colorIntensityPxSteps_ = 10;
+
+
 
   void start(const std::string& ip_str, const std::string& guid_str, const std::string& frame_id,
              bool print_all_features = false);
@@ -106,7 +132,9 @@ public:
       vimba_camera_ptr_.reset();
       frame_obs_ptr_.reset();
       setCallback([](const FramePtr& frame, const int i) {});
+
   }
+    void compress(const FramePtr& vimba_frame_ptr);
 
     Config config_;
 private:
@@ -130,7 +158,7 @@ private:
 
 
   // Created by pointlaz to store camId
-
+  uint8_t calculateColorIntensity(cv::Mat &img);
   CameraPtr openCamera(const std::string& id_str, bool print_all_features);
 
   compressCallbackFunc userFrameCallback;

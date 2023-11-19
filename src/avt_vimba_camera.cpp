@@ -67,7 +67,10 @@ AvtVimbaCamera::AvtVimbaCamera() : AvtVimbaCamera(ros::this_node::getName().c_st
 {
 }
 
-AvtVimbaCamera::AvtVimbaCamera(const std::string& name, const int camId, std::shared_ptr<AvtVimbaApi> api)        // Modified by pointlax (camId added)
+AvtVimbaCamera::AvtVimbaCamera(const std::string& name, const int camId, std::shared_ptr<AvtVimbaApi> api,
+                               std::shared_ptr<image_transport::CameraPublisher> pub,
+                               std::shared_ptr<ros::Publisher> colorPub
+                               )        // Modified by pointlax (camId added)
 {
   // Init global variables
   opened_ = false;     // camera connected to the api
@@ -77,6 +80,8 @@ AvtVimbaCamera::AvtVimbaCamera(const std::string& name, const int camId, std::sh
   camId_ = camId;       // Added by pointlaz
   camera_state_ = OPENING;
   api_ = api;
+  if (pub) pub_ = pub;
+  if (colorPub) colorPub_ = colorPub;
 }
 
 void AvtVimbaCamera::start(const std::string& ip_str, const std::string& guid_str, const std::string& frame_id,
@@ -158,6 +163,16 @@ void AvtVimbaCamera::stop()
   //
   vimba_camera_ptr_->Close();
   opened_ = false;
+  if (pub_)
+  {
+      pub_->shutdown();
+      pub_.reset();
+  }
+  if (colorPub_)
+  {
+      colorPub_->shutdown();
+      colorPub_.reset();
+  }
 }
 
 void AvtVimbaCamera::startImaging()
@@ -278,9 +293,113 @@ void AvtVimbaCamera::frameCallback(const FramePtr vimba_frame_ptr)
   camera_state_ = OK;
   ROS_INFO("Before THREAD JOINED CAM %i", camId_);
   // Call the callback implemented by other classes
-//  std::thread thread_callback = std::thread(M, vimba_frame_ptr,camId_);     // Modified by pointlaz (camId parameter added)
-//  thread_callback.join();
+  std::thread thread_callback = std::thread(&AvtVimbaCamera::compress,this, vimba_frame_ptr);     // Modified by pointlaz (camId parameter added)
+  thread_callback.join();
   ROS_INFO("THREAD JOINED CAM %i",camId_);
+}
+
+void AvtVimbaCamera::compress(const FramePtr& vimba_frame_ptr)
+{
+    ros::Time ros_time = ros::Time::now();
+    if (pub_->getNumSubscribers() >= 0)
+    {
+        sensor_msgs::Image img;
+        sensor_msgs::CompressedImage compressed;
+        if (api_->frameToImage(vimba_frame_ptr, img))
+        {
+            sensor_msgs::CameraInfo ci;
+            // Note: getCameraInfo() doesn't fill in header frame_id or stamp
+            ci.header.frame_id = frame_id_;
+            ci.header.stamp = ros_time;
+            img.header.stamp = ci.header.stamp;
+
+            if (compressJPG_ || calculateColorIntensity_)
+            {
+                cv_bridge::CvImagePtr cv_ptr;
+
+                cv_ptr = cv_bridge::toCvCopy(img, sensor_msgs::image_encodings::RGB8);
+
+                if (calculateColorIntensity_)
+                {
+                    std_msgs::UInt8 colorIntensityMsg;
+                    colorIntensityMsg.data = 0;
+                    try
+                    {
+                        colorIntensityMsg.data = calculateColorIntensity(cv_ptr->image);
+                    }
+                    catch (std::exception &e)
+                    {
+                        ROS_INFO("-----Could not calculate color intensity cam %d because %s", camId, e.what());
+                    }
+                    //colorPub_[camId].publish(colorIntensityMsg);
+                }
+
+                if (compressJPG_)
+                {
+                    // Compress the image using OpenCV
+                    std::vector<int> compression_params;
+                    compression_params.push_back(cv::IMWRITE_JPEG_QUALITY);  // You can use other parameters like PNG compression
+                    compression_params.push_back(qualityJPG_);  // Set the desired image quality (0-100)
+                    cv::imencode(".jpg", cv_ptr->image, img.data, compression_params);
+                    img.encoding = "jpg";
+                    pub_->publish(img, ci);
+                }
+                else
+                {
+                    pub_->publish(img, ci);
+                }
+            }
+            else
+            {
+                pub_->publish(img, ci);
+            }
+        }
+        else
+        {
+            ROS_WARN_STREAM("Function frameToImage returned 0. No image published.");
+        }
+    }
+}
+
+uint8_t AvtVimbaCamera::calculateColorIntensity(cv::Mat &img)
+{
+    bool sumRGB = false;
+    int colorId = 0;
+    if (colorIntensityRGB_ == "R" || colorIntensityRGB_ == "r") colorId = 0;
+    else if (colorIntensityRGB_ == "G" || colorIntensityRGB_ == "g") colorId = 1;
+    else if (colorIntensityRGB_ == "B" || colorIntensityRGB_ == "b") colorId = 2;
+    else sumRGB=true;
+
+    int count = 0;
+    int sum = 0;
+    cv::Vec3b vecRGB;
+
+    if (sumRGB)
+    {
+        for (int row = 0 ; row < img.rows; row +=  colorIntensityPxSteps_)
+        {
+            for (int col = 0 ; col < img.cols; col +=  colorIntensityPxSteps_)
+            {
+                vecRGB = img.at<cv::Vec3b>(row,col);
+                sum += (vecRGB[0]+vecRGB[2]+vecRGB[1]);
+                count++;
+            }
+        }
+        count *=3;
+    }
+    else
+    {
+        for (int row = 0 ; row < img.rows; row +=  colorIntensityPxSteps_)
+        {
+            for (int col = 0 ; col < img.cols; col +=  colorIntensityPxSteps_)
+            {
+                sum += img.at<cv::Vec3b>(row,col)[colorId];
+                count++;
+            }
+        }
+    }
+    uint8_t colorIntensity = (uint8_t)(sum/count);
+    return colorIntensity;
 }
 
 int AvtVimbaCamera::getSensorWidth()
