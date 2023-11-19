@@ -39,9 +39,6 @@
 #include <avt_vimba_camera/frame_observer.h>
 #include <avt_vimba_camera/avt_vimba_api.h>
 
-#include <diagnostic_updater/diagnostic_updater.h>
-#include <diagnostic_updater/publisher.h>
-
 #include <string>
 #include <mutex>
 
@@ -66,71 +63,61 @@ class AvtVimbaCamera
 {
 public:
   typedef avt_vimba_camera::AvtVimbaCameraConfig Config;
-  typedef std::function<void(const FramePtr, const int)> frameCallbackFunc;         // Modified by pointlaz. camId as parameter
+  typedef std::function<void(const FramePtr)> frameCallbackFunc;         // Modified by pointlaz. camId as parameter
 
   AvtVimbaCamera();
-  AvtVimbaCamera(const std::string& name, const int camId = 0);         // Modified by pointlaz. camId as parameter
+  AvtVimbaCamera(const std::string& name, const int camId = 0, std::shared_ptr<AvtVimbaApi> api = nullptr);         // Modified by pointlaz. camId as parameter
 
   void start(const std::string& ip_str, const std::string& guid_str, const std::string& frame_id,
              bool print_all_features = false);
   void stop();
 
   void updateConfig(Config& config);
-  void loadCameraSettings(const std::string& settingPath);          // Created by pointlaz
   void startImaging();
   void stopImaging();
 
   // Utility functions
-  double getTimestampRealTime(VmbUint64_t timestamp_ticks);
   bool isOpened()
   {
     return opened_;
   }
 
   // Getters
-  double getTimestamp();
-  double getDeviceTemp();
   int getSensorWidth();
   int getSensorHeight();
-
-  bool initialized_ = false;
 
   // Setters
   void setCallback(frameCallbackFunc callback)
   {
     userFrameCallback = callback;
   }
-
-  int getCamId(){return camId_;}            // Created by pointlaz
+   // Created by pointlaz
+   int camId_;
   bool opened_;
   bool streaming_;
   bool on_init_;
 
   ~ AvtVimbaCamera()
   {
-      ROS_INFO("Destroying Camera");
       stopImaging();
       stop();
       frame_obs_ptr_.reset();
       vimba_frame_ptr_.reset();
       vimba_camera_ptr_.reset();
-      setCallback([](const FramePtr& frame, int camId) {});
-      ROS_INFO("Camera Destroyed");
+      setCallback([](const FramePtr& frame) {});
   }
 
+    Config config_;
 private:
-  Config config_;
 
-  AvtVimbaApi api_;
+
+  std::shared_ptr<AvtVimbaApi> api_;
   // IFrame Observer
   SP_DECL(FrameObserver) frame_obs_ptr_;
   // The currently streaming camera
   CameraPtr vimba_camera_ptr_;
   // Current frame
   FramePtr vimba_frame_ptr_;
-  // Tick frequency of the on-board clock. Equal to 1 GHz when PTP is in use.
-  VmbInt64_t vimba_timestamp_tick_freq_ = 1;
-
   // Mutex
   std::mutex config_mutex_;
 
@@ -139,17 +126,14 @@ private:
   std::string name_;
   std::string guid_;
   std::string frame_id_;
-  int camId_=0;
+
 
   // Created by pointlaz to store camId
-
-  diagnostic_updater::Updater updater_;
-  std::string diagnostic_msg_;
 
   CameraPtr openCamera(const std::string& id_str, bool print_all_features);
 
   frameCallbackFunc userFrameCallback;
-  void frameCallback(const FramePtr vimba_frame_ptr, const int camId =0);       // Modified by pointlaz. camId as parameter
+  void frameCallback(const FramePtr vimba_frame_ptr);       // Modified by pointlaz. camId as parameter
 
   template <typename T>
   VmbErrorType setFeatureValue(const std::string& feature_str, const T& val);
@@ -177,7 +161,6 @@ private:
   void updateUSBGPIOConfig(Config& config);
   void updateIrisConfig(Config& config);
 
-  void getCurrentState(diagnostic_updater::DiagnosticStatusWrapper& stat);
 };
 }  // namespace avt_vimba_camera
 #endif

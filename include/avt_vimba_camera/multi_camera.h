@@ -29,7 +29,7 @@ namespace avt_vimba_camera
         ~MultiCamera(void);
 
     private:
-        AvtVimbaApi api_;
+        std::shared_ptr<AvtVimbaApi> api_;
         std::vector<std::shared_ptr<AvtVimbaCamera>> cam_;
 
         ros::NodeHandle nh_;
@@ -80,7 +80,6 @@ namespace avt_vimba_camera
 
         void frameCallback(const FramePtr& ,const int camId=0);
         void configure(Config& newconfig, uint32_t level);
-        void updateCameraInfo(const Config& config, const int camId=0);
 
     };
 }  // namespace avt_vimba_camera

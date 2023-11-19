@@ -12,7 +12,8 @@ namespace avt_vimba_camera
         // Start Vimba & list all available cameras
         try
         {
-            api_.start();
+            api_.reset(new AvtVimbaApi);
+            api_->start();
         }
         catch (std::exception &e)
         {
@@ -83,63 +84,35 @@ namespace avt_vimba_camera
         {
             ROS_ERROR("Reconfiguring error because %s", e.what());
         }
-        cam_[4]->startImaging();
-        ROS_INFO("Setting call back cam %i is cam streaming: %i", 4, cam_[4]->streaming_);
-        cam_[4]->setCallback(std::bind(&avt_vimba_camera::MultiCamera::frameCallback,
-                                       this,
-                                       std::placeholders::_1,
-                                       4));
 
-//        for (int i = 0; i < camQty_; i++)
-//        {
-//            try
-//            {
-//
-//                cam_[i]->startImaging();
-//                ROS_INFO("Setting call back cam %i is cam configured: %i", i, cam_[i]->initialized_);
-//                cam_[i]->setCallback(std::bind(&avt_vimba_camera::MultiCamera::frameCallback,
-//                                               this,
-//                                               std::placeholders::_1,
-//                                               i));
-//            }
-//            catch (std::exception &e)
-//            {
-//                ROS_ERROR("Set call backe cam %d error because %s", i, e.what());
-//            }
-//
-//        }
+        for (int i = 0; i < camQty_; i++)
+        {
+            try
+            {
 
+                cam_[i]->startImaging();
+                ROS_INFO("Setting call back cam %i is cam opened: %i", i, cam_[i]->opened_);
+                cam_[i]->setCallback(std::bind(&avt_vimba_camera::MultiCamera::frameCallback,
+                                               this,
+                                               std::placeholders::_1,i));
+            }
+            catch (std::exception &e)
+            {
+                ROS_ERROR("Set call backe cam %d error because %s", i, e.what());
+            }
+        }
     }
 
     MultiCamera::~MultiCamera(void)
     {
         for (int i = 0 ; i < cam_.size(); i++)
         {
-
-            try
-            {
-                cam_[i]->~AvtVimbaCamera();
-                cam_[i].reset();
-            }
-            catch (std::exception &e)
-            {
-                ROS_ERROR("Reseting cam %d error because %s",i, e.what());
-            }
-
-            try
-            {
-                pub_[i].shutdown();
-            }
-            catch (std::exception &e)
-            {
-                ROS_ERROR("Publishing shutdown error cam %d error because %s",i, e.what());
-            }
-            reconfigure_server_.clearCallback();
-
+            cam_[i].reset();
+            pub_[i].shutdown();
         }
+        reconfigure_server_.clearCallback();
         cam_.clear();
-
-
+        api_.reset();
     }
 
     void MultiCamera::frameCallback(const FramePtr& vimba_frame_ptr, const int camId)
@@ -149,7 +122,7 @@ namespace avt_vimba_camera
         {
             sensor_msgs::Image img;
             sensor_msgs::CompressedImage compressed;
-            if (api_.frameToImage(vimba_frame_ptr, img))
+            if (api_->frameToImage(vimba_frame_ptr, img))
             {
                 sensor_msgs::CameraInfo ci = info_man_[camId]->getCameraInfo();
                 // Note: getCameraInfo() doesn't fill in header frame_id or stamp
@@ -165,7 +138,7 @@ namespace avt_vimba_camera
                     {
                         ROS_ERROR("Frame callback gettimestamp error cam %d error because %s",camId, e.what());
                     }
-                    ci.header.stamp = ros::Time(cam_[camId]->getTimestampRealTime(frame_timestamp)) + ros::Duration(ptp_offset_, 0);
+                    ci.header.stamp = ros_time;
                 }
                 else
                 {
@@ -233,10 +206,6 @@ namespace avt_vimba_camera
  **/
     void MultiCamera::configure(Config& newconfig, uint32_t level)
     {
-        for (int i = 0 ; i < cam_.size();i++)
-        {
-            if (!cam_[i]->initialized_) return;
-        }
         ROS_WARN_STREAM("-------------Configure");
         for (int i = 0 ; i < cam_.size();i++)
         {
@@ -247,67 +216,23 @@ namespace avt_vimba_camera
                 // so there's no problem on changing any feature.
                 if (!cam_[i]->isOpened())
                 {
+                    ROS_WARN_STREAM("-------------START CAM " << i);
                     cam_[i]->start(ip_, guid_[i], frame_id_[i], print_all_features_);
+                    ROS_WARN_STREAM("-------------STOP IMAGING CAM " << i);
                     cam_[i]->stopImaging();
-                    ROS_WARN_STREAM("-------------START");
-                    Config config = newconfig;
-                    cam_[i]->updateConfig(config);
-//                    updateCameraInfo(config,i);
-                    ROS_WARN_STREAM("------------- CONFIGURED");
+                    ROS_WARN_STREAM("-------------UPDATE CONFIG CAM " << i);
+                    cam_[i]->updateConfig(newconfig);
+                    ROS_WARN_STREAM("-------------START IMAGING CAM " << i);
+                    cam_[i]->startImaging();
                 }
-
-//                else
-//                {
-//                    Config config = newconfig;
-//                    cam_[i]->updateConfig(config);
-//                    updateCameraInfo(config,i);
-//                    cam_[i]->start(ip_, guid_[i], frame_id_[i], print_all_features_);
-//                    ROS_WARN_STREAM("------------- CONFIGURED");
-//                }
             }
             catch (const std::exception& e)
             {
                 ROS_ERROR_STREAM("Error reconfiguring multi_camera node : " << e.what());
             }
         }
-
     }
 
-// See REP-104 for details regarding CameraInfo parameters
-    void MultiCamera::updateCameraInfo(const avt_vimba_camera::AvtVimbaCameraConfig& config, const int camId)
-    {
-        sensor_msgs::CameraInfo ci = info_man_[camId]->getCameraInfo();
-
-        // Set the operational parameters in CameraInfo (binning, ROI)
-        int binning_or_decimation_x = std::max(config.binning_x, config.decimation_x);
-        int binning_or_decimation_y = std::max(config.binning_y, config.decimation_y);
-
-        // Set the operational parameters in CameraInfo (binning, ROI)
-        int sensor_width = cam_[camId]->getSensorWidth();
-        int sensor_height = cam_[camId]->getSensorHeight();
-
-        if (sensor_width == -1 || sensor_height == -1)
-        {
-            ROS_ERROR("Could not determine sensor pixel dimensions, camera_info will be wrong");
-        }
-
-        ci.width = sensor_width;
-        ci.height = sensor_height;
-        ci.binning_x = binning_or_decimation_x;
-        ci.binning_y = binning_or_decimation_y;
-
-        // ROI is in unbinned coordinates, need to scale up
-        ci.roi.width = config.width * binning_or_decimation_x;
-        ci.roi.height = config.height * binning_or_decimation_y;
-        ci.roi.x_offset = config.offset_x * binning_or_decimation_x;
-        ci.roi.y_offset = config.offset_y * binning_or_decimation_y;
-
-        bool roi_is_full_image = (ci.roi.width == ci.width && ci.roi.height == ci.height);
-        ci.roi.do_rectify = !roi_is_full_image;
-
-        // push the changes to manager
-        info_man_[camId]->setCameraInfo(ci);
-    }
     uint8_t MultiCamera::calculateColorIntensity(cv::Mat &img)
     {
         bool sumRGB = false;
