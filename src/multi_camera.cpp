@@ -214,7 +214,7 @@ namespace avt_vimba_camera
                 ROS_WARN_STREAM("-------------UPDATE CONFIG CAM " << i);
                 cam_[i]->updateConfig(newconfig);
 
-                if (cam_[i]->isOpened())
+                if (cam_[i]->connected_)
                 {
                     ROS_WARN_STREAM("-------------START IMAGING CAM " << i);
                     cam_[i]->startImaging();

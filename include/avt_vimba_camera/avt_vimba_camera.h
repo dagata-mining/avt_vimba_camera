@@ -93,9 +93,10 @@ public:
   }
    // Created by pointlaz
    int camId_;
-  bool opened_;
-  bool streaming_;
-  bool on_init_;
+  bool opened_ = false;
+  bool streaming_ = false;
+  bool on_init_ = false ;
+  bool connected_ = false;
 
   ~ AvtVimbaCamera()
   {
