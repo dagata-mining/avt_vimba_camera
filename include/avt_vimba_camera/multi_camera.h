@@ -78,7 +78,7 @@ namespace avt_vimba_camera
         // Camera configuration
         Config camera_config_;
 
-        void frameCallback(const FramePtr& ,const int camId=0);
+        void compressCallback(const FramePtr& ,const int camId=0);
         void configure(Config& newconfig, uint32_t level);
 
     };

@@ -278,7 +278,7 @@ void AvtVimbaCamera::frameCallback(const FramePtr vimba_frame_ptr)
   camera_state_ = OK;
   ROS_INFO("Before THREAD JOINED CAM %i", camId_);
   // Call the callback implemented by other classes
-  std::thread thread_callback = std::thread(userFrameCallback, vimba_frame_ptr);     // Modified by pointlaz (camId parameter added)
+  std::thread thread_callback = std::thread(userFrameCallback, vimba_frame_ptr,camId_);     // Modified by pointlaz (camId parameter added)
   thread_callback.join();
   ROS_INFO("THREAD JOINED CAM %i",camId_);
 }

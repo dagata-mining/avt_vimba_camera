@@ -61,9 +61,9 @@ namespace avt_vimba_camera
                 ROS_INFO("-------------New Cam");
                 std::shared_ptr<AvtVimbaCamera>
                     cam = std::shared_ptr<AvtVimbaCamera>(new AvtVimbaCamera(frame_id_[i], i));
-                cam->setCallback(std::bind(&avt_vimba_camera::MultiCamera::frameCallback,
+                cam->setCallback(std::bind(&avt_vimba_camera::MultiCamera::compressCallback,
                                            this,
-                                           std::placeholders::_1, i));
+                                           std::placeholders::_1, std::placeholders::_2));
                 cam_[i] = cam;
             }
             catch (std::exception &e)
@@ -101,7 +101,7 @@ namespace avt_vimba_camera
         api_.reset();
     }
 
-    void MultiCamera::frameCallback(const FramePtr& vimba_frame_ptr, const int camId)
+    void MultiCamera::compressCallback(const FramePtr& vimba_frame_ptr, const int camId)
     {
         ros::Time ros_time = ros::Time::now();
         if (pub_[camId].getNumSubscribers() >= 0)

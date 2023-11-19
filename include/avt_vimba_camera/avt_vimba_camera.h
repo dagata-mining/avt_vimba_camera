@@ -63,7 +63,7 @@ class AvtVimbaCamera
 {
 public:
   typedef avt_vimba_camera::AvtVimbaCameraConfig Config;
-  typedef std::function<void(const FramePtr)> frameCallbackFunc;         // Modified by pointlaz. camId as parameter
+  typedef std::function<void(const FramePtr,const int i)> compressCallbackFunc;         // Modified by pointlaz. camId as parameter
 
   AvtVimbaCamera();
   AvtVimbaCamera(const std::string& name, const int camId = 0, std::shared_ptr<AvtVimbaApi> api = nullptr);         // Modified by pointlaz. camId as parameter
@@ -87,7 +87,7 @@ public:
   int getSensorHeight();
 
   // Setters
-  void setCallback(frameCallbackFunc callback)
+  void setCallback(compressCallbackFunc callback)
   {
     userFrameCallback = callback;
   }
@@ -105,7 +105,7 @@ public:
       vimba_frame_ptr_.reset();
       vimba_camera_ptr_.reset();
       frame_obs_ptr_.reset();
-      setCallback([](const FramePtr& frame) {});
+      setCallback([](const FramePtr& frame, const int i) {});
   }
 
     Config config_;
@@ -133,7 +133,7 @@ private:
 
   CameraPtr openCamera(const std::string& id_str, bool print_all_features);
 
-  frameCallbackFunc userFrameCallback;
+  compressCallbackFunc userFrameCallback;
   void frameCallback(const FramePtr vimba_frame_ptr);       // Modified by pointlaz. camId as parameter
 
   template <typename T>
