@@ -164,8 +164,7 @@ void AvtVimbaCamera::stop()
         std::cout << "revoke" << std::endl;
         vimba_camera_ptr_->Close();
         std::cout << "close" << std::endl;
-        opened_ = false;
-        std::cout << "cameradown" << std::endl;
+
     }
       if (pub_)
       {

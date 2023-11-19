@@ -77,11 +77,6 @@ namespace avt_vimba_camera
     MultiCamera::~MultiCamera()
     {
         std::cout<< "exit stream" << std::endl;
-        for (int i = 0; i < cam_.size(); i++)
-        {
-            cam_[i]->~AvtVimbaCamera();
-            cam_[i].reset();
-        }
         cam_.clear();
         if(api_)api_.reset();
         pub_.clear();
