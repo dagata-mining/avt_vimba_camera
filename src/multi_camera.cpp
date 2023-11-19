@@ -88,7 +88,9 @@ namespace avt_vimba_camera
         {
             try
             {
+
                 cam_[i]->startImaging();
+                ROS_INFO("Setting call back cam %i is cam configured: %i", i, cam_[i]->initialized_);
                 cam_[i]->setCallback(std::bind(&avt_vimba_camera::MultiCamera::frameCallback,
                                                this,
                                                std::placeholders::_1,
