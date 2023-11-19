@@ -200,14 +200,22 @@ namespace avt_vimba_camera
             {
                 // The camera already stops & starts acquisition
                 // so there's no problem on changing any feature.
+                if (cam_[i]->isOpened())
+                {
+                    ROS_WARN_STREAM("-------------STOP IMAGING CAM " << i);
+                    cam_[i]->stopImaging();
+                }
                 if (!cam_[i]->isOpened())
                 {
                     ROS_WARN_STREAM("-------------START CAM " << i);
                     cam_[i]->start(ip_, guid_[i], frame_id_[i], print_all_features_);
-                    ROS_WARN_STREAM("-------------STOP IMAGING CAM " << i);
-                    cam_[i]->stopImaging();
-                    ROS_WARN_STREAM("-------------UPDATE CONFIG CAM " << i);
-                    cam_[i]->updateConfig(newconfig);
+                }
+
+                ROS_WARN_STREAM("-------------UPDATE CONFIG CAM " << i);
+                cam_[i]->updateConfig(newconfig);
+
+                if (cam_[i]->isOpened())
+                {
                     ROS_WARN_STREAM("-------------START IMAGING CAM " << i);
                     cam_[i]->startImaging();
                 }

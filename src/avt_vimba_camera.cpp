@@ -138,6 +138,7 @@ void AvtVimbaCamera::start(const std::string& ip_str, const std::string& guid_st
       SP_SET(frame_obs_ptr_,
              new FrameObserver(vimba_camera_ptr_,
                                std::bind(&avt_vimba_camera::AvtVimbaCamera::frameCallback, this, std::placeholders::_1)));       // Modified by pointlaz
+      startImaging();
   }
 
 }
