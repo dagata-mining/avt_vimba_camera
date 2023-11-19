@@ -83,35 +83,31 @@ namespace avt_vimba_camera
         {
             ROS_ERROR("Reconfiguring error because %s", e.what());
         }
-
-        for (int i = 0; i < camQty_; i++)
-        {
-            try
-            {
-
-                cam_[i]->startImaging();
-                ROS_INFO("Setting call back cam %i is cam configured: %i", i, cam_[i]->initialized_);
-                cam_[i]->setCallback(std::bind(&avt_vimba_camera::MultiCamera::frameCallback,
+        cam_[4]->startImaging();
+                ROS_INFO("Setting call back cam %i is cam configured: %i", 4, cam_[4]->initialized_);
+                cam_[4]->setCallback(std::bind(&avt_vimba_camera::MultiCamera::frameCallback,
                                                this,
                                                std::placeholders::_1,
-                                               i));
-            }
-            catch (std::exception &e)
-            {
-                ROS_ERROR("Set call backe cam %d error because %s", i, e.what());
-            }
+                                               4));
 
-            // Set camera info manager
-            try
-            {
-                info_man_[i] = std::shared_ptr<camera_info_manager::CameraInfoManager>(
-                    new camera_info_manager::CameraInfoManager(nhp_, name_[i], camera_info_url_[i]));
-            }
-            catch (std::exception &e)
-            {
-                ROS_ERROR("Publishing error cam %d error because %s", i, e.what());
-            }
-        }
+//        for (int i = 0; i < camQty_; i++)
+//        {
+//            try
+//            {
+//
+//                cam_[i]->startImaging();
+//                ROS_INFO("Setting call back cam %i is cam configured: %i", i, cam_[i]->initialized_);
+//                cam_[i]->setCallback(std::bind(&avt_vimba_camera::MultiCamera::frameCallback,
+//                                               this,
+//                                               std::placeholders::_1,
+//                                               i));
+//            }
+//            catch (std::exception &e)
+//            {
+//                ROS_ERROR("Set call backe cam %d error because %s", i, e.what());
+//            }
+//
+//        }
 
     }
 
