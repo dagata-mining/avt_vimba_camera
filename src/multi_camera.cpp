@@ -9,7 +9,6 @@ namespace avt_vimba_camera
     MultiCamera::MultiCamera(ros::NodeHandle& nh, ros::NodeHandle& nhp)
             : nh_(nh), nhp_(nhp), it_(nhp)
     {
-        // Start Vimba & list all available cameras
         try
         {
             api_.reset(new AvtVimbaApi);

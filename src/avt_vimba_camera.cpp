@@ -36,7 +36,7 @@
 #include <ros/ros.h>
 
 #include <signal.h>
-#include <thread>
+
 
 namespace avt_vimba_camera
 {
@@ -289,8 +289,8 @@ void AvtVimbaCamera::frameCallback(const FramePtr vimba_frame_ptr)
   std::unique_lock<std::mutex> lock(config_mutex_);
   camera_state_ = OK;
   // Call the callback implemented by other classes
-  std::thread thread_callback = std::thread(&AvtVimbaCamera::compress,this, vimba_frame_ptr);     // Modified by pointlaz (camId parameter added)
-  thread_callback.join();
+  currentThread = std::thread(&AvtVimbaCamera::compress,this, vimba_frame_ptr);     // Modified by pointlaz (camId parameter added)
+  currentThread.join();
 }
 
 void AvtVimbaCamera::compress(const FramePtr& vimba_frame_ptr)
@@ -682,6 +682,7 @@ bool AvtVimbaCamera::runCommand(const std::string& command_str)
   VmbErrorType err = vimba_camera_ptr_->GetFeatureByName(command_str.c_str(), feature_ptr);
   if (err == VmbErrorSuccess)
   {
+
     err = feature_ptr->RunCommand();
     if (err == VmbErrorSuccess)
     {

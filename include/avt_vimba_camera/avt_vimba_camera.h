@@ -45,6 +45,7 @@
 #include <sensor_msgs/CameraInfo.h>
 #include <std_msgs/UInt8.h>
 #include <cv_bridge/cv_bridge.h>
+#include <thread>
 #include <opencv2/opencv.hpp>
 
 #include <string>
@@ -122,9 +123,14 @@ public:
   bool streaming_ = false;
   bool on_init_ = false ;
   bool connected_ = false;
+  std::thread currentThread;
 
-  ~ AvtVimbaCamera()
+    ~ AvtVimbaCamera()
   {
+
+      std::unique_lock<std::mutex> unlock(config_mutex_);
+      unlock.unlock();
+      currentThread.detach();
       stopImaging();
       stop();
       vimba_frame_ptr_.reset();
