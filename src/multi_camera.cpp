@@ -98,6 +98,7 @@ namespace avt_vimba_camera
 
     MultiCamera::~MultiCamera(void)
     {
+        ROS_INFO("MultiCamera destructor called");
         reconfigure_server_.clearCallback();
         cam_.clear();
         api_.reset();
