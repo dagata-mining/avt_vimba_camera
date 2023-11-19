@@ -83,8 +83,8 @@ namespace avt_vimba_camera
         {
             ROS_ERROR("Reconfiguring error because %s", e.what());
         }
-        cam_[4]->startImaging();
-                ROS_INFO("Setting call back cam %i is cam configured: %i", 4, cam_[4]->initialized_);
+//        cam_[4]->startImaging();
+                ROS_INFO("Setting call back cam %i is cam streaming: %i", 4, cam_[4]->streaming_);
                 cam_[4]->setCallback(std::bind(&avt_vimba_camera::MultiCamera::frameCallback,
                                                this,
                                                std::placeholders::_1,
@@ -254,11 +254,12 @@ namespace avt_vimba_camera
                 if (!cam_[i]->isOpened())
                 {
                     cam_[i]->start(ip_, guid_[i], frame_id_[i], print_all_features_);
-                    //cam_[i]->stopImaging();
+                    cam_[i]->stopImaging();
                     ROS_WARN_STREAM("-------------START");
                     Config config = newconfig;
                     cam_[i]->updateConfig(config);
 //                    updateCameraInfo(config,i);
+                    cam_[i]->startImaging();
                     ROS_WARN_STREAM("------------- CONFIGURED");
                 }
 

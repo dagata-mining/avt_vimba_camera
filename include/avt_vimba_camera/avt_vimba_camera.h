@@ -102,7 +102,9 @@ public:
   }
 
   int getCamId(){return camId_;}            // Created by pointlaz
-
+  bool opened_;
+  bool streaming_;
+  bool on_init_;
 
 private:
   Config config_;
@@ -121,9 +123,7 @@ private:
   std::mutex config_mutex_;
 
   CameraState camera_state_;
-  bool opened_;
-  bool streaming_;
-  bool on_init_;
+
   std::string name_;
   std::string guid_;
   std::string frame_id_;
