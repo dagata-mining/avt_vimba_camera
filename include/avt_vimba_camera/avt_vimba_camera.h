@@ -127,14 +127,12 @@ public:
     ~ AvtVimbaCamera()
   {
         std::cout << "exit cam stream" << std::endl;
-      if (isOpened())
-      {
-          stopImaging();
-          stop();
-      }
+        stopImaging();
+        stop();
+      std::cout << "stopped" << std::endl;
+      if(frame_obs_ptr_) frame_obs_ptr_.reset();
       if (vimba_frame_ptr_) vimba_frame_ptr_.reset();
       if (vimba_camera_ptr_) vimba_camera_ptr_.reset();
-      if(frame_obs_ptr_) frame_obs_ptr_.reset();
       std::cout<< "cam clean finish" << std::endl;
 
   }
