@@ -162,9 +162,6 @@ void AvtVimbaCamera::stop()
         std::cout << "flush" << std::endl;
         vimba_camera_ptr_->RevokeAllFrames();
         std::cout << "revoke" << std::endl;
-        vimba_frame_ptr_->UnregisterObserver();
-        std::cout << "unregister" << std::endl;
-        //
         vimba_camera_ptr_->Close();
         std::cout << "close" << std::endl;
         opened_ = false;
