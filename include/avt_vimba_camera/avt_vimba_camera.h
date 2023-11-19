@@ -75,8 +75,7 @@ public:
 
   AvtVimbaCamera();
   AvtVimbaCamera(const std::string& name, const int camId = 0, std::shared_ptr<AvtVimbaApi> api = nullptr,
-                 std::shared_ptr<image_transport::CameraPublisher> pub = nullptr,
-                 std::shared_ptr<ros::Publisher> colorPub = nullptr);         // Modified by pointlaz. camId as parameter
+                 std::shared_ptr<image_transport::CameraPublisher> pub = nullptr);         // Modified by pointlaz. camId as parameter
 
  //Publishers
   std::shared_ptr<image_transport::CameraPublisher> pub_;

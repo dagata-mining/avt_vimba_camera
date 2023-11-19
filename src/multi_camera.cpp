@@ -61,7 +61,14 @@ namespace avt_vimba_camera
             {
                 ROS_INFO("-------------New Cam");
                 std::shared_ptr<AvtVimbaCamera>
-                    cam = std::shared_ptr<AvtVimbaCamera>(new AvtVimbaCamera(frame_id_[i], i ,api_,pub_[i],colorPub_[i]));
+                    cam = std::shared_ptr<AvtVimbaCamera>(new AvtVimbaCamera(frame_id_[i], i ,api_,pub_[i]));
+                if (calculateColorIntensity_)
+                {
+                    ROS_INFO("-------------Color Intensity");
+                    colorPub_[i].reset(new ros::Publisher);
+                    *colorPub_[i] = nh_.advertise<std_msgs::UInt8>("/multi_camera/color_intensity_" + std::to_string(i), 1);
+                    cam->colorPub_= colorPub_[i];
+                }
 //                cam->setCallback(std::bind(&avt_vimba_camera::MultiCamera::compressCallback,
 //                                           this,
 //                                           std::placeholders::_1, std::placeholders::_2));

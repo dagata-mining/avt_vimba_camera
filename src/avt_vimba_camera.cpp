@@ -68,9 +68,7 @@ AvtVimbaCamera::AvtVimbaCamera() : AvtVimbaCamera(ros::this_node::getName().c_st
 }
 
 AvtVimbaCamera::AvtVimbaCamera(const std::string& name, const int camId, std::shared_ptr<AvtVimbaApi> api,
-                               std::shared_ptr<image_transport::CameraPublisher> pub,
-                               std::shared_ptr<ros::Publisher> colorPub
-                               )        // Modified by pointlax (camId added)
+                               std::shared_ptr<image_transport::CameraPublisher> pub)        // Modified by pointlax (camId added)
 {
   // Init global variables
   opened_ = false;     // camera connected to the api
@@ -81,7 +79,6 @@ AvtVimbaCamera::AvtVimbaCamera(const std::string& name, const int camId, std::sh
   camera_state_ = OPENING;
   api_ = api;
   if (pub) pub_ = pub;
-  if (colorPub) colorPub_ = colorPub;
 }
 
 void AvtVimbaCamera::start(const std::string& ip_str, const std::string& guid_str, const std::string& frame_id,
