@@ -118,15 +118,6 @@ namespace avt_vimba_camera
 
             try
             {
-                cam_[i]->stop();
-            }
-            catch (std::exception &e)
-            {
-                ROS_ERROR("Stopping cam %d error because %s",i, e.what());
-            }
-
-            try
-            {
                 cam_[i].reset();
             }
             catch (std::exception &e)
@@ -142,6 +133,7 @@ namespace avt_vimba_camera
             {
                 ROS_ERROR("Publishing shutdown error cam %d error because %s",i, e.what());
             }
+            reconfigure_server_.clearCallback();
 
         }
 

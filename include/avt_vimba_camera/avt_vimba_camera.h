@@ -106,6 +106,18 @@ public:
   bool streaming_;
   bool on_init_;
 
+  ~ AvtVimbaCamera()
+  {
+      ROS_INFO("Destroying Camera");
+      stopImaging();
+      stop();
+      frame_obs_ptr_.reset();
+      vimba_frame_ptr_.reset();
+      vimba_camera_ptr_.reset();
+      setCallback([](const FramePtr& frame, int camId) {});
+      ROS_INFO("Camera Destroyed");
+  }
+
 private:
   Config config_;
 
