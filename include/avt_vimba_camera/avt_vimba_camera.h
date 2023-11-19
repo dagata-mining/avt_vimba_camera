@@ -123,20 +123,19 @@ public:
   bool streaming_ = false;
   bool on_init_ = false ;
   bool connected_ = false;
-  std::thread currentThread;
 
     ~ AvtVimbaCamera()
   {
-
-      std::unique_lock<std::mutex> unlock(config_mutex_);
-      unlock.unlock();
-      currentThread.detach();
-      stopImaging();
-      stop();
-      vimba_frame_ptr_.reset();
-      vimba_camera_ptr_.reset();
-      frame_obs_ptr_.reset();
-      setCallback([](const FramePtr& frame, const int i) {});
+        std::cout << "exit cam stream" << std::endl;
+      if (isOpened())
+      {
+          stopImaging();
+          stop();
+      }
+      if (vimba_frame_ptr_) vimba_frame_ptr_.reset();
+      if (vimba_camera_ptr_) vimba_camera_ptr_.reset();
+      if(frame_obs_ptr_) frame_obs_ptr_.reset();
+      std::cout<< "cam clean finish" << std::endl;
 
   }
     void compress(const FramePtr& vimba_frame_ptr);

@@ -61,6 +61,7 @@ static volatile int keepRunning = 1;
 void intHandler(int dummy)
 {
   keepRunning = 0;
+  ros::shutdown();
 }
 
 AvtVimbaCamera::AvtVimbaCamera() : AvtVimbaCamera(ros::this_node::getName().c_str())
@@ -128,21 +129,21 @@ void AvtVimbaCamera::start(const std::string& ip_str, const std::string& guid_st
     camera_state_ = ERROR;
   }
 
-  VmbInterfaceType cam_int_type;
-  vimba_camera_ptr_->GetInterfaceType(cam_int_type);
-  if (cam_int_type == VmbInterfaceEthernet)
+
+  if (camera_state_ == IDLE && vimba_camera_ptr_)
   {
-    runCommand("GVSPAdjustPacketSize");
-  }
-  if (camera_state_ == IDLE)
-  {
+      VmbInterfaceType cam_int_type;
+      vimba_camera_ptr_->GetInterfaceType(cam_int_type);
+      if (cam_int_type == VmbInterfaceEthernet)
+      {
+          runCommand("GVSPAdjustPacketSize");
+      }
       // Create a frame observer for this camera
       SP_SET(frame_obs_ptr_,
              new FrameObserver(vimba_camera_ptr_,
                                std::bind(&avt_vimba_camera::AvtVimbaCamera::frameCallback, this, std::placeholders::_1)));       // Modified by pointlaz
       connected_ = true;
   }
-
 }
 
 void AvtVimbaCamera::stop()
@@ -289,7 +290,7 @@ void AvtVimbaCamera::frameCallback(const FramePtr vimba_frame_ptr)
   std::unique_lock<std::mutex> lock(config_mutex_);
   camera_state_ = OK;
   // Call the callback implemented by other classes
-  currentThread = std::thread(&AvtVimbaCamera::compress,this, vimba_frame_ptr);     // Modified by pointlaz (camId parameter added)
+  std::thread currentThread = std::thread(&AvtVimbaCamera::compress,this, vimba_frame_ptr);     // Modified by pointlaz (camId parameter added)
   currentThread.join();
 }
 

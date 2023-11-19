@@ -9,17 +9,11 @@ namespace avt_vimba_camera
     MultiCamera::MultiCamera(ros::NodeHandle& nh, ros::NodeHandle& nhp)
             : nh_(nh), nhp_(nhp), it_(nhp)
     {
-        try
-        {
-            api_.reset(new AvtVimbaApi);
-            api_->start();
-        }
-        catch (std::exception &e)
-        {
-            ROS_ERROR("api start error because %s", e.what());
-        }
 
-        // Set the params
+        api_.reset(new AvtVimbaApi);
+        api_->start();
+//
+//        // Set the params
 
         nhp_.param("camera_qty", camQty_, 1);
         nhp_.param("compress_jpeg_vimba", compressJPG_, true);
@@ -56,54 +50,39 @@ namespace avt_vimba_camera
             nhp_.param("use_measurement_time", use_measurement_time_, false);
             nhp_.param("ptp_offset", ptp_offset_, 0);
 
-            try
+            ROS_INFO("-------------New Cam");
+            std::shared_ptr<AvtVimbaCamera>
+                cam = std::shared_ptr<AvtVimbaCamera>(new AvtVimbaCamera(frame_id_[i], i, api_, pub_[i]));
+            if (calculateColorIntensity_)
             {
-                ROS_INFO("-------------New Cam");
-                std::shared_ptr<AvtVimbaCamera>
-                    cam = std::shared_ptr<AvtVimbaCamera>(new AvtVimbaCamera(frame_id_[i], i ,api_,pub_[i]));
-                if (calculateColorIntensity_)
-                {
-                    ROS_INFO("-------------Color Intensity");
-                    colorPub_[i].reset(new ros::Publisher);
-                    *colorPub_[i] = nh_.advertise<std_msgs::UInt8>("/multi_camera/color_intensity_" + std::to_string(i), 1);
-                    cam->colorPub_= colorPub_[i];
-                }
+                ROS_INFO("-------------Color Intensity");
+                colorPub_[i].reset(new ros::Publisher);
+                *colorPub_[i] = nh_.advertise<std_msgs::UInt8>("/multi_camera/color_intensity_" + std::to_string(i), 1);
+                cam->colorPub_ = colorPub_[i];
+            }
 //                cam->setCallback(std::bind(&avt_vimba_camera::MultiCamera::compressCallback,
 //                                           this,
 //                                           std::placeholders::_1, std::placeholders::_2));
-                cam_[i] = cam;
-            }
-            catch (std::exception &e)
-            {
-                ROS_ERROR("Creating cam %d error because %s", i, e.what());
-            }
-
+            cam_[i] = cam;
         }
-
-        // Start dynamic_reconfigur & run configure()
-        try
-        {
             ROS_INFO("-------------Reconfig");
             reconfigure_server_.setCallback(
                 std::bind(&avt_vimba_camera::MultiCamera::configure,
                           this,
                           std::placeholders::_1,
                           std::placeholders::_2));
-        }
-        catch (std::exception &e)
-        {
-            ROS_ERROR("Reconfiguring error because %s", e.what());
-        }
+            reconfigure_server_.clearCallback();
     }
 
-    MultiCamera::~MultiCamera(void)
+    MultiCamera::~MultiCamera()
     {
-        ROS_INFO("MultiCamera destructor called");
-        reconfigure_server_.clearCallback();
+        std::cout<< "exit stream" << std::endl;
         cam_.clear();
-        api_.reset();
+        if(api_)api_.reset();
         pub_.clear();
         colorPub_.clear();
+        reconfigure_server_.clearCallback();
+        std::cout<< "multi clean finish" << std::endl;
     }
 
 
@@ -123,34 +102,30 @@ namespace avt_vimba_camera
         for (int i = 0 ; i < cam_.size();i++)
         {
             ROS_INFO("-------------------------------CAMERA %d", i);
-            try
+            // The camera already stops & starts acquisition
+            // so there's no problem on changing any feature.
+            if (cam_[i]->isOpened())
             {
-                // The camera already stops & starts acquisition
-                // so there's no problem on changing any feature.
-                if (cam_[i]->isOpened())
-                {
-                    ROS_WARN_STREAM("-------------STOP IMAGING CAM " << i);
-                    cam_[i]->stopImaging();
-                }
-                if (!cam_[i]->isOpened())
-                {
-                    ROS_WARN_STREAM("-------------START CAM " << i);
-                    cam_[i]->start(ip_, guid_[i], frame_id_[i], print_all_features_);
-                }
+                ROS_WARN_STREAM("-------------STOP IMAGING CAM " << i);
+                cam_[i]->stopImaging();
+            }
+            if (!cam_[i]->isOpened())
+            {
+                ROS_WARN_STREAM("-------------START CAM " << i);
+                cam_[i]->start(ip_, guid_[i], frame_id_[i], print_all_features_);
+            }
 
+            if (cam_[i]->isOpened())
+            {
                 ROS_WARN_STREAM("-------------UPDATE CONFIG CAM " << i);
                 cam_[i]->updateConfig(newconfig);
-
-                if (cam_[i]->connected_)
-                {
-                    ROS_WARN_STREAM("-------------START IMAGING CAM " << i);
-                    cam_[i]->startImaging();
-                }
             }
-            catch (const std::exception& e)
+            if (cam_[i]->connected_)
             {
-                ROS_ERROR_STREAM("Error reconfiguring multi_camera node : " << e.what());
+                ROS_WARN_STREAM("-------------START IMAGING CAM " << i);
+                cam_[i]->startImaging();
             }
+
         }
     }
 
