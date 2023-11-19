@@ -61,6 +61,9 @@ namespace avt_vimba_camera
                 ROS_INFO("-------------New Cam");
                 std::shared_ptr<AvtVimbaCamera>
                     cam = std::shared_ptr<AvtVimbaCamera>(new AvtVimbaCamera(frame_id_[i], i));
+                cam->setCallback(std::bind(&avt_vimba_camera::MultiCamera::frameCallback,
+                                           this,
+                                           std::placeholders::_1, i));
                 cam_[i] = cam;
             }
             catch (std::exception &e)
@@ -83,23 +86,6 @@ namespace avt_vimba_camera
         catch (std::exception &e)
         {
             ROS_ERROR("Reconfiguring error because %s", e.what());
-        }
-
-        for (int i = 0; i < camQty_; i++)
-        {
-            try
-            {
-
-                cam_[i]->startImaging();
-                ROS_INFO("Setting call back cam %i is cam opened: %i", i, cam_[i]->opened_);
-                cam_[i]->setCallback(std::bind(&avt_vimba_camera::MultiCamera::frameCallback,
-                                               this,
-                                               std::placeholders::_1,i));
-            }
-            catch (std::exception &e)
-            {
-                ROS_ERROR("Set call backe cam %d error because %s", i, e.what());
-            }
         }
     }
 

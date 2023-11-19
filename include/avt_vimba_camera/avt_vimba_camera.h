@@ -101,9 +101,9 @@ public:
   {
       stopImaging();
       stop();
-      frame_obs_ptr_.reset();
       vimba_frame_ptr_.reset();
       vimba_camera_ptr_.reset();
+      frame_obs_ptr_.reset();
       setCallback([](const FramePtr& frame) {});
   }
 
