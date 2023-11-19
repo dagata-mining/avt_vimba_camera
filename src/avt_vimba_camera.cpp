@@ -150,7 +150,7 @@ void AvtVimbaCamera::start(const std::string& ip_str, const std::string& guid_st
     runCommand("GVSPAdjustPacketSize");
   }
     int throughput;
-    configureFeature("DeviceLinkThroughputLimit", static_cast<VmbInt64_t>(50000000),throughput);
+    configureFeature("DeviceLinkThroughputLimit", static_cast<VmbInt64_t>(5000),throughput);
     ROS_INFO("------------DeviceThroughput Setted to %i", throughput);
 
   // Create a frame observer for this camera
@@ -310,6 +310,7 @@ void AvtVimbaCamera::frameCallback(const FramePtr vimba_frame_ptr, const int cam
   diagnostic_msg_ = "Camera operating normally";
     ROS_INFO("Before THREAD JOINED CAM %i",camId);
   // Call the callback implemented by other classes
+  if (!vimba_frame_ptr) return;
   std::thread thread_callback = std::thread(userFrameCallback, vimba_frame_ptr, camId);     // Modified by pointlaz (camId parameter added)
   thread_callback.join();
 //  userFrameCallback( vimba_frame_ptr, camId);
@@ -844,7 +845,7 @@ void AvtVimbaCamera::updateConfig(Config& config)
   updateWhiteBalanceConfig(config);
   updateImageModeConfig(config);
   updateROIConfig(config);
-  updateBandwidthConfig(config);
+//  updateBandwidthConfig(config);
   updateGPIOConfig(config);
   updateUSBGPIOConfig(config);
   updatePtpModeConfig(config);
