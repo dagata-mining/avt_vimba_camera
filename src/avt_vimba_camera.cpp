@@ -167,10 +167,10 @@ void AvtVimbaCamera::stop()
           pub_->shutdown();
           pub_.reset();
       }
-      if (colorPub_)
+      if (pixel_intensity_pub_)
       {
-          colorPub_->shutdown();
-          colorPub_.reset();
+          pixel_intensity_pub_->shutdown();
+          pixel_intensity_pub_.reset();
       }
 }
 
@@ -301,8 +301,9 @@ void AvtVimbaCamera::compress(const FramePtr& vimba_frame_ptr)
     if (pub_->getNumSubscribers() >= 0)
     {
         sensor_msgs::Image img;
-        sensor_msgs::CompressedImage compressed;
-        if (api_->frameToImage(vimba_frame_ptr, img))
+        std_msgs::UInt8 pixelIntensityMsg;
+
+        if (api_->frameToImage(vimba_frame_ptr, img, pixelIntensityMsg))
         {
             sensor_msgs::CameraInfo ci;
             // Note: getCameraInfo() doesn't fill in header frame_id or stamp
@@ -310,45 +311,21 @@ void AvtVimbaCamera::compress(const FramePtr& vimba_frame_ptr)
             ci.header.stamp = ros_time;
             img.header.stamp = ci.header.stamp;
 
-            if (compressJPG_ || calculateColorIntensity_)
+            if (compressJPG_)
             {
                 cv_bridge::CvImagePtr cv_ptr;
-
                 cv_ptr = cv_bridge::toCvCopy(img, sensor_msgs::image_encodings::RGB8);
-
-                if (calculateColorIntensity_)
-                {
-                    std_msgs::UInt8 colorIntensityMsg;
-                    colorIntensityMsg.data = 0;
-                    try
-                    {
-                        colorIntensityMsg.data = calculateColorIntensity(cv_ptr->image);
-                    }
-                    catch (std::exception &e)
-                    {
-                        ROS_INFO("-----Could not calculate color intensity cam %d because %s", camId_, e.what());
-                    }
-                    //colorPub_[camId].publish(colorIntensityMsg);
-                }
-
-                if (compressJPG_)
-                {
                     // Compress the image using OpenCV
                     std::vector<int> compression_params;
                     compression_params.push_back(cv::IMWRITE_JPEG_QUALITY);  // You can use other parameters like PNG compression
                     compression_params.push_back(qualityJPG_);  // Set the desired image quality (0-100)
                     cv::imencode(".jpg", cv_ptr->image, img.data, compression_params);
                     img.encoding = "jpg";
-                    pub_->publish(img, ci);
-                }
-                else
-                {
-                    pub_->publish(img, ci);
-                }
             }
-            else
+            pub_->publish(img, ci);
+            if (pixel_intensity_pub_)
             {
-                pub_->publish(img, ci);
+                pixel_intensity_pub_->publish(pixelIntensityMsg);
             }
         }
         else

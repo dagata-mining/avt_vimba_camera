@@ -55,18 +55,12 @@ namespace avt_vimba_camera
         bool allReady_ = false;
         bool allConfigure_ = false;
 
-
-
-        //Calculating color intensity
-        bool calculateColorIntensity_;
-        std::string colorIntensityRGB_;
-        int colorIntensityPxSteps_;
-        uint8_t calculateColorIntensity(cv::Mat &img);
-
+        // Calculating pixel intensity
+        bool calculate_pixel_intensity_;
 
         image_transport::ImageTransport it_;
         std::vector<std::shared_ptr<image_transport::CameraPublisher>> pub_;
-        std::vector<std::shared_ptr<ros::Publisher>> colorPub_;
+        std::vector<std::shared_ptr<ros::Publisher>> pixel_intensity_pub_;
 
 
         // Dynamic reconfigure

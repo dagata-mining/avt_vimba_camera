@@ -22,6 +22,8 @@ namespace avt_vimba_camera
         nhp_.param("calculate_color_intensity", calculateColorIntensity_, true);
         nhp_.param("color_intensity_pixel_steps", colorIntensityPxSteps_, 10);
         nhp_.param("color_intensity_RGB", colorIntensityRGB_);
+        // Get Pixel Intensity params
+        nhp_.param("calculate_pixel_intensity", calculate_pixel_intensity_,true);
 
         guid_.resize(camQty_);
         pub_.resize(camQty_);
@@ -29,19 +31,26 @@ namespace avt_vimba_camera
         frame_id_.resize(camQty_);
         cam_.resize(camQty_);
         name_.resize(camQty_);
-        if (calculateColorIntensity_)
-            colorPub_.resize(camQty_);
+
+        if(calculate_pixel_intensity_)
+        {
+            int pixel_intensity_pixel_steps, pixel_intensity_saturation_value;
+            double pixel_intensity_saturated_threshold;
+            bool pixel_intensity_echo;
+            nhp_.param("pixel_intensity_pixel_steps", pixel_intensity_pixel_steps,10);
+            nhp_.param("pixel_intensity_saturated_threshold", pixel_intensity_saturated_threshold,0.1);
+            nhp_.param("pixel_intensity_saturation_value", pixel_intensity_saturation_value,255);
+            nhp_.param("pixel_intensity_echo", pixel_intensity_echo,false);
+            api_->setPixelIntensityParameters(pixel_intensity_pixel_steps, pixel_intensity_saturated_threshold, pixel_intensity_saturation_value, pixel_intensity_echo);
+            pixel_intensity_pub_.resize(camQty_);
+        }
+
 
         for (int i = 0; i < camQty_; i++)
         {
             pub_[i].reset(new image_transport::CameraPublisher);
             *pub_[i] = it_.advertiseCamera(topicName + std::to_string(i), 1);
-            if (calculateColorIntensity_)
-            {
-                ROS_INFO("-------------Color Intensity");
-                colorPub_[i].reset(new ros::Publisher);
-                *colorPub_[i] = nh_.advertise<std_msgs::UInt8>("/multi_camera/color_intensity_" + std::to_string(i), 1);
-            }
+
             nhp_.param("guid_" + std::to_string(i), guid_[i], std::string(""));
             nhp_.param("camera_info_url_" + std::to_string(i), camera_info_url_[i], std::string(""));
             nhp_.param("frame_id_" + std::to_string(i), frame_id_[i], std::string(""));
@@ -53,16 +62,13 @@ namespace avt_vimba_camera
             ROS_INFO("-------------New Cam");
             std::shared_ptr<AvtVimbaCamera>
                 cam = std::shared_ptr<AvtVimbaCamera>(new AvtVimbaCamera(frame_id_[i], i, api_, pub_[i]));
-            if (calculateColorIntensity_)
+            if (calculate_pixel_intensity_)
             {
                 ROS_INFO("-------------Color Intensity");
-                colorPub_[i].reset(new ros::Publisher);
-                *colorPub_[i] = nh_.advertise<std_msgs::UInt8>("/multi_camera/color_intensity_" + std::to_string(i), 1);
-                cam->colorPub_ = colorPub_[i];
+                pixel_intensity_pub_[i].reset(new ros::Publisher);
+                *pixel_intensity_pub_[i] = nh_.advertise<std_msgs::UInt8>("/multi_camera/pixel_intensity_" + std::to_string(i), 1);
+                cam->setPixelIntensityPublisher(pixel_intensity_pub_[i]);
             }
-//                cam->setCallback(std::bind(&avt_vimba_camera::MultiCamera::compressCallback,
-//                                           this,
-//                                           std::placeholders::_1, std::placeholders::_2));
             cam_[i] = cam;
         }
             ROS_INFO("-------------Reconfig");

@@ -80,18 +80,13 @@ public:
 
  //Publishers
   std::shared_ptr<image_transport::CameraPublisher> pub_;
-  std::shared_ptr<ros::Publisher> colorPub_;
+  std::shared_ptr<ros::Publisher> pixel_intensity_pub_;
 
 
   //Compressing
   bool compressJPG_ = true;
   int qualityJPG_ = 90;
-
-  //intensity
-  bool calculateColorIntensity_ = false;
-  std::string colorIntensityRGB_ = "R";
-  int colorIntensityPxSteps_ = 10;
-
+  void setPixelIntensityPublisher(std::shared_ptr<ros::Publisher> pub) {if(pub) pixel_intensity_pub_ = pub;}
 
 
   void start(const std::string& ip_str, const std::string& guid_str, const std::string& frame_id,
