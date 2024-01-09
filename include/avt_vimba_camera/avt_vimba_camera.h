@@ -152,7 +152,6 @@ private:
 
 
   // Created by pointlaz to store camId
-  uint8_t calculateColorIntensity(cv::Mat &img);
   CameraPtr openCamera(const std::string& id_str, bool print_all_features);
 
   compressCallbackFunc userFrameCallback;

@@ -82,7 +82,7 @@ namespace avt_vimba_camera
         cam_.clear();
         if(api_)api_.reset();
         pub_.clear();
-        colorPub_.clear();
+        pixel_intensity_pub_.clear();
         reconfigure_server_.clearCallback();
         std::cout<< "multi clean finish" << std::endl;
     }

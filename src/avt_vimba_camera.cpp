@@ -335,47 +335,6 @@ void AvtVimbaCamera::compress(const FramePtr& vimba_frame_ptr)
     }
 }
 
-uint8_t AvtVimbaCamera::calculateColorIntensity(cv::Mat &img)
-{
-    bool sumRGB = false;
-    int colorId = 0;
-    if (colorIntensityRGB_ == "R" || colorIntensityRGB_ == "r") colorId = 0;
-    else if (colorIntensityRGB_ == "G" || colorIntensityRGB_ == "g") colorId = 1;
-    else if (colorIntensityRGB_ == "B" || colorIntensityRGB_ == "b") colorId = 2;
-    else sumRGB=true;
-
-    int count = 0;
-    int sum = 0;
-    cv::Vec3b vecRGB;
-
-    if (sumRGB)
-    {
-        for (int row = 0 ; row < img.rows; row +=  colorIntensityPxSteps_)
-        {
-            for (int col = 0 ; col < img.cols; col +=  colorIntensityPxSteps_)
-            {
-                vecRGB = img.at<cv::Vec3b>(row,col);
-                sum += (vecRGB[0]+vecRGB[2]+vecRGB[1]);
-                count++;
-            }
-        }
-        count *=3;
-    }
-    else
-    {
-        for (int row = 0 ; row < img.rows; row +=  colorIntensityPxSteps_)
-        {
-            for (int col = 0 ; col < img.cols; col +=  colorIntensityPxSteps_)
-            {
-                sum += img.at<cv::Vec3b>(row,col)[colorId];
-                count++;
-            }
-        }
-    }
-    uint8_t colorIntensity = (uint8_t)(sum/count);
-    return colorIntensity;
-}
-
 int AvtVimbaCamera::getSensorWidth()
 {
   int sensor_width;
