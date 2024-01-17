@@ -49,7 +49,7 @@ void FrameObserver::FrameReceived(const FramePtr vimba_frame_ptr)
     {
       case VmbFrameStatusComplete: {
         // Call the callback
-        callback_(vimba_frame_ptr,0);       // Modified by pointlaz (camId = 0)
+        callback_(vimba_frame_ptr);       // Modified by pointlaz (camId = 0)
         break;
       }
       case VmbFrameStatusIncomplete: {

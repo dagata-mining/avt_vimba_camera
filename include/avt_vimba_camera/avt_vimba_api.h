@@ -40,6 +40,7 @@
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/image_encodings.h>
 #include <sensor_msgs/fill_image.h>
+#include <std_msgs/UInt8.h>
 
 #include <string>
 #include <map>
@@ -56,6 +57,15 @@ public:
   AvtVimbaApi() : vs(VimbaSystem::GetInstance())
   {
   }
+
+    VimbaSystem& vs;      // Modified by pointlaz. vs is now public
+
+    // Pixel Intensity Calculation
+    int pixel_intensity_pixel_steps_;               // A pixel will be taken every 'pixel_intensity_pixel_steps' to do the pixel intensity calculation
+    double pixel_intensity_saturated_threshold_;    // The ratio of saturated pixels for which the image is considered saturated
+    int pixel_intensity_saturation_value_;          // The value for which a pixel is considered saturated
+    bool pixel_intensity_echo_;
+    bool pixel_intensity_ = false ;
 
   void start()
   {
@@ -142,7 +152,7 @@ public:
       return "Undefined access";
   }
 
-  bool frameToImage(const FramePtr vimba_frame_ptr, sensor_msgs::Image& image)
+  bool frameToImage(const FramePtr vimba_frame_ptr, sensor_msgs::Image& image, std_msgs::UInt8 &pixel_intensity_msg)
   {
     VmbPixelFormatType pixel_format;
     VmbUint32_t width, height, nSize;
@@ -228,8 +238,21 @@ public:
 
     VmbUchar_t* buffer_ptr;
     std::vector<VmbUchar_t> TransformedData;
-    VmbErrorType err = TransformImage( vimba_frame_ptr, TransformedData, "RGB24" );
+    VmbErrorType err;
+    try
+    {
+        err = TransformImage(vimba_frame_ptr, TransformedData, "RGB24");
+    }
+    catch (std::exception &e)
+    {
+        ROS_ERROR("Frame callback transformingImage error because %s", e.what());
+    }
     buffer_ptr =reinterpret_cast<VmbUchar_t*>(TransformedData.data());
+
+    if (pixel_intensity_)
+    {
+        pixel_intensity_msg = calculatePixelIntensity(TransformedData);
+    }
 
     bool res = false;
     if (VmbErrorSuccess == err)
@@ -246,7 +269,23 @@ public:
     return res;
   }
 
-  VimbaSystem& vs;      // Modified by pointlaz. vs is now public
+    /**
+   * @brief Set Pixel Intensity Calculation Parameters
+   *
+   * @param pixel_intensity_pixel_steps A pixel will be taken every 'pixel_intensity_pixel_steps' to do the pixel intensity calculation
+   * @param pixel_intensity_saturated_threshold The ratio of saturated pixels for which the image is considered saturated
+   * @param pixel_intensity_saturation_value The value for which a pixel is considered saturated
+   * @param pixel_intensity_echo If true, results of the calculation and computation time will be echo in terminal
+   */
+    void setPixelIntensityParameters(int pixel_intensity_pixel_steps, double pixel_intensity_saturated_threshold, int pixel_intensity_saturation_value, bool pixel_intensity_echo)
+    {
+        pixel_intensity_pixel_steps_ = pixel_intensity_pixel_steps;
+        pixel_intensity_saturated_threshold_ = pixel_intensity_saturated_threshold;
+        pixel_intensity_saturation_value_ = pixel_intensity_saturation_value;
+        pixel_intensity_echo_ = pixel_intensity_echo;
+        pixel_intensity_ = true ;
+    }
+
 
 private:
 
@@ -329,6 +368,9 @@ private:
       ROS_WARN("Could not start Vimba System");
     }
   }
+
+
+
     VmbErrorType TransformImage( const FramePtr & SourceFrame, std::vector<VmbUchar_t> & DestinationData, const std::string &DestinationFormat )
     {
         if( SP_ISNULL( SourceFrame) )
@@ -382,6 +424,59 @@ private:
         // Transform data
         Result = static_cast<VmbErrorType>( VmbImageTransform( &SourceImage, &DestinationImage, NULL , 0 ));
         return Result;
+    }
+
+    std_msgs::UInt8 calculatePixelIntensity(std::vector<VmbUchar_t> data)
+    {
+
+        ros::Time start_time = ros::Time::now();
+        int nb_pixels = 0;
+        int nb_saturated_pixels = 0;
+        int nb_non_saturated_pixels = 0;
+        int sum_values_non_saturated_pixels = 0;
+
+        // Parse Image Buffer
+        for(int i = 0 ; i < data.size() ; i += pixel_intensity_pixel_steps_)
+        {
+            // Saturated Pixel
+            if(data[i] >= pixel_intensity_saturation_value_)
+            {
+                nb_saturated_pixels++;
+            }
+                // Non Saturated Pixel
+            else
+            {
+                sum_values_non_saturated_pixels += data[i];
+                nb_non_saturated_pixels++;
+            }
+            nb_pixels++;
+        }
+
+        // Message definition
+        std_msgs::UInt8 pixel_intensity_msg;
+
+        // If too many pixels are saturated, the value '255' is published so the lights_intensities node know it has to quickly reduce the light intensity
+        float ratio_saturated_pixels = (float)nb_saturated_pixels / (float)nb_pixels;
+        if(ratio_saturated_pixels > pixel_intensity_saturated_threshold_)
+        {
+            pixel_intensity_msg.data = 255;
+        }
+            // Else, we calculate the mean intensity value from the non-saturated pixels
+        else
+        {
+            pixel_intensity_msg.data = sum_values_non_saturated_pixels / nb_non_saturated_pixels;
+        }
+
+        // Echos
+        if(pixel_intensity_echo_)
+        {
+            ROS_INFO_STREAM("--------------------------------------------------");
+            ROS_INFO_STREAM("nb_pixels: " << nb_pixels << " ; ratio_saturated_pixels: " << ratio_saturated_pixels << " ; pixel_intensity_msg.data: " << pixel_intensity_msg.data);
+            ros::Duration elapsed_time = ros::Time::now() - start_time;
+            ROS_INFO_STREAM("Elapsed Time: " << std::to_string(elapsed_time.toSec()) << "s" << std::endl);
+        }
+
+        return pixel_intensity_msg;
     }
 
 };

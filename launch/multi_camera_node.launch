@@ -82,7 +82,7 @@
   <arg name="whitebalance_auto"         default="Off"/>
   <arg name="whitebalance_auto_tol"     default="5"/>
   <arg name="whitebalance_auto_rate"    default="100"/>
-    <!-- Binning and Decimation -->
+  <!-- Binning and Decimation -->
   <arg name="binning_x"                 default="1"/>
   <arg name="binning_y"                 default="1"/>
   <arg name="decimation_x"              default="1"/>
@@ -112,10 +112,13 @@
   <arg name="compression_jpeg_restart_interval"     default="0"/>
   <arg name="compression_png_level"                 default="9"/>
 
-  <!-- Color Intensity parameters -->
-  <arg name="calculate_color_intensity"             default="false"/>
-  <arg name="color_intensity_pixel_steps"           default="10"/>
-  <arg name="color_intensity_RGB"                   default="R"/> <!-- R,G,B or RGB -->
+  <!-- Pixel Intensity parameters -->
+  <arg name="calculate_pixel_intensity"                 default="true"/>    <!-- (bool) If true, the pixel intensity will be calculated for every camera and published in topics. -->
+  <arg name="pixel_intensity_pixel_steps"               default="10"/>      <!-- (int) A pixel will be taken every 'pixel_intensity_pixel_steps' to do the pixel intensity calculation. -->
+  <arg name="pixel_intensity_saturated_threshold"       default="0.1"/>     <!-- (float ; [0.0 ; 1.0]) The ratio of saturated pixels for which the image is considered saturated. -->
+  <arg name="pixel_intensity_saturation_value"          default="255"/>     <!-- (int ; [0 ; 255]) The value for which a pixel is considered saturated. -->
+  <arg name="pixel_intensity_echo"                      default="true"/>    <!-- (bool) If true, results of the calculation and computation time will be echo in terminal. -->
+
 
   <group if="$(arg image_proc)" ns="$(arg name)">
     <node name="image_proc" pkg="image_proc" type="image_proc"/>
@@ -214,10 +217,12 @@
     <param name="line_selector"             value="$(arg line_selector)"/>
     <param name="line_mode"                 value="$(arg line_mode)"/>
 
-    <!-- Color Intensity parameters -->
-    <param name="calculate_color_intensity"                       value="$(arg calculate_color_intensity)"/>
-    <param name="color_intensity_pixel_steps"                     value="$(arg color_intensity_pixel_steps)"/>
-    <param name="color_intensity_RGB"                             value="$(arg color_intensity_RGB)"/>
+    <!-- Pixel Intensity parameters -->
+    <param name="calculate_pixel_intensity"                       value="$(arg calculate_pixel_intensity)"/>
+    <param name="pixel_intensity_pixel_steps"                     value="$(arg pixel_intensity_pixel_steps)"/>
+    <param name="pixel_intensity_saturated_threshold"             value="$(arg pixel_intensity_saturated_threshold)"/>
+    <param name="pixel_intensity_saturation_value"                value="$(arg pixel_intensity_saturation_value)"/>
+    <param name="pixel_intensity_echo"                            value="$(arg pixel_intensity_echo)"/>
 
     <param name="compress_jpeg_quality"                             value="$(arg compression_jpeg_quality)"/>
     <param name="compress_jpeg_vimba"                             value="$(arg compression_jpeg_vimba)"/>
@@ -308,4 +313,3 @@
   </group>
 
 </launch>
-

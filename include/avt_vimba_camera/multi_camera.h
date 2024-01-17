@@ -29,7 +29,7 @@ namespace avt_vimba_camera
         ~MultiCamera(void);
 
     private:
-        AvtVimbaApi api_;
+        std::shared_ptr<AvtVimbaApi> api_;
         std::vector<std::shared_ptr<AvtVimbaCamera>> cam_;
 
         ros::NodeHandle nh_;
@@ -52,19 +52,16 @@ namespace avt_vimba_camera
         //Compressing
         bool compressJPG_;
         int qualityJPG_;
+        bool allReady_ = false;
+        bool allConfigure_ = false;
 
-        //Calculating color intensity
-        bool calculateColorIntensity_;
-        std::string colorIntensityRGB_;
-        int colorIntensityPxSteps_;
-        uint8_t calculateColorIntensity(cv::Mat &img);
-
+        // Calculating pixel intensity
+        bool calculate_pixel_intensity_;
 
         image_transport::ImageTransport it_;
-        std::vector<image_transport::CameraPublisher> pub_;
-        std::vector<ros::Publisher> colorPub_;
+        std::vector<std::shared_ptr<image_transport::CameraPublisher>> pub_;
+        std::vector<std::shared_ptr<ros::Publisher>> pixel_intensity_pub_;
 
-        std::vector<std::shared_ptr<camera_info_manager::CameraInfoManager>> info_man_;
 
         // Dynamic reconfigure
         typedef avt_vimba_camera::AvtVimbaCameraConfig Config;
@@ -74,9 +71,8 @@ namespace avt_vimba_camera
         // Camera configuration
         Config camera_config_;
 
-        void frameCallback(const FramePtr& ,const int camId=0);
+        void compressCallback(const FramePtr& ,const int camId=0);
         void configure(Config& newconfig, uint32_t level);
-        void updateCameraInfo(const Config& config, const int camId=0);
 
     };
 }  // namespace avt_vimba_camera

@@ -38,9 +38,15 @@
 #include <avt_vimba_camera/AvtVimbaCameraConfig.h>
 #include <avt_vimba_camera/frame_observer.h>
 #include <avt_vimba_camera/avt_vimba_api.h>
-
-#include <diagnostic_updater/diagnostic_updater.h>
-#include <diagnostic_updater/publisher.h>
+#include <camera_info_manager/camera_info_manager.h>
+#include <image_transport/image_transport.h>
+#include <sensor_msgs/Image.h>
+#include <sensor_msgs/CompressedImage.h>
+#include <sensor_msgs/CameraInfo.h>
+#include <std_msgs/UInt8.h>
+#include <cv_bridge/cv_bridge.h>
+#include <thread>
+#include <opencv2/opencv.hpp>
 
 #include <string>
 #include <mutex>
@@ -66,73 +72,90 @@ class AvtVimbaCamera
 {
 public:
   typedef avt_vimba_camera::AvtVimbaCameraConfig Config;
-  typedef std::function<void(const FramePtr, const int)> frameCallbackFunc;         // Modified by pointlaz. camId as parameter
+  typedef std::function<void(const FramePtr,const int i)> compressCallbackFunc;         // Modified by pointlaz. camId as parameter
 
   AvtVimbaCamera();
-  AvtVimbaCamera(const std::string& name, const int camId = 0);         // Modified by pointlaz. camId as parameter
+  AvtVimbaCamera(const std::string& name, const int camId = 0, std::shared_ptr<AvtVimbaApi> api = nullptr,
+                 std::shared_ptr<image_transport::CameraPublisher> pub = nullptr);         // Modified by pointlaz. camId as parameter
+
+ //Publishers
+  std::shared_ptr<image_transport::CameraPublisher> pub_;
+  std::shared_ptr<ros::Publisher> pixel_intensity_pub_;
+
+
+  //Compressing
+  bool compressJPG_ = true;
+  int qualityJPG_ = 90;
+  void setPixelIntensityPublisher(std::shared_ptr<ros::Publisher> pub) {if(pub) pixel_intensity_pub_ = pub;}
+
 
   void start(const std::string& ip_str, const std::string& guid_str, const std::string& frame_id,
              bool print_all_features = false);
   void stop();
 
   void updateConfig(Config& config);
-  void loadCameraSettings(const std::string& settingPath);          // Created by pointlaz
   void startImaging();
   void stopImaging();
 
   // Utility functions
-  double getTimestampRealTime(VmbUint64_t timestamp_ticks);
   bool isOpened()
   {
     return opened_;
   }
 
   // Getters
-  double getTimestamp();
-  double getDeviceTemp();
   int getSensorWidth();
   int getSensorHeight();
 
   // Setters
-  void setCallback(frameCallbackFunc callback)
+  void setCallback(compressCallbackFunc callback)
   {
     userFrameCallback = callback;
   }
+   // Created by pointlaz
+   int camId_;
+  bool opened_ = false;
+  bool streaming_ = false;
+  bool on_init_ = false ;
+  bool connected_ = false;
 
-  int getCamId(){return camId_;}            // Created by pointlaz
+  ~AvtVimbaCamera()
+  {
+      stop();
+      if(frame_obs_ptr_) frame_obs_ptr_.reset();
+      if (vimba_frame_ptr_) vimba_frame_ptr_.reset();
+      if (vimba_camera_ptr_) vimba_camera_ptr_.reset();
+      std::cout<< "cam clean finish" << std::endl;
+  }
 
+    void compress(const FramePtr& vimba_frame_ptr);
+
+    Config config_;
 private:
-  Config config_;
 
-  AvtVimbaApi api_;
+
+  std::shared_ptr<AvtVimbaApi> api_;
   // IFrame Observer
   SP_DECL(FrameObserver) frame_obs_ptr_;
   // The currently streaming camera
   CameraPtr vimba_camera_ptr_;
   // Current frame
   FramePtr vimba_frame_ptr_;
-  // Tick frequency of the on-board clock. Equal to 1 GHz when PTP is in use.
-  VmbInt64_t vimba_timestamp_tick_freq_ = 1;
-
   // Mutex
   std::mutex config_mutex_;
 
   CameraState camera_state_;
-  bool opened_;
-  bool streaming_;
-  bool on_init_;
+
   std::string name_;
   std::string guid_;
   std::string frame_id_;
-  int camId_=0;             // Created by pointlaz to store camId
 
-  diagnostic_updater::Updater updater_;
-  std::string diagnostic_msg_;
 
+  // Created by pointlaz to store camId
   CameraPtr openCamera(const std::string& id_str, bool print_all_features);
 
-  frameCallbackFunc userFrameCallback;
-  void frameCallback(const FramePtr vimba_frame_ptr, const int camId =0);       // Modified by pointlaz. camId as parameter
+  compressCallbackFunc userFrameCallback;
+  void frameCallback(const FramePtr vimba_frame_ptr);       // Modified by pointlaz. camId as parameter
 
   template <typename T>
   VmbErrorType setFeatureValue(const std::string& feature_str, const T& val);
@@ -160,7 +183,6 @@ private:
   void updateUSBGPIOConfig(Config& config);
   void updateIrisConfig(Config& config);
 
-  void getCurrentState(diagnostic_updater::DiagnosticStatusWrapper& stat);
 };
 }  // namespace avt_vimba_camera
 #endif

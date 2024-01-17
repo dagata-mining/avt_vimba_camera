@@ -42,7 +42,7 @@ using namespace AVT::VmbAPI;
 class FrameObserver : virtual public IFrameObserver
 {
 public:
-  typedef std::function<void(const FramePtr vimba_frame_ptr, int camId)> Callback;      // Modified by pointlaz. camId as parameter
+  typedef std::function<void(const FramePtr vimba_frame_ptr)> Callback;      // Modified by pointlaz. camId as parameter
 
   // We pass the camera that will deliver the frames to the constructor
   FrameObserver(CameraPtr cam_ptr, Callback callback);
