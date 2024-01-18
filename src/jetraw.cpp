@@ -26,7 +26,7 @@ bool encode(const cv::Mat& input,const char*& dst, int32_t& dstLen) {
     std::shared_ptr<char[]> dstBuffer(new char[dstLen]);
     uint16_t* srcBuffer = mat16bit.ptr<uint16_t>();
     // Embed dpcore header
-    if (int status = dpcore_embed_meta(srcBuffer, cols * rows, "002KK_8bits") !=
+    if (int status = dpcore_embed_meta(srcBuffer, cols * rows, "002kk") !=
         dp_success) {
         std::cerr << "[ERROR] error while embedding data: " << status
                   << std::endl;
@@ -57,7 +57,7 @@ bool encode(unsigned char* buffer_ptr,int rows, int cols,unsigned char*& dst, in
     std::shared_ptr<char[]> dstBuffer(new char[dstLen]);
     uint16_t* srcBuffer = reinterpret_cast<uint16_t*>(buffer_ptr);
     // Embed dpcore header
-    if (int status = dpcore_embed_meta(srcBuffer, cols * rows, "002KK_8bits") !=
+    if (int status = dpcore_embed_meta(srcBuffer, cols * rows, "002kk") !=
         dp_success) {
         std::cerr << "[ERROR] error while embedding data: " << status
                   << std::endl;

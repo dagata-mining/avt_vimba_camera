@@ -76,31 +76,31 @@ namespace avt_vimba_camera
             }
             cam_[i] = cam;
         }
-        ROS_INFO("JETRAW------------STARTING");
-            //Testing JetRaw
-        ROS_INFO("JETRAW------------STARTING");
-        auto res = dpcore_init();
-        std::string inFile = "/home/alex/third_party/jetrawtest/raw.tiff";
-        cv::Mat inputImage = cv::imread(inFile, cv::IMREAD_UNCHANGED);
-        if (inputImage.empty()) {
-            ROS_ERROR("JETRAW-------------IMAGE_EMPTY");
-        }
-        // encode inputImage into encodedData
-        int32_t dstLen = 0;
-        const char* encodedData = nullptr;
-        if (!jetrawCompress::encode(inputImage, encodedData, dstLen)) {
-            ROS_ERROR("JETRAW-------------ENCODING FAILED");
-        }
-        // decode buffer encodedData and save it in cv::Mat decodedImage
-        cv::Mat decodedImage;
-        if (!jetrawCompress::decode(encodedData, inputImage.rows, inputImage.cols, decodedImage,
-                                    dstLen)) {
-            ROS_ERROR("JETRAW-------------DECODING FAILED");
-        }
-        // write in disk decompressed tiff image
-        std::string outFile = "/home/alex/third_party/jetrawtest/decompressed.tiff";
-        cv::imwrite(outFile, decodedImage);
-        ROS_INFO("JETRAW-------------COMPLETED");
+//        ROS_INFO("JETRAW------------STARTING");
+//            //Testing JetRaw
+//        ROS_INFO("JETRAW------------STARTING");
+//        auto res = dpcore_init();
+//        std::string inFile = "/home/alex/third_party/jetrawtest/raw.tiff";
+//        cv::Mat inputImage = cv::imread(inFile, cv::IMREAD_UNCHANGED);
+//        if (inputImage.empty()) {
+//            ROS_ERROR("JETRAW-------------IMAGE_EMPTY");
+//        }
+//        // encode inputImage into encodedData
+//        int32_t dstLen = 0;
+//        const char* encodedData = nullptr;
+//        if (!jetrawCompress::encode(inputImage, encodedData, dstLen)) {
+//            ROS_ERROR("JETRAW-------------ENCODING FAILED");
+//        }
+//        // decode buffer encodedData and save it in cv::Mat decodedImage
+//        cv::Mat decodedImage;
+//        if (!jetrawCompress::decode(encodedData, inputImage.rows, inputImage.cols, decodedImage,
+//                                    dstLen)) {
+//            ROS_ERROR("JETRAW-------------DECODING FAILED");
+//        }
+//        // write in disk decompressed tiff image
+//        std::string outFile = "/home/alex/third_party/jetrawtest/decompressed.tiff";
+//        cv::imwrite(outFile, decodedImage);
+//        ROS_INFO("JETRAW-------------COMPLETED");
 
 
         ROS_INFO("-------------Reconfig");
