@@ -332,6 +332,26 @@ public:
       else
       {
           //Other Transform
+          if (pixel_intensity_)
+          {
+              VmbUchar_t *buffer_ptr_in;
+              err = vimba_frame_ptr->GetImage(buffer_ptr_in);
+              if (VmbErrorSuccess != err)
+              {
+                  ROS_ERROR_STREAM("[" << ros::this_node::getName() << "]: Could not GetImage. "
+                                       << "\n Error: " << errorCodeToMessage(err));
+              }
+              try
+              {
+                  pixel_intensity_msg = calculatePixelIntensity(buffer_ptr_in, nSize);
+              }
+              catch (std::exception &e)
+              {
+                  ROS_ERROR("Frame callback intensity error because %s", e.what());
+              }
+
+          }
+
           VmbUchar_t *buffer_ptr;
           VmbErrorType err = vimba_frame_ptr->GetImage(buffer_ptr);
           res = sensor_msgs::fillImage(image,encoding,height,width,step,buffer_ptr);
@@ -544,7 +564,7 @@ private:
         if(pixel_intensity_echo_)
         {
             ROS_INFO_STREAM("--------------------------------------------------");
-            ROS_INFO_STREAM("nb_pixels: " << nb_pixels << " ; ratio_saturated_pixels: " << ratio_saturated_pixels << " ; pixel_intensity_msg.data: " << pixel_intensity_msg.data);
+            ROS_INFO_STREAM("nb_pixels: " << nb_pixels << " ; ratio_saturated_pixels: " << ratio_saturated_pixels << " ; pixel_intensity_msg.data: " << std::to_string(pixel_intensity_msg.data));
             ros::Duration elapsed_time = ros::Time::now() - start_time;
             ROS_INFO_STREAM("Elapsed Time: " << std::to_string(elapsed_time.toSec()) << "s" << std::endl);
         }
