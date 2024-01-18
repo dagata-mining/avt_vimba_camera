@@ -311,17 +311,6 @@ void AvtVimbaCamera::compress(const FramePtr& vimba_frame_ptr)
             ci.header.stamp = ros_time;
             img.header.stamp = ci.header.stamp;
 
-            if (compressJPG_)
-            {
-                cv_bridge::CvImagePtr cv_ptr;
-                cv_ptr = cv_bridge::toCvCopy(img, sensor_msgs::image_encodings::RGB8);
-                    // Compress the image using OpenCV
-                    std::vector<int> compression_params;
-                    compression_params.push_back(cv::IMWRITE_JPEG_QUALITY);  // You can use other parameters like PNG compression
-                    compression_params.push_back(qualityJPG_);  // Set the desired image quality (0-100)
-                    cv::imencode(".jpg", cv_ptr->image, img.data, compression_params);
-                    img.encoding = "jpg";
-            }
             pub_->publish(img, ci);
             if (pixel_intensity_pub_)
             {

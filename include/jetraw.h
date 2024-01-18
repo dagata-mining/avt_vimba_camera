@@ -26,6 +26,17 @@ namespace jetrawCompress
 
     /**
      *
+     * @param buffer_ptr
+     * @param rows
+     * @param cols
+     * @param dst
+     * @param dstLen
+     * @return
+     */
+    bool encode(unsigned char* buffer_ptr,int rows, int cols,unsigned char*& dst, int32_t& dstLen);
+
+/**
+     *
      * @param dataIn data buffer in
      * @param rows nbr of rows
      * @param cols nbr of cols

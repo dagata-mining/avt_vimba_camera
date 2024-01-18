@@ -48,6 +48,41 @@ bool encode(const cv::Mat& input,const char*& dst, int32_t& dstLen) {
     return true;
 }
 
+bool encode(unsigned char* buffer_ptr,int rows, int cols,unsigned char*& dst, int32_t& dstLen) {
+
+    dstLen = cols * rows * 0.5;
+    // Convert to 16-bit cv::Mat
+    cv::Mat mat16bit;
+    // Create a unique_ptr for the destination buffer
+    std::shared_ptr<char[]> dstBuffer(new char[dstLen]);
+    uint16_t* srcBuffer = reinterpret_cast<uint16_t*>(buffer_ptr);
+    // Embed dpcore header
+    if (int status = dpcore_embed_meta(srcBuffer, cols * rows, "002KK_8bits") !=
+        dp_success) {
+        std::cerr << "[ERROR] error while embedding data: " << status
+                  << std::endl;
+        return false;
+    }
+    // Encode input buffer
+    if (int status = jetraw_encode(srcBuffer, cols, rows, dstBuffer.get(),
+                                   &dstLen) != dp_success) {
+        std::cerr << "[ERROR] error while encoding data: " << status
+                  << std::endl;
+        return false;
+    }
+
+    std::unique_ptr<char[]> croppedDstBuffer(new char[dstLen]);
+    std::memcpy(croppedDstBuffer.get(), dstBuffer.get(), dstLen);
+    char* dstChar = croppedDstBuffer.release();
+    dst = reinterpret_cast<unsigned char*>(dstChar);
+
+
+    std::cerr << "[INFO] compressed from " << cols * rows << " to " << dstLen
+              << " (" << static_cast<float>(cols * rows) / dstLen << "x times)"
+              << std::endl;
+    return true;
+}
+
 bool decode(const char* dataIn, int rows, int cols, cv::Mat& out, int32_t inLen) {
     // Create a unique_ptr for the image buffer
     std::unique_ptr<uint16_t[]> imageBuffer(new uint16_t[rows * cols]);

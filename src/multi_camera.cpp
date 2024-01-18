@@ -16,11 +16,13 @@ namespace avt_vimba_camera
 //        // Set the params
 
         nhp_.param("camera_qty", camQty_, 1);
-        nhp_.param("compress_jpeg_vimba", compressJPG_, true);
+        nhp_.param("compress_jetraw_vimba", compressJetraw_, true);
+        nhp_.param("compress_jpeg_vimba", compressJPG_, false);
         std::string topicName = "image_raw_";
         nhp_.param("compress_jpeg_quality", qualityJPG_, 90);
         // Get Pixel Intensity params
         nhp_.param("calculate_pixel_intensity", calculate_pixel_intensity_,true);
+        if (compressJPG_ && compressJetraw_) compressJPG_ = false;
 
         guid_.resize(camQty_);
         pub_.resize(camQty_);
@@ -41,6 +43,12 @@ namespace avt_vimba_camera
             api_->setPixelIntensityParameters(pixel_intensity_pixel_steps, pixel_intensity_saturated_threshold, pixel_intensity_saturation_value, pixel_intensity_echo);
             pixel_intensity_pub_.resize(camQty_);
         }
+        if (compressJetraw_) api_->activateJetraw();
+        if (compressJPG_) {
+            api_->compressJPG_ = true;
+            api_->qualityJPG_ = qualityJPG_;
+        }
+
 
 
         for (int i = 0; i < camQty_; i++)

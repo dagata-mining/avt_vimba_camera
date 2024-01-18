@@ -84,7 +84,8 @@ public:
 
 
   //Compressing
-  bool compressJPG_ = true;
+  bool compressJPG_ = false;
+  bool compressJetraw_ = true;
   int qualityJPG_ = 90;
   void setPixelIntensityPublisher(std::shared_ptr<ros::Publisher> pub) {if(pub) pixel_intensity_pub_ = pub;}
 

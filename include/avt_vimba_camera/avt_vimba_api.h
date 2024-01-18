@@ -45,6 +45,11 @@
 #include <string>
 #include <map>
 
+#include <jetraw.h>
+#include <cv_bridge/cv_bridge.h>
+#include <thread>
+#include <opencv2/opencv.hpp>
+
 using AVT::VmbAPI::CameraPtr;
 using AVT::VmbAPI::FramePtr;
 using AVT::VmbAPI::VimbaSystem;
@@ -66,6 +71,9 @@ public:
     int pixel_intensity_saturation_value_;          // The value for which a pixel is considered saturated
     bool pixel_intensity_echo_;
     bool pixel_intensity_ = false ;
+    bool compressJetraw_ = false;
+    bool compressJPG_ = false;
+    int qualityJPG_ = 90;
 
   void start()
   {
@@ -154,118 +162,180 @@ public:
 
   bool frameToImage(const FramePtr vimba_frame_ptr, sensor_msgs::Image& image, std_msgs::UInt8 &pixel_intensity_msg)
   {
-    VmbPixelFormatType pixel_format;
-    VmbUint32_t width, height, nSize;
+      VmbPixelFormatType pixel_format;
+      VmbUint32_t width, height, nSize;
 
-    vimba_frame_ptr->GetWidth(width);
-    vimba_frame_ptr->GetHeight(height);
-    vimba_frame_ptr->GetPixelFormat(pixel_format);
-    vimba_frame_ptr->GetImageSize(nSize);
+      vimba_frame_ptr->GetWidth(width);
+      vimba_frame_ptr->GetHeight(height);
+      vimba_frame_ptr->GetPixelFormat(pixel_format);
+      vimba_frame_ptr->GetImageSize(nSize);
 
-    VmbUint32_t step = nSize / height;
+      VmbUint32_t step = nSize/height;
 
-    // NOTE: YUV and ARGB formats not supported
-    std::string encoding;
-    if (pixel_format == VmbPixelFormatMono8)
-      encoding = sensor_msgs::image_encodings::MONO8;
-    else if (pixel_format == VmbPixelFormatMono10)
-      encoding = sensor_msgs::image_encodings::MONO16;
-    else if (pixel_format == VmbPixelFormatMono12)
-      encoding = sensor_msgs::image_encodings::MONO16;
-    else if (pixel_format == VmbPixelFormatMono12Packed)
-      encoding = sensor_msgs::image_encodings::MONO16;
-    else if (pixel_format == VmbPixelFormatMono14)
-      encoding = sensor_msgs::image_encodings::MONO16;
-    else if (pixel_format == VmbPixelFormatMono16)
-      encoding = sensor_msgs::image_encodings::MONO16;
-    else if (pixel_format == VmbPixelFormatBayerGR8)
-      encoding = sensor_msgs::image_encodings::BAYER_GRBG8;
-    else if (pixel_format == VmbPixelFormatBayerRG8)
-      encoding = sensor_msgs::image_encodings::BAYER_RGGB8;
-    else if (pixel_format == VmbPixelFormatBayerGB8)
-      encoding = sensor_msgs::image_encodings::BAYER_GBRG8;
-    else if (pixel_format == VmbPixelFormatBayerBG8)
-      encoding = sensor_msgs::image_encodings::BAYER_BGGR8;
-    else if (pixel_format == VmbPixelFormatBayerGR10)
-      encoding = sensor_msgs::image_encodings::TYPE_16SC1;
-    else if (pixel_format == VmbPixelFormatBayerRG10)
-      encoding = sensor_msgs::image_encodings::TYPE_16SC1;
-    else if (pixel_format == VmbPixelFormatBayerGB10)
-      encoding = sensor_msgs::image_encodings::TYPE_16SC1;
-    else if (pixel_format == VmbPixelFormatBayerBG10)
-      encoding = sensor_msgs::image_encodings::TYPE_16SC1;
-    else if (pixel_format == VmbPixelFormatBayerGR12)
-      encoding = sensor_msgs::image_encodings::TYPE_16SC1;
-    else if (pixel_format == VmbPixelFormatBayerRG12)
-      encoding = sensor_msgs::image_encodings::TYPE_16SC1;
-    else if (pixel_format == VmbPixelFormatBayerGB12)
-      encoding = sensor_msgs::image_encodings::TYPE_16SC1;
-    else if (pixel_format == VmbPixelFormatBayerBG12)
-      encoding = sensor_msgs::image_encodings::TYPE_16SC1;
-    else if (pixel_format == VmbPixelFormatBayerGR12Packed)
-      encoding = sensor_msgs::image_encodings::TYPE_32SC4;
-    else if (pixel_format == VmbPixelFormatBayerRG12Packed)
-      encoding = sensor_msgs::image_encodings::TYPE_32SC4;
-    else if (pixel_format == VmbPixelFormatBayerGB12Packed)
-      encoding = sensor_msgs::image_encodings::TYPE_32SC4;
-    else if (pixel_format == VmbPixelFormatBayerBG12Packed)
-      encoding = sensor_msgs::image_encodings::TYPE_32SC4;
-    else if (pixel_format == VmbPixelFormatBayerGR16)
-      encoding = sensor_msgs::image_encodings::TYPE_16SC1;
-    else if (pixel_format == VmbPixelFormatBayerRG16)
-      encoding = sensor_msgs::image_encodings::TYPE_16SC1;
-    else if (pixel_format == VmbPixelFormatBayerGB16)
-      encoding = sensor_msgs::image_encodings::TYPE_16SC1;
-    else if (pixel_format == VmbPixelFormatBayerBG16)
-      encoding = sensor_msgs::image_encodings::TYPE_16SC1;
-    else if (pixel_format == VmbPixelFormatRgb8)
-      encoding = sensor_msgs::image_encodings::RGB8;
-    else if (pixel_format == VmbPixelFormatBgr8)
-      encoding = sensor_msgs::image_encodings::BGR8;
-    else if (pixel_format == VmbPixelFormatRgba8)
-      encoding = sensor_msgs::image_encodings::RGBA8;
-    else if (pixel_format == VmbPixelFormatBgra8)
-      encoding = sensor_msgs::image_encodings::BGRA8;
-    else if (pixel_format == VmbPixelFormatRgb12)
-      encoding = sensor_msgs::image_encodings::TYPE_16UC3;
-    else if (pixel_format == VmbPixelFormatRgb16)
-      encoding = sensor_msgs::image_encodings::TYPE_16UC3;
-    else
-      ROS_WARN("Received frame with unsupported pixel format %d", pixel_format);
-    if (encoding == "")
-      return false;
+      // NOTE: YUV and ARGB formats not supported
+      std::string encoding;
+      if (pixel_format==VmbPixelFormatMono8)
+          encoding = sensor_msgs::image_encodings::MONO8;
+      else if (pixel_format==VmbPixelFormatMono10)
+          encoding = sensor_msgs::image_encodings::MONO16;
+      else if (pixel_format==VmbPixelFormatMono12)
+          encoding = sensor_msgs::image_encodings::MONO16;
+      else if (pixel_format==VmbPixelFormatMono12Packed)
+          encoding = sensor_msgs::image_encodings::MONO16;
+      else if (pixel_format==VmbPixelFormatMono14)
+          encoding = sensor_msgs::image_encodings::MONO16;
+      else if (pixel_format==VmbPixelFormatMono16)
+          encoding = sensor_msgs::image_encodings::MONO16;
+      else if (pixel_format==VmbPixelFormatBayerGR8)
+          encoding = sensor_msgs::image_encodings::BAYER_GRBG8;
+      else if (pixel_format==VmbPixelFormatBayerRG8)
+          encoding = sensor_msgs::image_encodings::BAYER_RGGB8;
+      else if (pixel_format==VmbPixelFormatBayerGB8)
+          encoding = sensor_msgs::image_encodings::BAYER_GBRG8;
+      else if (pixel_format==VmbPixelFormatBayerBG8)
+          encoding = sensor_msgs::image_encodings::BAYER_BGGR8;
+      else if (pixel_format==VmbPixelFormatBayerGR10)
+          encoding = sensor_msgs::image_encodings::TYPE_16SC1;
+      else if (pixel_format==VmbPixelFormatBayerRG10)
+          encoding = sensor_msgs::image_encodings::TYPE_16SC1;
+      else if (pixel_format==VmbPixelFormatBayerGB10)
+          encoding = sensor_msgs::image_encodings::TYPE_16SC1;
+      else if (pixel_format==VmbPixelFormatBayerBG10)
+          encoding = sensor_msgs::image_encodings::TYPE_16SC1;
+      else if (pixel_format==VmbPixelFormatBayerGR12)
+          encoding = sensor_msgs::image_encodings::TYPE_16SC1;
+      else if (pixel_format==VmbPixelFormatBayerRG12)
+          encoding = sensor_msgs::image_encodings::TYPE_16SC1;
+      else if (pixel_format==VmbPixelFormatBayerGB12)
+          encoding = sensor_msgs::image_encodings::TYPE_16SC1;
+      else if (pixel_format==VmbPixelFormatBayerBG12)
+          encoding = sensor_msgs::image_encodings::TYPE_16SC1;
+      else if (pixel_format==VmbPixelFormatBayerGR12Packed)
+          encoding = sensor_msgs::image_encodings::TYPE_32SC4;
+      else if (pixel_format==VmbPixelFormatBayerRG12Packed)
+          encoding = sensor_msgs::image_encodings::TYPE_32SC4;
+      else if (pixel_format==VmbPixelFormatBayerGB12Packed)
+          encoding = sensor_msgs::image_encodings::TYPE_32SC4;
+      else if (pixel_format==VmbPixelFormatBayerBG12Packed)
+          encoding = sensor_msgs::image_encodings::TYPE_32SC4;
+      else if (pixel_format==VmbPixelFormatBayerGR16)
+          encoding = sensor_msgs::image_encodings::TYPE_16SC1;
+      else if (pixel_format==VmbPixelFormatBayerRG16)
+          encoding = sensor_msgs::image_encodings::TYPE_16SC1;
+      else if (pixel_format==VmbPixelFormatBayerGB16)
+          encoding = sensor_msgs::image_encodings::TYPE_16SC1;
+      else if (pixel_format==VmbPixelFormatBayerBG16)
+          encoding = sensor_msgs::image_encodings::TYPE_16SC1;
+      else if (pixel_format==VmbPixelFormatRgb8)
+          encoding = sensor_msgs::image_encodings::RGB8;
+      else if (pixel_format==VmbPixelFormatBgr8)
+          encoding = sensor_msgs::image_encodings::BGR8;
+      else if (pixel_format==VmbPixelFormatRgba8)
+          encoding = sensor_msgs::image_encodings::RGBA8;
+      else if (pixel_format==VmbPixelFormatBgra8)
+          encoding = sensor_msgs::image_encodings::BGRA8;
+      else if (pixel_format==VmbPixelFormatRgb12)
+          encoding = sensor_msgs::image_encodings::TYPE_16UC3;
+      else if (pixel_format==VmbPixelFormatRgb16)
+          encoding = sensor_msgs::image_encodings::TYPE_16UC3;
+      else
+          ROS_WARN("Received frame with unsupported pixel format %d", pixel_format);
+      if (encoding=="")
+          return false;
 
 
-    VmbUchar_t* buffer_ptr;
-    std::vector<VmbUchar_t> TransformedData;
-    VmbErrorType err;
-    try
-    {
-        err = TransformImage(vimba_frame_ptr, TransformedData, "RGB24");
-    }
-    catch (std::exception &e)
-    {
-        ROS_ERROR("Frame callback transformingImage error because %s", e.what());
-    }
-    buffer_ptr =reinterpret_cast<VmbUchar_t*>(TransformedData.data());
+      VmbErrorType err;
+      bool res = false;
+      if (compressJetraw_)
+      {
+          VmbUchar_t *buffer_ptr_in;
+          err = vimba_frame_ptr->GetImage(buffer_ptr_in);
+          if (VmbErrorSuccess != err)
+          {
+              ROS_ERROR_STREAM("[" << ros::this_node::getName() << "]: Could not GetImage. "
+                                   << "\n Error: " << errorCodeToMessage(err));
+          }
+          if (pixel_intensity_)
+          {
+              try
+              {
+                  pixel_intensity_msg = calculatePixelIntensity(buffer_ptr_in, nSize);
+              }
+              catch (std::exception &e)
+              {
+                  ROS_ERROR("Frame callback intensity error because %s", e.what());
+              }
+          }
+          VmbUchar_t *buffer_ptr_out;
+          int32_t dstLen;
+          if (!jetrawCompress::encode(buffer_ptr_in,height, width,buffer_ptr_out, dstLen))
+          {
+              ROS_ERROR("JETRAW-------------ENCODING FAILED");
+          }
+          encoding = "jetraw";
+          VmbUint32_t step = dstLen;
+          res = sensor_msgs::fillImage(image, encoding, height, width, dstLen, buffer_ptr_out);
 
-    if (pixel_intensity_)
-    {
-        pixel_intensity_msg = calculatePixelIntensity(TransformedData);
-    }
 
-    bool res = false;
-    if (VmbErrorSuccess == err)
-    {
-        encoding = sensor_msgs::image_encodings::RGB8;
-        VmbUint32_t step = TransformedData.size() / height;
-        res = sensor_msgs::fillImage(image, encoding, height, width, step, buffer_ptr);
-    }
-    else
-    {
-      ROS_ERROR_STREAM("[" << ros::this_node::getName() << "]: Could not GetImage. "
-                           << "\n Error: " << errorCodeToMessage(err));
-    }
+      }
+      else if (compressJPG_)
+      {
+
+          if (pixel_intensity_)
+          {
+              VmbUchar_t *buffer_ptr_in;
+              err = vimba_frame_ptr->GetImage(buffer_ptr_in);
+              if (VmbErrorSuccess != err)
+              {
+                  ROS_ERROR_STREAM("[" << ros::this_node::getName() << "]: Could not GetImage. "
+                                       << "\n Error: " << errorCodeToMessage(err));
+              }
+              try
+              {
+                  pixel_intensity_msg = calculatePixelIntensity(buffer_ptr_in, nSize);
+              }
+              catch (std::exception &e)
+              {
+                  ROS_ERROR("Frame callback intensity error because %s", e.what());
+              }
+
+          }
+
+          std::vector<VmbUchar_t> TransformedData;
+          try
+          {
+              err = TransformImage(vimba_frame_ptr, TransformedData, "RGB24");
+          }
+          catch (std::exception &e)
+          {
+              ROS_ERROR("Frame callback transformingImage error because %s", e.what());
+          }
+          VmbUchar_t *buffer_ptr_out;
+          buffer_ptr_out =reinterpret_cast<VmbUchar_t*>(TransformedData.data());
+          encoding = sensor_msgs::image_encodings::RGB8;
+          VmbUint32_t step = TransformedData.size() / height;
+          res = sensor_msgs::fillImage(image, encoding, height, width, step, buffer_ptr_out);
+
+          //Compressing to JPG
+          if (res)
+          {
+              cv_bridge::CvImagePtr cv_ptr;
+              cv_ptr = cv_bridge::toCvCopy(image, sensor_msgs::image_encodings::RGB8);
+              std::vector<int> compression_params;
+              compression_params.push_back(cv::IMWRITE_JPEG_QUALITY);  // You can use other parameters like PNG compression
+              compression_params.push_back(qualityJPG_);  // Set the desired image quality (0-100)
+              res = cv::imencode(".jpg", cv_ptr->image, image.data, compression_params);
+              image.encoding = "jpg";
+          }
+
+      }
+      else
+      {
+          //Other Transform
+          VmbUchar_t *buffer_ptr;
+          VmbErrorType err = vimba_frame_ptr->GetImage(buffer_ptr);
+          res = sensor_msgs::fillImage(image,encoding,height,width,step,buffer_ptr);
+      }
     return res;
   }
 
@@ -285,6 +355,8 @@ public:
         pixel_intensity_echo_ = pixel_intensity_echo;
         pixel_intensity_ = true ;
     }
+
+    void activateJetraw(){compressJetraw_ = true;}
 
 
 private:
@@ -426,7 +498,7 @@ private:
         return Result;
     }
 
-    std_msgs::UInt8 calculatePixelIntensity(std::vector<VmbUchar_t> data)
+    std_msgs::UInt8 calculatePixelIntensity(VmbUchar_t* data, VmbUint32_t size)
     {
 
         ros::Time start_time = ros::Time::now();
@@ -434,12 +506,13 @@ private:
         int nb_saturated_pixels = 0;
         int nb_non_saturated_pixels = 0;
         int sum_values_non_saturated_pixels = 0;
+        VmbUchar_t pixelSaturation = (VmbUchar_t)pixel_intensity_saturation_value_;
 
         // Parse Image Buffer
-        for(int i = 0 ; i < data.size() ; i += pixel_intensity_pixel_steps_)
+        for(int i = 0 ; i < size ; i += pixel_intensity_pixel_steps_)
         {
             // Saturated Pixel
-            if(data[i] >= pixel_intensity_saturation_value_)
+            if(data[i] >= pixelSaturation)
             {
                 nb_saturated_pixels++;
             }
