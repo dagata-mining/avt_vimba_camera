@@ -43,7 +43,12 @@ namespace avt_vimba_camera
             api_->setPixelIntensityParameters(pixel_intensity_pixel_steps, pixel_intensity_saturated_threshold, pixel_intensity_saturation_value, pixel_intensity_echo);
             pixel_intensity_pub_.resize(camQty_);
         }
-        if (compressJetraw_) api_->activateJetraw();
+        if (compressJetraw_)
+        {
+            ROS_INFO("JETRAW------------STARTING");
+            auto res = dpcore_init();
+            api_->activateJetraw();
+        }
         if (compressJPG_) {
             api_->compressJPG_ = true;
             api_->qualityJPG_ = qualityJPG_;

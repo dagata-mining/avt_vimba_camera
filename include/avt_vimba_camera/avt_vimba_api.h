@@ -393,8 +393,6 @@ public:
     }
 
     void activateJetraw(){
-        ROS_INFO("JETRAW------------STARTING");
-        auto res = dpcore_init();
         compressJetraw_ = true;
     }
 
