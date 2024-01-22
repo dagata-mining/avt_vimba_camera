@@ -269,7 +269,8 @@ public:
           }
           int32_t dstLen;
           ros::Time start_time_compress = ros::Time::now();
-          if (!jetrawCompress::encode(buffer_ptr_in,height, width, image, dstLen))
+          res = jetrawCompress::encode(buffer_ptr_in,height, width, image, dstLen);
+          if (!res)
           {
               ROS_ERROR("JETRAW-------------ENCODING FAILED");
           }
