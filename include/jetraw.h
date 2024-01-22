@@ -11,6 +11,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <dpcore/dpcore.h>
+#include <sensor_msgs/Image.h>
 
 void initialization();
 
@@ -33,7 +34,7 @@ namespace jetrawCompress
      * @param dstLen
      * @return
      */
-    bool encode(unsigned char* buffer_ptr,int rows, int cols,unsigned char*& dst, int32_t& dstLen);
+    bool encode(unsigned char* buffer_ptr,int rows, int cols, sensor_msgs::Image& image, int32_t& dstLen);
 
 /**
      *

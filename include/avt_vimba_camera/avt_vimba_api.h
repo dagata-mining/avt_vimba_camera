@@ -267,20 +267,14 @@ public:
                   ROS_ERROR("Frame callback intensity error because %s", e.what());
               }
           }
-          VmbUchar_t *buffer_ptr_out;
           int32_t dstLen;
           ros::Time start_time_compress = ros::Time::now();
-          if (!jetrawCompress::encode(buffer_ptr_in,height, width,buffer_ptr_out, dstLen))
+          if (!jetrawCompress::encode(buffer_ptr_in,height, width, image, dstLen))
           {
               ROS_ERROR("JETRAW-------------ENCODING FAILED");
           }
           ros::Duration elapsed_time = ros::Time::now() - start_time_compress;
           ROS_INFO_STREAM("Elapsed Time for compressing jetraw : " << std::to_string(elapsed_time.toSec()) << "s" << std::endl);
-
-
-          encoding = "jetraw";
-          VmbUint32_t step = dstLen;
-          res = sensor_msgs::fillImage(image, encoding, height, width, dstLen, buffer_ptr_out);
           elapsed_time = ros::Time::now() - start_time;
           ROS_INFO_STREAM("Elapsed Time for jetraw msg process: " << std::to_string(elapsed_time.toSec()) << "s" << std::endl);
 

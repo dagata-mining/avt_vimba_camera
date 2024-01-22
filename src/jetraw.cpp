@@ -48,7 +48,7 @@ bool encode(const cv::Mat& input,const char*& dst, int32_t& dstLen) {
     return true;
 }
 
-bool encode(unsigned char* buffer_ptr,int rows, int cols,unsigned char*& dst, int32_t& dstLen) {
+bool encode(unsigned char* buffer_ptr,int rows, int cols,sensor_msgs::Image& image, int32_t& dstLen) {
 
     dstLen = cols * rows * 0.5;
     // Convert to 16-bit cv::Mat
@@ -71,10 +71,12 @@ bool encode(unsigned char* buffer_ptr,int rows, int cols,unsigned char*& dst, in
         return false;
     }
 
-    std::unique_ptr<char[]> croppedDstBuffer(new char[dstLen]);
-    std::memcpy(croppedDstBuffer.get(), dstBuffer.get(), dstLen);
-    char* dstChar = croppedDstBuffer.release();
-    dst = reinterpret_cast<unsigned char*>(dstChar);
+    image.encoding = "jetraw";
+    image.height   = rows;
+    image.width    = cols;
+    image.step     = dstLen;
+    image.data.resize(dstLen);
+    std::copy(dstBuffer.get(), dstBuffer.get() + dstLen, image.data.begin());
 
 
     std::cerr << "[INFO] compressed from " << cols * rows << " to " << dstLen
