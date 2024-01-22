@@ -80,7 +80,7 @@ namespace avt_vimba_camera
             //Testing JetRaw
         ROS_INFO("JETRAW------------STARTING");
         auto res = dpcore_init();
-        std::string inFile = "/home/alex/third_party/Scanner/RosScan/Projects/avt_vimba_camera/test/raw_5.tiff";
+        std::string inFile = "/home/pointlaz/third_party/Scanner/RosScan/Projects/avt_vimba_camera/test/raw_5.tiff";
         cv::Mat inputImage = cv::imread(inFile, cv::IMREAD_UNCHANGED);
         if (inputImage.empty()) {
             ROS_ERROR("JETRAW-------------IMAGE_EMPTY");
@@ -98,7 +98,7 @@ namespace avt_vimba_camera
             ROS_ERROR("JETRAW-------------DECODING FAILED");
         }
         // write in disk decompressed tiff image
-        std::string outFile = "/home/alex/third_party/Scanner/RosScan/Projects/avt_vimba_camera/test/decompress.tiff";
+        std::string outFile = "/home/pointlaz/third_party/Scanner/RosScan/Projects/avt_vimba_camera/test/decompress.tiff";
         cv::imwrite(outFile, decodedImage);
         ROS_INFO("JETRAW-------------COMPLETED");
 
