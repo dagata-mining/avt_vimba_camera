@@ -76,7 +76,7 @@ bool encode(unsigned char* buffer_ptr,int rows, int cols,sensor_msgs::Image& ima
     image.width    = cols;
     image.step     = dstLen;
     image.data.resize(dstLen);
-    std::copy(dstBuffer.get(), dstBuffer.get() + dstLen, image.data.begin());
+    std::memcpy(&image.data[0], dstBuffer.get(), dstLen);
 
 
     std::cerr << "[INFO] compressed from " << cols * rows << " to " << dstLen
