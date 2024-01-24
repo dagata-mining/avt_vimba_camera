@@ -94,16 +94,16 @@ namespace avt_vimba_camera
         if (!jetrawCompress::encode(inputImage, encodedData, dstLen)) {
             ROS_ERROR("JETRAW-------------ENCODING FAILED");
         }
-//        // decode buffer encodedData and save it in cv::Mat decodedImage
-//        cv::Mat decodedImage;
-//        if (!jetrawCompress::decode(encodedData, inputImage.rows, inputImage.cols, decodedImage,
-//                                    dstLen)) {
-//            ROS_ERROR("JETRAW-------------DECODING FAILED");
-//        }
-//        // write in disk decompressed tiff image
-//        std::string outFile = "/home/pointlaz/third_party/Scanner/RosScan/Projects/avt_vimba_camera/test/decompress.tiff";
-//        cv::imwrite(outFile, decodedImage);
-//        ROS_INFO("JETRAW-------------COMPLETED");
+        // decode buffer encodedData and save it in cv::Mat decodedImage
+        cv::Mat decodedImage;
+        if (!jetrawCompress::decode(encodedData, inputImage.rows, inputImage.cols, decodedImage,
+                                    dstLen)) {
+            ROS_ERROR("JETRAW-------------DECODING FAILED");
+        }
+        // write in disk decompressed tiff image
+        std::string outFile = "/home/pointlaz/third_party/Scanner/RosScan/Projects/avt_vimba_camera/test/decompress.tiff";
+        cv::imwrite(outFile, decodedImage);
+        ROS_INFO("JETRAW-------------COMPLETED");
 
 
         ROS_INFO("-------------Reconfig");
