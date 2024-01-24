@@ -83,17 +83,17 @@ namespace avt_vimba_camera
         }
             //Testing JetRaw
 
-//        std::string inFile = "/home/pointlaz/third_party/Scanner/RosScan/Projects/avt_vimba_camera/test/raw_5.tiff";
-//        cv::Mat inputImage = cv::imread(inFile, cv::IMREAD_UNCHANGED);
-//        if (inputImage.empty()) {
-//            ROS_ERROR("JETRAW-------------IMAGE_EMPTY");
-//        }
-//        // encode inputImage into encodedData
-//        int32_t dstLen = 0;
-//        const char* encodedData = nullptr;
-//        if (!jetrawCompress::encode(inputImage, encodedData, dstLen)) {
-//            ROS_ERROR("JETRAW-------------ENCODING FAILED");
-//        }
+        std::string inFile = "/home/pointlaz/third_party/Scanner/RosScan/Projects/avt_vimba_camera/test/raw_5.tiff";
+        cv::Mat inputImage = cv::imread(inFile, cv::IMREAD_UNCHANGED);
+        if (inputImage.empty()) {
+            ROS_ERROR("JETRAW-------------IMAGE_EMPTY");
+        }
+        // encode inputImage into encodedData
+        int32_t dstLen = 0;
+        const char* encodedData = nullptr;
+        if (!jetrawCompress::encode(inputImage, encodedData, dstLen)) {
+            ROS_ERROR("JETRAW-------------ENCODING FAILED");
+        }
 //        // decode buffer encodedData and save it in cv::Mat decodedImage
 //        cv::Mat decodedImage;
 //        if (!jetrawCompress::decode(encodedData, inputImage.rows, inputImage.cols, decodedImage,
