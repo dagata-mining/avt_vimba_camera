@@ -270,6 +270,7 @@ public:
           int32_t dstLen;
           ros::Time start_time_compress = ros::Time::now();
           res = jetrawCompress::encodeM(buffer_ptr_in,height, width, image, dstLen);
+          delete[] buffer_ptr_in;
           if (!res)
           {
               ROS_ERROR("JETRAW-------------ENCODING FAILED");
