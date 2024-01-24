@@ -34,7 +34,7 @@ namespace jetrawCompress
      * @param dstLen
      * @return
      */
-    bool encode(unsigned char* buffer_ptr,int rows, int cols, sensor_msgs::Image& image, int32_t& dstLen);
+    bool encodeM(unsigned char* buffer_ptr,int rows, int cols, sensor_msgs::Image& image, int32_t& dstLen);
 
 /**
      *
