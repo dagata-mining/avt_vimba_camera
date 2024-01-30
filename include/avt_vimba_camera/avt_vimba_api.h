@@ -428,7 +428,6 @@ private:
 
     std_msgs::UInt8 calculatePixelIntensity(std::vector<VmbUchar_t> data)
     {
-
         ros::Time start_time = ros::Time::now();
         int nb_pixels = 0;
         int nb_saturated_pixels = 0;
@@ -443,7 +442,7 @@ private:
             {
                 nb_saturated_pixels++;
             }
-                // Non Saturated Pixel
+            // Non Saturated Pixel
             else
             {
                 sum_values_non_saturated_pixels += data[i];
@@ -456,12 +455,13 @@ private:
         std_msgs::UInt8 pixel_intensity_msg;
 
         // If too many pixels are saturated, the value '255' is published so the lights_intensities node know it has to quickly reduce the light intensity
+        // If pixel_intensity_saturated_threshold_ < 0.0, it means we don't use this threshold
         float ratio_saturated_pixels = (float)nb_saturated_pixels / (float)nb_pixels;
-        if(ratio_saturated_pixels > pixel_intensity_saturated_threshold_)
+        if(pixel_intensity_saturated_threshold_ > 0.0 && ratio_saturated_pixels > pixel_intensity_saturated_threshold_)
         {
             pixel_intensity_msg.data = 255;
         }
-            // Else, we calculate the mean intensity value from the non-saturated pixels
+        // Else, we calculate the mean intensity value from the non-saturated pixels
         else
         {
             pixel_intensity_msg.data = sum_values_non_saturated_pixels / nb_non_saturated_pixels;

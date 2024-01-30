@@ -115,7 +115,7 @@
   <!-- Pixel Intensity parameters -->
   <arg name="calculate_pixel_intensity"                 default="true"/>    <!-- (bool) If true, the pixel intensity will be calculated for every camera and published in topics. -->
   <arg name="pixel_intensity_pixel_steps"               default="10"/>      <!-- (int) A pixel will be taken every 'pixel_intensity_pixel_steps' to do the pixel intensity calculation. -->
-  <arg name="pixel_intensity_saturated_threshold"       default="0.1"/>     <!-- (float ; [0.0 ; 1.0]) The ratio of saturated pixels for which the image is considered saturated. -->
+  <arg name="pixel_intensity_saturated_threshold"       default="-1.0"/>     <!-- (float ; [0.0 ; 1.0] ; -1.0 to not use it) The ratio of saturated pixels for which the image is considered saturated. -->
   <arg name="pixel_intensity_saturation_value"          default="255"/>     <!-- (int ; [0 ; 255]) The value for which a pixel is considered saturated. -->
   <arg name="pixel_intensity_echo"                      default="true"/>    <!-- (bool) If true, results of the calculation and computation time will be echo in terminal. -->
 
