@@ -6,6 +6,9 @@
   <!-- multi_camera_node parameters, these parameters define the cameras parameters -->
   <!-- Change these parameters using the quantity and ID of your cameras -->
 
+  <!-- Update compression_type parameter -->
+  <arg name="compression_type"               default="jpeg"/>
+
   <!-- Cameras IDs config file -->
   <arg name="cameras_ids_config_file"   default="$(find avt_vimba_camera)/config/cameras_ids.yaml" />
   <!-- Camera 0 -->
