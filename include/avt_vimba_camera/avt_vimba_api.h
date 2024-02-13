@@ -248,7 +248,6 @@ public:
       bool res = false;
       if (compressJetraw_)
       {
-          ros::Time start_time = ros::Time::now();
           VmbUchar_t *buffer_ptr_in;
           err = vimba_frame_ptr->GetImage(buffer_ptr_in);
           if (VmbErrorSuccess != err)
@@ -268,22 +267,17 @@ public:
               }
           }
           int32_t dstLen;
-          ros::Time start_time_compress = ros::Time::now();
           res = jetrawCompress::encodeM(buffer_ptr_in,height, width, image, dstLen);
           delete[] buffer_ptr_in;
           if (!res)
           {
               ROS_ERROR("JETRAW-------------ENCODING FAILED");
           }
-          ros::Duration elapsed_time = ros::Time::now() - start_time_compress;
-          ROS_INFO_STREAM("Elapsed Time for compressing jetraw : " << std::to_string(elapsed_time.toSec()) << "s" << std::endl);
-          elapsed_time = ros::Time::now() - start_time;
-          ROS_INFO_STREAM("Elapsed Time for jetraw msg process: " << std::to_string(elapsed_time.toSec()) << "s" << std::endl);
 
       }
       else if (compressJPG_)
       {
-          ros::Time start_time = ros::Time::now();
+
           if (pixel_intensity_)
           {
               VmbUchar_t *buffer_ptr_in;
@@ -320,7 +314,6 @@ public:
           res = sensor_msgs::fillImage(image, encoding, height, width, step, buffer_ptr_out);
 
           //Compressing to JPG
-          ros::Time start_time_compress = ros::Time::now();
           if (res)
           {
               cv_bridge::CvImagePtr cv_ptr;
@@ -331,17 +324,11 @@ public:
               res = cv::imencode(".jpg", cv_ptr->image, image.data, compression_params);
               image.encoding = "jpg";
           }
-          ros::Duration elapsed_time = ros::Time::now() - start_time_compress;
-          ROS_INFO_STREAM("Elapsed Time for compressing jetraw : " << std::to_string(elapsed_time.toSec()) << "s" << std::endl);
-
-          elapsed_time = ros::Time::now() - start_time;
-          ROS_INFO_STREAM("Elapsed Time for jpg msg process: " << std::to_string(elapsed_time.toSec()) << "s" << std::endl);
 
       }
       else
       {
           //Other Transform
-          ros::Time start_time = ros::Time::now();
           if (pixel_intensity_)
           {
               VmbUchar_t *buffer_ptr_in;
@@ -361,12 +348,9 @@ public:
               }
 
           }
-
           VmbUchar_t *buffer_ptr;
           VmbErrorType err = vimba_frame_ptr->GetImage(buffer_ptr);
           res = sensor_msgs::fillImage(image,encoding,height,width,step,buffer_ptr);
-          ros::Duration elapsed_time = ros::Time::now() - start_time;
-          ROS_INFO_STREAM("Elapsed Time for bayer msg process: " << std::to_string(elapsed_time.toSec()) << "s" << std::endl);
       }
     return res;
   }

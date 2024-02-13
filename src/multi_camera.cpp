@@ -93,23 +93,23 @@ namespace avt_vimba_camera
         }
             //Testing JetRaw
 
-        std::string inFile = "/home/pointlaz/third_party/Scanner/RosScan/Projects/avt_vimba_camera/test/raw_5.tiff";
-        cv::Mat inputImage = cv::imread(inFile, cv::IMREAD_UNCHANGED);
-        if (inputImage.empty()) {
-            ROS_ERROR("JETRAW-------------IMAGE_EMPTY");
-        }
-        // encode inputImage into encodedData
-        int32_t dstLen = 0;
-        const char* encodedData = nullptr;
-        if (!jetrawCompress::encode(inputImage, encodedData, dstLen)) {
-            ROS_ERROR("JETRAW-------------ENCODING FAILED");
-        }
-        // decode buffer encodedData and save it in cv::Mat decodedImage
-        cv::Mat decodedImage;
-        if (!jetrawCompress::decode(encodedData, inputImage.rows, inputImage.cols, decodedImage,
-                                    dstLen)) {
-            ROS_ERROR("JETRAW-------------DECODING FAILED");
-        }
+//        std::string inFile = "/home/pointlaz/third_party/Scanner/RosScan/Projects/avt_vimba_camera/test/raw_5.tiff";
+//        cv::Mat inputImage = cv::imread(inFile, cv::IMREAD_UNCHANGED);
+//        if (inputImage.empty()) {
+//            ROS_ERROR("JETRAW-------------IMAGE_EMPTY");
+//        }
+//        // encode inputImage into encodedData
+//        int32_t dstLen = 0;
+//        const char* encodedData = nullptr;
+//        if (!jetrawCompress::encode(inputImage, encodedData, dstLen)) {
+//            ROS_ERROR("JETRAW-------------ENCODING FAILED");
+//        }
+//        // decode buffer encodedData and save it in cv::Mat decodedImage
+//        cv::Mat decodedImage;
+//        if (!jetrawCompress::decode(encodedData, inputImage.rows, inputImage.cols, decodedImage,
+//                                    dstLen)) {
+//            ROS_ERROR("JETRAW-------------DECODING FAILED");
+//        }
         // write in disk decompressed tiff image
 //        std::string outFile = "/home/pointlaz/third_party/Scanner/RosScan/Projects/avt_vimba_camera/test/decompress.tiff";
 //        cv::imwrite(outFile, decodedImage);
@@ -123,7 +123,6 @@ namespace avt_vimba_camera
                       std::placeholders::_1,
                       std::placeholders::_2));
         reconfigure_server_.clearCallback();
-
     }
 
     MultiCamera::~MultiCamera()
