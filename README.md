@@ -23,6 +23,14 @@ git push
 ```
 - It's possible that the merge doesn't complete automatically depending on the complexity of Pointlaz's modifications. In this case, be prepared to do a manual merge. You can use the method of your choice, by example using CLION: check https://www.jetbrains.com/help/clion/resolving-conflicts.html#distributed-version-control-systems
 
+## Running a debug node in CLION
+https://www.jetbrains.com/help/clion/ros-setup-tutorial.html#example
+run on the terminal of CLION the roslaunch command 
+```bash
+roslaunch roslaunch avt_vimba_camera multi_camera_node.launch 
+```
+CTRL+ALT+F5 and link the node
+
 ___
 ## Vimba cameras configuration
 

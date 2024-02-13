@@ -47,7 +47,17 @@ namespace avt_vimba_camera
         {
             ROS_INFO("JETRAW------------STARTING");
             auto res = dpcore_init();
-            api_->activateJetraw();
+            if (res == 0)
+            {
+                api_->activateJetraw();
+                ROS_INFO("JETRAW------------ACTIVATED");
+            }
+            else
+            {
+                ROS_WARN("JETRAW------------INIT FAILED FALL BACK TO JPG");
+                compressJPG_ = true;
+                compressJetraw_ = false;
+            }
         }
         if (compressJPG_) {
             api_->compressJPG_ = true;

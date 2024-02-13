@@ -51,8 +51,6 @@ bool encode(const cv::Mat& input,const char*& dst, int32_t& dstLen) {
 bool encodeM(unsigned char* buffer_ptr,int rows, int cols,sensor_msgs::Image& image, int32_t& dstLen) {
 
     dstLen = cols * rows * 0.5;
-    // Convert to 16-bit cv::Mat
-    cv::Mat mat16bit;
     // Create a unique_ptr for the destination buffer
     std::shared_ptr<char[]> dstBuffer(new char[dstLen]);
     uint16_t* srcBuffer = reinterpret_cast<uint16_t*>(buffer_ptr);
@@ -95,7 +93,7 @@ bool decode(const char* dataIn, int rows, int cols, cv::Mat& out, int32_t inLen)
                   << std::endl;
         return false;
     }
-    cv::Mat mat(rows, cols, CV_16U, imageBuffer.get());
+    cv::Mat mat(rows, cols, CV_16U, imageBuffer.get());//std::move
     mat.convertTo(out, CV_8U);
     return true;
 }
