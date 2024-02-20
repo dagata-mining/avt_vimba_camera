@@ -62,8 +62,12 @@ namespace avt_vimba_camera
         // Calculating pixel intensity
         bool calculate_pixel_intensity_;
 
+        // Debug Image
+        bool debugImage_;
+
         image_transport::ImageTransport it_;
         std::vector<std::shared_ptr<image_transport::CameraPublisher>> pub_;
+        std::vector<std::shared_ptr<image_transport::CameraPublisher>> debugPub_;
         std::vector<std::shared_ptr<ros::Publisher>> pixel_intensity_pub_;
 
 

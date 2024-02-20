@@ -75,6 +75,9 @@ public:
     bool compressJPG_ = false;
     int qualityJPG_ = 90;
 
+    //Debug image
+    bool debugImage_ = false;
+
   void start()
   {
     VmbErrorType err = vs.Startup();
@@ -160,7 +163,7 @@ public:
       return "Undefined access";
   }
 
-  bool frameToImage(const FramePtr vimba_frame_ptr, sensor_msgs::Image& image, std_msgs::UInt8 &pixel_intensity_msg)
+  bool frameToImage(const FramePtr vimba_frame_ptr, sensor_msgs::Image& image, sensor_msgs::Image& debugImage, std_msgs::UInt8 &pixel_intensity_msg, )
   {
       VmbPixelFormatType pixel_format;
       VmbUint32_t width, height, nSize;
@@ -268,12 +271,10 @@ public:
           }
           int32_t dstLen;
           res = jetrawCompress::encodeM(buffer_ptr_in,height, width, image, dstLen);
-//          delete[] buffer_ptr_in;
           if (!res)
           {
               ROS_ERROR("JETRAW-------------ENCODING FAILED");
           }
-
       }
       else if (compressJPG_)
       {
@@ -349,7 +350,7 @@ public:
 
           }
           VmbUchar_t *buffer_ptr;
-          VmbErrorType err = vimba_frame_ptr->GetImage(buffer_ptr);
+          err = vimba_frame_ptr->GetImage(buffer_ptr);
           res = sensor_msgs::fillImage(image,encoding,height,width,step,buffer_ptr);
       }
     return res;
@@ -374,6 +375,11 @@ public:
 
     void activateJetraw(){
         compressJetraw_ = true;
+    }
+
+    void activateDebugImage()
+    {
+        debugImage_ = true;
     }
 
 

@@ -80,6 +80,7 @@ public:
 
  //Publishers
   std::shared_ptr<image_transport::CameraPublisher> pub_;
+  std::shared_ptr<image_transport::CameraPublisher> debugPub_;
   std::shared_ptr<ros::Publisher> pixel_intensity_pub_;
 
 
@@ -88,6 +89,13 @@ public:
   bool compressJetraw_ = true;
   int qualityJPG_ = 90;
   void setPixelIntensityPublisher(std::shared_ptr<ros::Publisher> pub) {if(pub) pixel_intensity_pub_ = pub;}
+
+  //Debug Pupub_blisher
+  void setDebugPublisher(std::shared_ptr<image_transport::CameraPublisher> pub)
+  {
+      ROS_WARN("DEBUG PUB ACTIVATED WILL SLOW DOWN PROCESSING BUT PUBLISH RGB IMAGES");
+      if(pub) debugPub_ = pub;
+  }
 
 
   void start(const std::string& ip_str, const std::string& guid_str, const std::string& frame_id,

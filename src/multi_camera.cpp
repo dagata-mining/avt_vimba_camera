@@ -11,9 +11,8 @@ namespace avt_vimba_camera
     {
         api_.reset(new AvtVimbaApi);
         api_->start();
-//
-//        // Set the params
 
+//        // Set the params
         nhp_.param("camera_qty", camQty_, 1);
         nhp_.param("compress_jetraw_vimba", compressJetraw_, true);
         nhp_.param("compress_jpeg_vimba", compressJPG_, false);
@@ -21,7 +20,12 @@ namespace avt_vimba_camera
         nhp_.param("compress_jpeg_quality", qualityJPG_, 90);
         // Get Pixel Intensity params
         nhp_.param("calculate_pixel_intensity", calculate_pixel_intensity_,true);
+
+        //Debug Image
+        nhp_.param("debug_image", debugImage_,false);
+
         if (compressJPG_ && compressJetraw_) compressJPG_ = false;
+
 
         guid_.resize(camQty_);
         pub_.resize(camQty_);
@@ -64,6 +68,8 @@ namespace avt_vimba_camera
             api_->qualityJPG_ = qualityJPG_;
         }
 
+        if (debugImage_) api_->activateDebugImage();
+
 
 
         for (int i = 0; i < camQty_; i++)
@@ -88,6 +94,13 @@ namespace avt_vimba_camera
                 pixel_intensity_pub_[i].reset(new ros::Publisher);
                 *pixel_intensity_pub_[i] = nh_.advertise<std_msgs::UInt8>("/multi_camera/pixel_intensity_" + std::to_string(i), 1);
                 cam->setPixelIntensityPublisher(pixel_intensity_pub_[i]);
+            }
+            if (debugImage_)
+            {
+                ROS_INFO("-------------Debug Image Publisher");
+                debugPub_[i].reset(new image_transport::CameraPublisher);
+                *debugPub_[i] = it_.advertiseCamera(topicName + std::to_string(i)+"_debug", 1);
+                cam->setDebugPublisher(debugPub_[i]);
             }
             cam_[i] = cam;
         }
