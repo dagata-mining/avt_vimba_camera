@@ -22,7 +22,7 @@ make sure to delete it, it might be an old license activation
 Then 
 ```sh
 mkdir ~/.config/dpcore
-cp ./test/002kk.dat ~/.config dpcore 
+cp ./test/002kk.dat ~/.config/dpcore 
 ```
 
 ### Activate the license
