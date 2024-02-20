@@ -9,18 +9,26 @@ namespace avt_vimba_camera
     MultiCamera::MultiCamera(ros::NodeHandle& nh, ros::NodeHandle& nhp)
             : nh_(nh), nhp_(nhp), it_(nhp)
     {
-
         api_.reset(new AvtVimbaApi);
         api_->start();
-//
-//        // Set the params
 
+        // Set the params
         nhp_.param("camera_qty", camQty_, 1);
-        nhp_.param("compress_jpeg_vimba", compressJPG_, true);
+        nhp_.param("compress_jetraw_vimba", compressJetraw_, true);
+        nhp_.param("compress_jpeg_vimba", compressJPG_, false);
         std::string topicName = "image_raw_";
         nhp_.param("compress_jpeg_quality", qualityJPG_, 90);
         // Get Pixel Intensity params
         nhp_.param("calculate_pixel_intensity", calculate_pixel_intensity_,true);
+
+        ROS_INFO_STREAM("JPEG STATUS " << compressJPG_);
+        ROS_INFO_STREAM("JETRAW STATUS " << compressJetraw_);
+
+        //Debug Image
+        nhp_.param("debug_image", debugImage_,false);
+        nhp_.param("compress_info", compressInfo_,false);
+
+        if (compressJPG_ && compressJetraw_) compressJPG_ = false;
 
         guid_.resize(camQty_);
         pub_.resize(camQty_);
@@ -42,6 +50,37 @@ namespace avt_vimba_camera
             pixel_intensity_pub_.resize(camQty_);
         }
 
+        if (compressJetraw_)
+        {
+            auto res = dpcore_init();
+            ROS_INFO_STREAM("JETRAW------------ INIT STATUS " << std::to_string(res));
+            if (res <= 1)
+            {
+                api_->activateJetraw();
+                ROS_INFO("JETRAW------------ACTIVATED");
+            }
+            else
+            {
+                ROS_WARN("JETRAW------------INIT FAILED FALL BACK TO JPG");
+                compressJPG_ = true;
+                compressJetraw_ = false;
+            }
+        }
+        if (compressJPG_) {
+            api_->compressJPG_ = true;
+            api_->qualityJPG_ = qualityJPG_;
+        }
+
+        if (debugImage_)
+        {
+            api_->activateDebugImage();
+            debugPub_.resize(camQty_);
+        }
+
+        if (compressInfo_)
+        {
+            api_->compressInfo_ = compressInfo_;
+        }
 
         for (int i = 0; i < camQty_; i++)
         {
@@ -66,15 +105,23 @@ namespace avt_vimba_camera
                 *pixel_intensity_pub_[i] = nh_.advertise<std_msgs::UInt8>("/multi_camera/pixel_intensity_" + std::to_string(i), 1);
                 cam->setPixelIntensityPublisher(pixel_intensity_pub_[i]);
             }
+            if (debugImage_)
+            {
+                ROS_INFO("-------------Debug Image Publisher");
+                debugPub_[i].reset(new image_transport::CameraPublisher);
+                *debugPub_[i] = it_.advertiseCamera(topicName + std::to_string(i)+"_debug", 1);
+                cam->setDebugPublisher(debugPub_[i]);
+            }
             cam_[i] = cam;
         }
-            ROS_INFO("-------------Reconfig");
-            reconfigure_server_.setCallback(
-                std::bind(&avt_vimba_camera::MultiCamera::configure,
-                          this,
-                          std::placeholders::_1,
-                          std::placeholders::_2));
-            reconfigure_server_.clearCallback();
+
+        ROS_INFO("-------------Reconfig");
+        reconfigure_server_.setCallback(
+            std::bind(&avt_vimba_camera::MultiCamera::configure,
+                      this,
+                      std::placeholders::_1,
+                      std::placeholders::_2));
+        reconfigure_server_.clearCallback();
     }
 
     MultiCamera::~MultiCamera()
@@ -133,4 +180,4 @@ namespace avt_vimba_camera
 
 
 
-};  // namespace avt_vimba_camera
+}  // namespace avt_vimba_camera

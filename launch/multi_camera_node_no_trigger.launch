@@ -6,9 +6,6 @@
   <!-- multi_camera_node parameters, these parameters define the cameras parameters -->
   <!-- Change these parameters using the quantity and ID of your cameras -->
 
-  <!-- Update compression_type parameter -->
-  <arg name="compression_type"               default="jpeg"/>
-
   <!-- Cameras IDs config file -->
   <arg name="cameras_ids_config_file"   default="$(find avt_vimba_camera)/config/cameras_ids.yaml" />
   <!-- Camera 0 -->
@@ -55,7 +52,7 @@
   <arg name="acquisition_rate"          default="10"/>
   <!-- Trigger -->
   <arg name="trigger_source"            default="Line1"/>
-  <arg name="trigger_mode"              default="On"/>
+  <arg name="trigger_mode"              default="Off"/>
   <arg name="trigger_selector"          default="FrameStart"/>
   <arg name="trigger_activation"        default="RisingEdge"/>
   <arg name="trigger_delay"             default="0.0"/>
@@ -119,12 +116,12 @@
   <!-- Pixel Intensity parameters -->
   <arg name="calculate_pixel_intensity"                 default="true"/>    <!-- (bool) If true, the pixel intensity will be calculated for every camera and published in topics. -->
   <arg name="pixel_intensity_pixel_steps"               default="10"/>      <!-- (int) A pixel will be taken every 'pixel_intensity_pixel_steps' to do the pixel intensity calculation. -->
-  <arg name="pixel_intensity_saturated_threshold"       default="-1.0"/>     <!-- (float ; [0.0 ; 1.0] ; -1.0 to not use it) The ratio of saturated pixels for which the image is considered saturated. -->
+  <arg name="pixel_intensity_saturated_threshold"       default="0.1"/>     <!-- (float ; [0.0 ; 1.0]) The ratio of saturated pixels for which the image is considered saturated. -->
   <arg name="pixel_intensity_saturation_value"          default="255"/>     <!-- (int ; [0 ; 255]) The value for which a pixel is considered saturated. -->
   <arg name="pixel_intensity_echo"                      default="false"/>    <!-- (bool) If true, results of the calculation and computation time will be echo in terminal. -->
 
   <!-- Debug image to be published in a readable way for RQT, test compression algorithms -->
-  <arg name="debug_image"                 default="true"/>
+  <arg name="debug_image"                 default="false"/>
   <arg name="compress_info"                 default="false"/>
 
   <group if="$(arg image_proc)" ns="$(arg name)">
@@ -231,9 +228,9 @@
     <param name="pixel_intensity_saturation_value"                value="$(arg pixel_intensity_saturation_value)"/>
     <param name="pixel_intensity_echo"                            value="$(arg pixel_intensity_echo)"/>
 
-    <param name="compress_jpeg_quality"                             value="$(arg compression_jpeg_quality)"/>
+    <param name="compress_jpeg_quality"                           value="$(arg compression_jpeg_quality)"/>
     <param name="compress_jpeg_vimba"                             value="$(arg compression_jpeg_vimba)"/>
-    <param name="compress_jetraw_vimba"                             value="$(arg compression_jetraw_vimba)"/>
+    <param name="compress_jetraw_vimba"                           value="$(arg compression_jetraw_vimba)"/>
 
     <!-- Debug Image Parameters -->
     <param name="debug_image"                                     value="$(arg debug_image)"/>
@@ -291,6 +288,7 @@
 
   </node>
 
+  <!-- Prevent to compress data with image transport -->
   <!-- Prevent to compress data with image transport -->
   <group if="$(eval (compression_jpeg_vimba) or (not (compression_jpeg_imageTransport) or  (compression_jetraw_vimba)))">
     <!-- Prevent image_raw_transport from exporting to jpeg using imageTransport-->

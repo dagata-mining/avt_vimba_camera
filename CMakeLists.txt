@@ -14,6 +14,15 @@ find_package(catkin REQUIRED COMPONENTS
   nodelet
 )
 
+set(JETRAW_INCLUDE_DIR " ${CMAKE_CURRENT_SOURCE_DIR}/JetrawWithDPCore-22.02.16.1/include")
+
+set (JETRAW_LIBS
+        ${CMAKE_CURRENT_SOURCE_DIR}/JetrawWithDPCore-22.02.16.1/lib/libcrypto.so.1.1
+        ${CMAKE_CURRENT_SOURCE_DIR}/JetrawWithDPCore-22.02.16.1/lib/libdpcore.so
+        ${CMAKE_CURRENT_SOURCE_DIR}/JetrawWithDPCore-22.02.16.1/lib/libjetraw.so
+        ${CMAKE_CURRENT_SOURCE_DIR}/JetrawWithDPCore-22.02.16.1/lib/libjetraw_tiff.so
+        ${CMAKE_CURRENT_SOURCE_DIR}/JetrawWithDPCore-22.02.16.1/lib/libssl.so.1.1)
+
 #Get architecture
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(TargetArchitecture)
@@ -21,7 +30,7 @@ target_architecture(ARCH)
 
 #add dynamic reconfigure api
 generate_dynamic_reconfigure_options(
-  cfg/AvtVimbaCamera.cfg
+        cfg/AvtVimbaCamera.cfg
 )
 
 catkin_package(
@@ -35,6 +44,7 @@ catkin_package(
 
 include_directories(
   ${catkin_INCLUDE_DIRS}
+  ${JETRAW_INCLUDE_DIR}
   include
 )
 
@@ -58,6 +68,7 @@ function(add_dependencies_and_linkings arg)
   if("${ARCH}" STREQUAL x86_64)
     target_link_libraries(${arg}
       ${catkin_LIBRARIES}
+      ${JETRAW_LIBS}
       ${CMAKE_CURRENT_SOURCE_DIR}/lib/64bit/libVimbaC.so
       ${CMAKE_CURRENT_SOURCE_DIR}/lib/64bit/libVimbaCPP.so
       ${CMAKE_CURRENT_SOURCE_DIR}/lib/64bit/libVimbaImageTransform.so
@@ -92,6 +103,7 @@ add_executable(multi_camera_node
         src/multi_camera.cpp
         src/avt_vimba_camera.cpp
         src/frame_observer.cpp
+        src/jetraw.cpp
         )
 add_dependencies_and_linkings(multi_camera_node)
 
@@ -108,6 +120,8 @@ add_library(avt_camera_nodelets
 
 ## Mark executables and/or libraries for installation
 install(TARGETS
+  trigger_node
+  avt_camera_nodelets
   multi_camera_node     # Added by pointlaz
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}

@@ -301,9 +301,10 @@ void AvtVimbaCamera::compress(const FramePtr& vimba_frame_ptr)
     if (pub_->getNumSubscribers() >= 0)
     {
         sensor_msgs::Image img;
+        sensor_msgs::Image debugImg;
         std_msgs::UInt8 pixelIntensityMsg;
 
-        if (api_->frameToImage(vimba_frame_ptr, img, pixelIntensityMsg))
+        if (api_->frameToImage(vimba_frame_ptr, img, debugImg, pixelIntensityMsg))
         {
             sensor_msgs::CameraInfo ci;
             // Note: getCameraInfo() doesn't fill in header frame_id or stamp
@@ -311,21 +312,14 @@ void AvtVimbaCamera::compress(const FramePtr& vimba_frame_ptr)
             ci.header.stamp = ros_time;
             img.header.stamp = ci.header.stamp;
 
-            if (compressJPG_)
-            {
-                cv_bridge::CvImagePtr cv_ptr;
-                cv_ptr = cv_bridge::toCvCopy(img, sensor_msgs::image_encodings::RGB8);
-                    // Compress the image using OpenCV
-                    std::vector<int> compression_params;
-                    compression_params.push_back(cv::IMWRITE_JPEG_QUALITY);  // You can use other parameters like PNG compression
-                    compression_params.push_back(qualityJPG_);  // Set the desired image quality (0-100)
-                    cv::imencode(".jpg", cv_ptr->image, img.data, compression_params);
-                    img.encoding = "jpg";
-            }
             pub_->publish(img, ci);
             if (pixel_intensity_pub_)
             {
                 pixel_intensity_pub_->publish(pixelIntensityMsg);
+            }
+            if (debugPub_)
+            {
+                debugPub_->publish(debugImg,ci);
             }
         }
         else

@@ -8,6 +8,32 @@ The driver relies on libraries provided by AVT as part of their [Vimba SDK](http
 ___
 ## This is the Pointlaz modified version
  Last modification 2023-04-07 by CASL and Antoine Gruet.
+
+## Jetraw implementation
+You need to have a license activated and the parameters to the right place
+
+First create a license.txt in ~/.config/jetraw/ create a jetraw directory if there is none
+if there is another file that looks like this:
+
+01CUZ82QvWVr2DYaeuWpvpyexTp76dEkMErung78g4.lic
+
+make sure to delete it, it might be an old license activation
+
+Then 
+```sh
+mkdir ~/.config/dpcore
+cp ./test/002kk.dat ~/.config/dpcore 
+```
+
+### Activate the license
+You'll need to activate the licence and you'll require to be connected to internet. 
+```
+./JetrawWithDPCore-22.02.16.1/bin/jetraw compress -d ./test ./raw_5.tiff 
+```
+Then there should be a new .lic file in the ~/.config/jetraw/
+
+Last modification 2023-04-07 by CASL and Antoine Gruet.
+
 ### How to update this version
 Since the PointLaz modifications are contained on a branch, it is possible to isolate the modifications from the update.
 - While working on this fork, start by checking out on the master branch
@@ -22,6 +48,22 @@ git merge ros1_master
 git push
 ```
 - It's possible that the merge doesn't complete automatically depending on the complexity of Pointlaz's modifications. In this case, be prepared to do a manual merge. You can use the method of your choice, by example using CLION: check https://www.jetbrains.com/help/clion/resolving-conflicts.html#distributed-version-control-systems
+
+## Running a debug node in CLION
+https://www.jetbrains.com/help/clion/ros-setup-tutorial.html#example
+run a roscore on a new terminal
+```bash
+roscore
+```
+
+on another terminal load params from yaml file
+```bash
+rosparam load /home/alex/third_party/Scanner/RosScan/Projects/avt_vimba_camera/launch/no_trigger_params.yaml
+```
+
+in clion run the node in debug mode 
+
+CTRL+ALT+5 and link the node ( Main | Run | Attach to process)
 
 ___
 ## Vimba cameras configuration

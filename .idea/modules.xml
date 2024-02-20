@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/avt_vimba_camera.iml" filepath="$PROJECT_DIR$/.idea/avt_vimba_camera.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/avt_vimba_camera2.iml" filepath="$PROJECT_DIR$/.idea/avt_vimba_camera2.iml" />
     </modules>
   </component>
 </project>

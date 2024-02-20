@@ -18,6 +18,9 @@
 #include <cv_bridge/cv_bridge.h>
 #include <opencv2/opencv.hpp>
 
+#include <dpcore/dpcore.h>
+#include <jetraw.h>
+
 #include <string>
 
 namespace avt_vimba_camera
@@ -51,6 +54,7 @@ namespace avt_vimba_camera
 
         //Compressing
         bool compressJPG_;
+        bool compressJetraw_;
         int qualityJPG_;
         bool allReady_ = false;
         bool allConfigure_ = false;
@@ -58,8 +62,13 @@ namespace avt_vimba_camera
         // Calculating pixel intensity
         bool calculate_pixel_intensity_;
 
+        // Debug Image
+        bool debugImage_;
+        bool compressInfo_;
+
         image_transport::ImageTransport it_;
         std::vector<std::shared_ptr<image_transport::CameraPublisher>> pub_;
+        std::vector<std::shared_ptr<image_transport::CameraPublisher>> debugPub_;
         std::vector<std::shared_ptr<ros::Publisher>> pixel_intensity_pub_;
 
 
