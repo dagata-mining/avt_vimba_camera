@@ -9,7 +9,6 @@ namespace avt_vimba_camera
     MultiCamera::MultiCamera(ros::NodeHandle& nh, ros::NodeHandle& nhp)
             : nh_(nh), nhp_(nhp), it_(nhp)
     {
-
         api_.reset(new AvtVimbaApi);
         api_->start();
 //
@@ -43,11 +42,12 @@ namespace avt_vimba_camera
             api_->setPixelIntensityParameters(pixel_intensity_pixel_steps, pixel_intensity_saturated_threshold, pixel_intensity_saturation_value, pixel_intensity_echo);
             pixel_intensity_pub_.resize(camQty_);
         }
+
         if (compressJetraw_)
         {
-            ROS_INFO("JETRAW------------STARTING");
             auto res = dpcore_init();
-            if (res == 0)
+            ROS_INFO_STREAM("JETRAW------------ INIT STATUS " << std::to_string(res));
+            if (res <= 1)
             {
                 api_->activateJetraw();
                 ROS_INFO("JETRAW------------ACTIVATED");
@@ -93,7 +93,7 @@ namespace avt_vimba_camera
         }
             //Testing JetRaw
 
-//        std::string inFile = "/home/pointlaz/third_party/Scanner/RosScan/Projects/avt_vimba_camera/test/raw_5.tiff";
+//        std::string inFile = "/home/alex/third_party/Scanner/RosScan/Projects/avt_vimba_camera/test/raw_5.tiff";
 //        cv::Mat inputImage = cv::imread(inFile, cv::IMREAD_UNCHANGED);
 //        if (inputImage.empty()) {
 //            ROS_ERROR("JETRAW-------------IMAGE_EMPTY");
@@ -110,8 +110,8 @@ namespace avt_vimba_camera
 //                                    dstLen)) {
 //            ROS_ERROR("JETRAW-------------DECODING FAILED");
 //        }
-        // write in disk decompressed tiff image
-//        std::string outFile = "/home/pointlaz/third_party/Scanner/RosScan/Projects/avt_vimba_camera/test/decompress.tiff";
+////         write in disk decompressed tiff image
+//        std::string outFile = "/home/alex/third_party/Scanner/RosScan/Projects/avt_vimba_camera/test/decompress.tiff";
 //        cv::imwrite(outFile, decodedImage);
 //        ROS_INFO("JETRAW-------------COMPLETED");
 
@@ -181,4 +181,4 @@ namespace avt_vimba_camera
 
 
 
-};  // namespace avt_vimba_camera
+}  // namespace avt_vimba_camera

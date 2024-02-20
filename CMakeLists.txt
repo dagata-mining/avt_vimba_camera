@@ -30,7 +30,7 @@ target_architecture(ARCH)
 
 #add dynamic reconfigure api
 generate_dynamic_reconfigure_options(
-  cfg/AvtVimbaCamera.cfg
+        cfg/AvtVimbaCamera.cfg
 )
 
 catkin_package(
@@ -120,6 +120,8 @@ add_library(avt_camera_nodelets
 
 ## Mark executables and/or libraries for installation
 install(TARGETS
+  trigger_node
+  avt_camera_nodelets
   multi_camera_node     # Added by pointlaz
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}

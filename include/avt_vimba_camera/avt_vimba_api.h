@@ -268,7 +268,7 @@ public:
           }
           int32_t dstLen;
           res = jetrawCompress::encodeM(buffer_ptr_in,height, width, image, dstLen);
-          delete[] buffer_ptr_in;
+//          delete[] buffer_ptr_in;
           if (!res)
           {
               ROS_ERROR("JETRAW-------------ENCODING FAILED");
