@@ -51,10 +51,18 @@ git push
 
 ## Running a debug node in CLION
 https://www.jetbrains.com/help/clion/ros-setup-tutorial.html#example
-run on the terminal of CLION the roslaunch command 
+run a roscore on a new terminal
 ```bash
-roslaunch roslaunch avt_vimba_camera multi_camera_node.launch 
+roscore
 ```
+
+on another terminal load params from yaml file
+```bash
+rosparam load /home/alex/third_party/Scanner/RosScan/Projects/avt_vimba_camera/launch/no_trigger_params.yaml
+```
+
+in clion run the node in debug mode 
+
 CTRL+ALT+5 and link the node ( Main | Run | Attach to process)
 
 ___

@@ -77,6 +77,7 @@ public:
 
     //Debug image
     bool debugImage_ = false;
+    bool compressInfo_ = false;
 
   void start()
   {
@@ -163,7 +164,7 @@ public:
       return "Undefined access";
   }
 
-  bool frameToImage(const FramePtr vimba_frame_ptr, sensor_msgs::Image& image, sensor_msgs::Image& debugImage, std_msgs::UInt8 &pixel_intensity_msg, )
+  bool frameToImage(const FramePtr vimba_frame_ptr, sensor_msgs::Image& image, sensor_msgs::Image& debugImage, std_msgs::UInt8 &pixel_intensity_msg)
   {
       VmbPixelFormatType pixel_format;
       VmbUint32_t width, height, nSize;
@@ -249,6 +250,9 @@ public:
 
       VmbErrorType err;
       bool res = false;
+
+      ros::Time start_time = ros::Time::now();
+
       if (compressJetraw_)
       {
           VmbUchar_t *buffer_ptr_in;
@@ -270,10 +274,19 @@ public:
               }
           }
           int32_t dstLen;
-          res = jetrawCompress::encodeM(buffer_ptr_in,height, width, image, dstLen);
+          res = jetrawCompress::encodeMsg(buffer_ptr_in,height, width, image, dstLen);
           if (!res)
           {
               ROS_ERROR("JETRAW-------------ENCODING FAILED");
+          }
+
+          if (debugImage_)
+          {
+            bool decodeDebug = jetrawCompress::decodeMsg(image,debugImage);
+            if (!decodeDebug)
+            {
+                ROS_ERROR("JETRAW-------------DEBUG DECODING FAILED");
+            }
           }
       }
       else if (compressJPG_)
@@ -324,6 +337,15 @@ public:
               compression_params.push_back(qualityJPG_);  // Set the desired image quality (0-100)
               res = cv::imencode(".jpg", cv_ptr->image, image.data, compression_params);
               image.encoding = "jpg";
+
+              //Decompressing
+              if (debugImage_)
+              {
+                  const cv::Mat_<uchar>
+                      in(1, image.data.size(), const_cast<uchar *>(&image.data[0]));
+                  const cv::Mat rgb_a = cv::imdecode(in, cv::IMREAD_UNCHANGED);
+                  res = sensor_msgs::fillImage(debugImage,  sensor_msgs::image_encodings::RGB8, rgb_a.rows, rgb_a.cols, rgb_a.step, rgb_a.data);
+              }
           }
 
       }
@@ -352,7 +374,22 @@ public:
           VmbUchar_t *buffer_ptr;
           err = vimba_frame_ptr->GetImage(buffer_ptr);
           res = sensor_msgs::fillImage(image,encoding,height,width,step,buffer_ptr);
+          if (debugImage_)
+          {
+              cv_bridge::CvImagePtr cv_ptr;
+              cv_ptr = cv_bridge::toCvCopy(image, sensor_msgs::image_encodings::RGB8);
+              res = sensor_msgs::fillImage(debugImage,  sensor_msgs::image_encodings::RGB8,cv_ptr->image.rows, cv_ptr->image.cols, cv_ptr->image.step, cv_ptr->image.data);
+          }
+
       }
+
+    if(compressInfo_)
+    {
+        ros::Duration elapsed_time = ros::Time::now() - start_time;
+        size_t compressSize = image.data.size();
+        ROS_INFO_STREAM("Time to process image: " << std::to_string(elapsed_time.toSec()) << "s. Compressed from "
+        << nSize << " to " << compressSize << " (" << static_cast<float>(nSize)/compressSize << "x times)"<<std::endl);
+    }
     return res;
   }
 

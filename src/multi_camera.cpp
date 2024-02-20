@@ -12,7 +12,7 @@ namespace avt_vimba_camera
         api_.reset(new AvtVimbaApi);
         api_->start();
 
-//        // Set the params
+        // Set the params
         nhp_.param("camera_qty", camQty_, 1);
         nhp_.param("compress_jetraw_vimba", compressJetraw_, true);
         nhp_.param("compress_jpeg_vimba", compressJPG_, false);
@@ -21,11 +21,14 @@ namespace avt_vimba_camera
         // Get Pixel Intensity params
         nhp_.param("calculate_pixel_intensity", calculate_pixel_intensity_,true);
 
+        ROS_INFO_STREAM("JPEG STATUS " << compressJPG_);
+        ROS_INFO_STREAM("JETRAW STATUS " << compressJetraw_);
+
         //Debug Image
         nhp_.param("debug_image", debugImage_,false);
+        nhp_.param("compress_info", compressInfo_,false);
 
         if (compressJPG_ && compressJetraw_) compressJPG_ = false;
-
 
         guid_.resize(camQty_);
         pub_.resize(camQty_);
@@ -68,9 +71,16 @@ namespace avt_vimba_camera
             api_->qualityJPG_ = qualityJPG_;
         }
 
-        if (debugImage_) api_->activateDebugImage();
+        if (debugImage_)
+        {
+            api_->activateDebugImage();
+            debugPub_.resize(camQty_);
+        }
 
-
+        if (compressInfo_)
+        {
+            api_->compressInfo_ = compressInfo_;
+        }
 
         for (int i = 0; i < camQty_; i++)
         {
@@ -104,30 +114,6 @@ namespace avt_vimba_camera
             }
             cam_[i] = cam;
         }
-            //Testing JetRaw
-
-//        std::string inFile = "/home/alex/third_party/Scanner/RosScan/Projects/avt_vimba_camera/test/raw_5.tiff";
-//        cv::Mat inputImage = cv::imread(inFile, cv::IMREAD_UNCHANGED);
-//        if (inputImage.empty()) {
-//            ROS_ERROR("JETRAW-------------IMAGE_EMPTY");
-//        }
-//        // encode inputImage into encodedData
-//        int32_t dstLen = 0;
-//        const char* encodedData = nullptr;
-//        if (!jetrawCompress::encode(inputImage, encodedData, dstLen)) {
-//            ROS_ERROR("JETRAW-------------ENCODING FAILED");
-//        }
-//        // decode buffer encodedData and save it in cv::Mat decodedImage
-//        cv::Mat decodedImage;
-//        if (!jetrawCompress::decode(encodedData, inputImage.rows, inputImage.cols, decodedImage,
-//                                    dstLen)) {
-//            ROS_ERROR("JETRAW-------------DECODING FAILED");
-//        }
-////         write in disk decompressed tiff image
-//        std::string outFile = "/home/alex/third_party/Scanner/RosScan/Projects/avt_vimba_camera/test/decompress.tiff";
-//        cv::imwrite(outFile, decodedImage);
-//        ROS_INFO("JETRAW-------------COMPLETED");
-
 
         ROS_INFO("-------------Reconfig");
         reconfigure_server_.setCallback(

@@ -36,7 +36,7 @@ namespace jetrawCompress
      * @param dstLen
      * @return
      */
-    bool encodeM(unsigned char* buffer_ptr,int rows, int cols, sensor_msgs::Image& image, int32_t& dstLen);
+    bool encodeMsg(unsigned char* buffer_ptr,int rows, int cols, sensor_msgs::Image& image, int32_t& dstLen);
 
 /**
      *
@@ -47,6 +47,17 @@ namespace jetrawCompress
      * @return
      */
     bool decode(const char* dataIn, int rows, int cols, cv::Mat& out, int32_t inLen);
+
+    /**
+     *
+     * @param dataIn
+     * @param rows
+     * @param cols
+     * @param out
+     * @param inLen
+     * @return
+     */
+    bool decodeMsg(const sensor_msgs::Image& src, sensor_msgs::Image& dst);
 };
 
 #endif //ODOMETRY_SRC_JETRAW_JETRAW_H

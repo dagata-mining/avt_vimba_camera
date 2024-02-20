@@ -102,8 +102,8 @@
   <arg name="line_selector"             default="Line0"/>
   <arg name="line_mode"                 default="Input"/>
   <!-- Compression parameters -->       <!-- See parameters description at http://wiki.ros.org/compressed_image_transport -->
-  <arg name="compression_jpeg_vimba"                   default="false"/>
-  <arg name="compression_jetraw_vimba"                 default="true"/>
+  <arg name="compression_jpeg_vimba"                   default="true"/>
+  <arg name="compression_jetraw_vimba"                 default="false"/>
   <arg name="compression_jpeg_imageTransport"          default="false"/>
 
   <arg name="compression_format"                    default="jpeg"/>
@@ -120,6 +120,9 @@
   <arg name="pixel_intensity_saturation_value"          default="255"/>     <!-- (int ; [0 ; 255]) The value for which a pixel is considered saturated. -->
   <arg name="pixel_intensity_echo"                      default="false"/>    <!-- (bool) If true, results of the calculation and computation time will be echo in terminal. -->
 
+  <!-- Debug image to be published in a readable way for RQT, test compression algorithms -->
+  <arg name="debug_image"                 default="false"/>
+  <arg name="compress_info"                 default="false"/>
 
   <group if="$(arg image_proc)" ns="$(arg name)">
     <node name="image_proc" pkg="image_proc" type="image_proc"/>
@@ -225,9 +228,13 @@
     <param name="pixel_intensity_saturation_value"                value="$(arg pixel_intensity_saturation_value)"/>
     <param name="pixel_intensity_echo"                            value="$(arg pixel_intensity_echo)"/>
 
-    <param name="compress_jpeg_quality"                             value="$(arg compression_jpeg_quality)"/>
+    <param name="compress_jpeg_quality"                           value="$(arg compression_jpeg_quality)"/>
     <param name="compress_jpeg_vimba"                             value="$(arg compression_jpeg_vimba)"/>
-    <param name="compress_jetraw_vimba"                             value="$(arg compression_jetraw_vimba)"/>
+    <param name="compress_jetraw_vimba"                           value="$(arg compression_jetraw_vimba)"/>
+
+    <!-- Debug Image Parameters -->
+    <param name="debug_image"                                     value="$(arg debug_image)"/>
+    <param name="compress_info"                                     value="$(arg compress_info)"/>
 
     <!-- Camera 0 -->
     <param name="image_raw_0/compressed/format"                     value="$(arg compression_format)"/>
@@ -282,7 +289,8 @@
   </node>
 
   <!-- Prevent to compress data with image transport -->
-  <group if="$(eval (compression_jpeg_vimba) or (not (compression_jpeg_imageTransport)))">
+  <!-- Prevent to compress data with image transport -->
+  <group if="$(eval (compression_jpeg_vimba) or (not (compression_jpeg_imageTransport) or  (compression_jetraw_vimba)))">
     <!-- Prevent image_raw_transport from exporting to jpeg using imageTransport-->
     <rosparam ns="/multi_camera/image_raw_0" param="disable_pub_plugins" >
       - 'image_transport/compressed'
@@ -312,6 +320,36 @@
       - 'image_transport/compressed'
       - 'image_transport/compressedDepth'
     </rosparam>
+
+    <rosparam ns="/multi_camera/image_raw_0_debug" param="disable_pub_plugins" >
+      - 'image_transport/compressed'
+      - 'image_transport/compressedDepth'
+    </rosparam>
+    <rosparam ns="/multi_camera/image_raw_1_debug" param="disable_pub_plugins" >
+      - 'image_transport/compressed'
+      - 'image_transport/compressedDepth'
+    </rosparam>
+    <rosparam ns="/multi_camera/image_raw_2_debug" param="disable_pub_plugins" >
+      - 'image_transport/compressed'
+      - 'image_transport/compressedDepth'
+    </rosparam>
+    <rosparam ns="/multi_camera/image_raw_3_debug" param="disable_pub_plugins" >
+      - 'image_transport/compressed'
+      - 'image_transport/compressedDepth'
+    </rosparam>
+    <rosparam ns="/multi_camera/image_raw_4_debug" param="disable_pub_plugins" >
+      - 'image_transport/compressed'
+      - 'image_transport/compressedDepth'
+    </rosparam>
+    <rosparam ns="/multi_camera/image_raw_5_debug" param="disable_pub_plugins" >
+      - 'image_transport/compressed'
+      - 'image_transport/compressedDepth'
+    </rosparam>
+    <rosparam ns="/multi_camera/image_raw_6_debug" param="disable_pub_plugins" >
+      - 'image_transport/compressed'
+      - 'image_transport/compressedDepth'
+    </rosparam>
+
   </group>
 
 </launch>

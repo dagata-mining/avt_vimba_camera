@@ -64,6 +64,7 @@ namespace avt_vimba_camera
 
         // Debug Image
         bool debugImage_;
+        bool compressInfo_;
 
         image_transport::ImageTransport it_;
         std::vector<std::shared_ptr<image_transport::CameraPublisher>> pub_;
