@@ -53,8 +53,8 @@ namespace avt_vimba_camera
         int action_group_mask_;
 
         //Compressing
-        bool compressJPG_;
-        bool compressJetraw_;
+        bool compressJPG_ = true;
+        bool compressJetraw_ = false;
         int qualityJPG_;
         bool allReady_ = false;
         bool allConfigure_ = false;

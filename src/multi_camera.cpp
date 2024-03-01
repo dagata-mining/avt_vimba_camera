@@ -14,8 +14,28 @@ namespace avt_vimba_camera
 
         // Set the params
         nhp_.param("camera_qty", camQty_, 1);
-        nhp_.param("compress_jetraw_vimba", compressJetraw_, true);
-        nhp_.param("compress_jpeg_vimba", compressJPG_, false);
+        std::string compressionType;
+        nhp_.param<std::string>("compression_type", compressionType, "jpeg");
+        if (compressionType == "jpeg")
+        {
+            compressJPG_ = true;
+            compressJetraw_ = false;
+        }
+        else if (compressionType == "jetraw")
+        {
+            compressJPG_ = false;
+            compressJetraw_ = true;
+        }
+        else if (compressionType == "none")
+        {
+            compressJPG_ = false;
+            compressJetraw_ = false;
+        }
+        else
+        {
+            ROS_WARN_STREAM("compression_type = '" << compressionType << "' bad value. Must be 'jpeg', 'jetraw' or 'none'. Set to default value 'jpeg'");
+        }
+
         std::string topicName = "image_raw_";
         nhp_.param("compress_jpeg_quality", qualityJPG_, 90);
         // Get Pixel Intensity params
@@ -27,8 +47,6 @@ namespace avt_vimba_camera
         //Debug Image
         nhp_.param("debug_image", debugImage_,false);
         nhp_.param("compress_info", compressInfo_,false);
-
-        if (compressJPG_ && compressJetraw_) compressJPG_ = false;
 
         guid_.resize(camQty_);
         pub_.resize(camQty_);
