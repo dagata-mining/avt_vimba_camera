@@ -7,7 +7,7 @@
   <!-- Change these parameters using the quantity and ID of your cameras -->
 
   <!-- Update compression_type parameter -->
-  <arg name="compression_type"               default="test"/>
+  <arg name="compression_type"               default="jpeg"/>
 
   <!-- Cameras IDs config file -->
   <arg name="cameras_ids_config_file"   default="$(find avt_vimba_camera)/config/cameras_ids.yaml" />
@@ -104,11 +104,8 @@
   <!-- USB GPIO -->
   <arg name="line_selector"             default="Line0"/>
   <arg name="line_mode"                 default="Input"/>
-  <!-- Compression parameters -->       <!-- See parameters description at http://wiki.ros.org/compressed_image_transport -->
-  <arg name="compression_jpeg_vimba"                   default="true"/>
-  <arg name="compression_jetraw_vimba"                 default="false"/>
-  <arg name="compression_jpeg_imageTransport"          default="false"/>
 
+  <!-- Jpeg compression quality -->
   <arg name="compression_jpeg_quality"              default="90"/>
 
   <!-- Pixel Intensity parameters -->
@@ -120,7 +117,7 @@
 
   <!-- Debug image to be published in a readable way for RQT, test compression algorithms -->
   <arg name="debug_image"                 default="true"/>
-  <arg name="compress_info"                 default="false"/>
+  <arg name="compress_info"               default="false"/>
 
   <group if="$(arg image_proc)" ns="multi_camera">
     <node name="image_proc" pkg="image_proc" type="image_proc"/>
@@ -233,84 +230,80 @@
 
     <!-- Debug Image Parameters -->
     <param name="debug_image"                                     value="$(arg debug_image)"/>
-    <param name="compress_info"                                     value="$(arg compress_info)"/>
+    <param name="compress_info"                                   value="$(arg compress_info)"/>
 
   </node>
 
   <!-- Prevent to compress data with image transport -->
-  <group if="$(eval (compression_jpeg_vimba) or (not (compression_jpeg_imageTransport) or  (compression_jetraw_vimba)))">
-    <!-- Prevent image_raw_transport from exporting to jpeg using imageTransport-->
-    <rosparam ns="/multi_camera/image_raw_0" param="disable_pub_plugins" >
-      - 'image_transport/compressed'
-      - 'image_transport/compressedDepth'
-      - 'image_transport/theora'
-    </rosparam>
-    <rosparam ns="/multi_camera/image_raw_1" param="disable_pub_plugins" >
-      - 'image_transport/compressed'
-      - 'image_transport/compressedDepth'
-      - 'image_transport/theora'
-    </rosparam>
-    <rosparam ns="/multi_camera/image_raw_2" param="disable_pub_plugins" >
-      - 'image_transport/compressed'
-      - 'image_transport/compressedDepth'
-      - 'image_transport/theora'
-    </rosparam>
-    <rosparam ns="/multi_camera/image_raw_3" param="disable_pub_plugins" >
-      - 'image_transport/compressed'
-      - 'image_transport/compressedDepth'
-      - 'image_transport/theora'
-    </rosparam>
-    <rosparam ns="/multi_camera/image_raw_4" param="disable_pub_plugins" >
-      - 'image_transport/compressed'
-      - 'image_transport/compressedDepth'
-      - 'image_transport/theora'
-    </rosparam>
-    <rosparam ns="/multi_camera/image_raw_5" param="disable_pub_plugins" >
-      - 'image_transport/compressed'
-      - 'image_transport/compressedDepth'
-      - 'image_transport/theora'
-    </rosparam>
-    <rosparam ns="/multi_camera/image_raw_6" param="disable_pub_plugins" >
-      - 'image_transport/compressed'
-      - 'image_transport/compressedDepth'
-      - 'image_transport/theora'
-    </rosparam>
-
-    <rosparam ns="/multi_camera/image_raw_0_debug" param="disable_pub_plugins" >
-      - 'image_transport/compressed'
-      - 'image_transport/compressedDepth'
-      - 'image_transport/theora'
-    </rosparam>
-    <rosparam ns="/multi_camera/image_raw_1_debug" param="disable_pub_plugins" >
-      - 'image_transport/compressed'
-      - 'image_transport/compressedDepth'
-      - 'image_transport/theora'
-    </rosparam>
-    <rosparam ns="/multi_camera/image_raw_2_debug" param="disable_pub_plugins" >
-      - 'image_transport/compressed'
-      - 'image_transport/compressedDepth'
-      - 'image_transport/theora'
-    </rosparam>
-    <rosparam ns="/multi_camera/image_raw_3_debug" param="disable_pub_plugins" >
-      - 'image_transport/compressed'
-      - 'image_transport/compressedDepth'
-      - 'image_transport/theora'
-    </rosparam>
-    <rosparam ns="/multi_camera/image_raw_4_debug" param="disable_pub_plugins" >
-      - 'image_transport/compressed'
-      - 'image_transport/compressedDepth'
-      - 'image_transport/theora'
-    </rosparam>
-    <rosparam ns="/multi_camera/image_raw_5_debug" param="disable_pub_plugins" >
-      - 'image_transport/compressed'
-      - 'image_transport/compressedDepth'
-      - 'image_transport/theora'
-    </rosparam>
-    <rosparam ns="/multi_camera/image_raw_6_debug" param="disable_pub_plugins" >
-      - 'image_transport/compressed'
-      - 'image_transport/compressedDepth'
-      - 'image_transport/theora'
-    </rosparam>
-  </group>
+  <rosparam ns="/multi_camera/image_raw_0" param="disable_pub_plugins" >
+    - 'image_transport/compressed'
+    - 'image_transport/compressedDepth'
+    - 'image_transport/theora'
+  </rosparam>
+  <rosparam ns="/multi_camera/image_raw_1" param="disable_pub_plugins" >
+    - 'image_transport/compressed'
+    - 'image_transport/compressedDepth'
+    - 'image_transport/theora'
+  </rosparam>
+  <rosparam ns="/multi_camera/image_raw_2" param="disable_pub_plugins" >
+    - 'image_transport/compressed'
+    - 'image_transport/compressedDepth'
+    - 'image_transport/theora'
+  </rosparam>
+  <rosparam ns="/multi_camera/image_raw_3" param="disable_pub_plugins" >
+    - 'image_transport/compressed'
+    - 'image_transport/compressedDepth'
+    - 'image_transport/theora'
+  </rosparam>
+  <rosparam ns="/multi_camera/image_raw_4" param="disable_pub_plugins" >
+    - 'image_transport/compressed'
+    - 'image_transport/compressedDepth'
+    - 'image_transport/theora'
+  </rosparam>
+  <rosparam ns="/multi_camera/image_raw_5" param="disable_pub_plugins" >
+    - 'image_transport/compressed'
+    - 'image_transport/compressedDepth'
+    - 'image_transport/theora'
+  </rosparam>
+  <rosparam ns="/multi_camera/image_raw_6" param="disable_pub_plugins" >
+    - 'image_transport/compressed'
+    - 'image_transport/compressedDepth'
+    - 'image_transport/theora'
+  </rosparam>
+  <rosparam ns="/multi_camera/image_raw_0_debug" param="disable_pub_plugins" >
+    - 'image_transport/compressed'
+    - 'image_transport/compressedDepth'
+    - 'image_transport/theora'
+  </rosparam>
+  <rosparam ns="/multi_camera/image_raw_1_debug" param="disable_pub_plugins" >
+    - 'image_transport/compressed'
+    - 'image_transport/compressedDepth'
+    - 'image_transport/theora'
+  </rosparam>
+  <rosparam ns="/multi_camera/image_raw_2_debug" param="disable_pub_plugins" >
+    - 'image_transport/compressed'
+    - 'image_transport/compressedDepth'
+    - 'image_transport/theora'
+  </rosparam>
+  <rosparam ns="/multi_camera/image_raw_3_debug" param="disable_pub_plugins" >
+    - 'image_transport/compressed'
+    - 'image_transport/compressedDepth'
+    - 'image_transport/theora'
+  </rosparam>
+  <rosparam ns="/multi_camera/image_raw_4_debug" param="disable_pub_plugins" >
+    - 'image_transport/compressed'
+    - 'image_transport/compressedDepth'
+    - 'image_transport/theora'
+  </rosparam>
+  <rosparam ns="/multi_camera/image_raw_5_debug" param="disable_pub_plugins" >
+    - 'image_transport/compressed'
+    - 'image_transport/compressedDepth'
+    - 'image_transport/theora'
+  </rosparam>
+  <rosparam ns="/multi_camera/image_raw_6_debug" param="disable_pub_plugins" >
+    - 'image_transport/compressed'
+    - 'image_transport/compressedDepth'
+    - 'image_transport/theora'
+  </rosparam>
 
 </launch>
