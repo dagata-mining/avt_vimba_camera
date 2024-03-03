@@ -116,7 +116,7 @@
   <arg name="pixel_intensity_echo"                      default="false"/>    <!-- (bool) If true, results of the calculation and computation time will be echo in terminal. -->
 
   <!-- Debug image to be published in a readable way for RQT, test compression algorithms -->
-  <arg name="debug_image"                 default="true"/>
+  <arg name="debug_image"                 default="false"/>
   <arg name="compress_info"               default="false"/>
 
   <group if="$(arg image_proc)" ns="multi_camera">
