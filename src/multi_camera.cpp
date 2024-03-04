@@ -59,12 +59,15 @@ namespace avt_vimba_camera
         {
             int pixel_intensity_pixel_steps, pixel_intensity_saturation_value;
             double pixel_intensity_saturated_threshold;
-            bool pixel_intensity_echo;
+            bool pixel_intensity_count_saturated_pixels_in_mean, pixel_intensity_echo;
+            std::vector<int> echoed_pixel_intensities;
             nhp_.param("pixel_intensity_pixel_steps", pixel_intensity_pixel_steps,10);
             nhp_.param("pixel_intensity_saturated_threshold", pixel_intensity_saturated_threshold,0.1);
             nhp_.param("pixel_intensity_saturation_value", pixel_intensity_saturation_value,255);
+            nhp_.param("pixel_intensity_count_saturated_pixels_in_mean", pixel_intensity_count_saturated_pixels_in_mean, true);
             nhp_.param("pixel_intensity_echo", pixel_intensity_echo,false);
-            api_->setPixelIntensityParameters(pixel_intensity_pixel_steps, pixel_intensity_saturated_threshold, pixel_intensity_saturation_value, pixel_intensity_echo);
+            nhp_.param<std::vector<int>>("echoed_pixel_intensities", echoed_pixel_intensities, {});
+            api_->setPixelIntensityParameters(pixel_intensity_pixel_steps, pixel_intensity_saturated_threshold, pixel_intensity_saturation_value, pixel_intensity_count_saturated_pixels_in_mean, pixel_intensity_echo, echoed_pixel_intensities);
             pixel_intensity_pub_.resize(camQty_);
         }
 

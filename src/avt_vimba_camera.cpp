@@ -304,7 +304,7 @@ void AvtVimbaCamera::compress(const FramePtr& vimba_frame_ptr)
         sensor_msgs::Image debugImg;
         std_msgs::UInt8 pixelIntensityMsg;
 
-        if (api_->frameToImage(vimba_frame_ptr, img, debugImg, pixelIntensityMsg))
+        if (api_->frameToImage(vimba_frame_ptr, img, debugImg, pixelIntensityMsg, camId_))
         {
             sensor_msgs::CameraInfo ci;
             // Note: getCameraInfo() doesn't fill in header frame_id or stamp

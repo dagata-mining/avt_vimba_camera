@@ -69,7 +69,9 @@ public:
     int pixel_intensity_pixel_steps_;               // A pixel will be taken every 'pixel_intensity_pixel_steps' to do the pixel intensity calculation
     double pixel_intensity_saturated_threshold_;    // The ratio of saturated pixels for which the image is considered saturated
     int pixel_intensity_saturation_value_;          // The value for which a pixel is considered saturated
+    bool pixel_intensity_count_saturated_pixels_in_mean_;
     bool pixel_intensity_echo_;
+    std::vector<int> echoed_pixel_intensities_;
     bool pixel_intensity_ = false ;
     bool compressJetraw_ = false;
     bool compressJPG_ = false;
@@ -164,7 +166,7 @@ public:
       return "Undefined access";
   }
 
-  bool frameToImage(const FramePtr vimba_frame_ptr, sensor_msgs::Image& image, sensor_msgs::Image& debugImage, std_msgs::UInt8 &pixel_intensity_msg)
+  bool frameToImage(const FramePtr vimba_frame_ptr, sensor_msgs::Image& image, sensor_msgs::Image& debugImage, std_msgs::UInt8 &pixel_intensity_msg, int camId)
   {
       VmbPixelFormatType pixel_format;
       VmbUint32_t width, height, nSize;
@@ -266,7 +268,7 @@ public:
           {
               try
               {
-                  pixel_intensity_msg = calculatePixelIntensity(buffer_ptr_in, nSize);
+                  pixel_intensity_msg = calculatePixelIntensity(buffer_ptr_in, nSize, camId);
               }
               catch (std::exception &e)
               {
@@ -303,7 +305,7 @@ public:
               }
               try
               {
-                  pixel_intensity_msg = calculatePixelIntensity(buffer_ptr_in, nSize);
+                  pixel_intensity_msg = calculatePixelIntensity(buffer_ptr_in, nSize, camId);
               }
               catch (std::exception &e)
               {
@@ -363,7 +365,7 @@ public:
               }
               try
               {
-                  pixel_intensity_msg = calculatePixelIntensity(buffer_ptr_in, nSize);
+                  pixel_intensity_msg = calculatePixelIntensity(buffer_ptr_in, nSize, camId);
               }
               catch (std::exception &e)
               {
@@ -399,14 +401,18 @@ public:
    * @param pixel_intensity_pixel_steps A pixel will be taken every 'pixel_intensity_pixel_steps' to do the pixel intensity calculation
    * @param pixel_intensity_saturated_threshold The ratio of saturated pixels for which the image is considered saturated
    * @param pixel_intensity_saturation_value The value for which a pixel is considered saturated
+   * @param pixel_intensity_count_saturated_pixel_in_mean If true, the saturated pixels will be taken into account in the mean pixel intensity calculation
    * @param pixel_intensity_echo If true, results of the calculation and computation time will be echo in terminal
+   * @param echoed_pixel_intensities List of cameras id for which we want to echo values
    */
-    void setPixelIntensityParameters(int pixel_intensity_pixel_steps, double pixel_intensity_saturated_threshold, int pixel_intensity_saturation_value, bool pixel_intensity_echo)
+    void setPixelIntensityParameters(int pixel_intensity_pixel_steps, double pixel_intensity_saturated_threshold, int pixel_intensity_saturation_value, bool pixel_intensity_count_saturated_pixels_in_mean, bool pixel_intensity_echo, std::vector<int> echoed_pixel_intensities)
     {
         pixel_intensity_pixel_steps_ = pixel_intensity_pixel_steps;
         pixel_intensity_saturated_threshold_ = pixel_intensity_saturated_threshold;
         pixel_intensity_saturation_value_ = pixel_intensity_saturation_value;
+        pixel_intensity_count_saturated_pixels_in_mean_ = pixel_intensity_count_saturated_pixels_in_mean;
         pixel_intensity_echo_ = pixel_intensity_echo;
+        echoed_pixel_intensities_ = echoed_pixel_intensities;
         pixel_intensity_ = true ;
     }
 
@@ -559,13 +565,13 @@ private:
         return Result;
     }
 
-    std_msgs::UInt8 calculatePixelIntensity(VmbUchar_t* data, VmbUint32_t size)
+    std_msgs::UInt8 calculatePixelIntensity(VmbUchar_t* data, VmbUint32_t size, int camId)
     {
         ros::Time start_time = ros::Time::now();
         int nb_pixels = 0;
         int nb_saturated_pixels = 0;
         int nb_non_saturated_pixels = 0;
-        int sum_values_non_saturated_pixels = 0;
+        int sum_values_to_calculate_mean = 0;
         VmbUchar_t pixelSaturation = (VmbUchar_t)pixel_intensity_saturation_value_;
 
         // Parse Image Buffer
@@ -574,12 +580,16 @@ private:
             // Saturated Pixel
             if(data[i] >= pixelSaturation)
             {
+                if(pixel_intensity_count_saturated_pixels_in_mean_)
+                {
+                    sum_values_to_calculate_mean += data[i];
+                }
                 nb_saturated_pixels++;
             }
             // Non Saturated Pixel
             else
             {
-                sum_values_non_saturated_pixels += data[i];
+                sum_values_to_calculate_mean += data[i];
                 nb_non_saturated_pixels++;
             }
             nb_pixels++;
@@ -595,19 +605,30 @@ private:
         {
             pixel_intensity_msg.data = 255;
         }
-        // Else, we calculate the mean intensity value from the non-saturated pixels
+        // Else, we calculate the mean intensity value
         else
         {
-            pixel_intensity_msg.data = sum_values_non_saturated_pixels / nb_non_saturated_pixels;
+            if(pixel_intensity_count_saturated_pixels_in_mean_)
+            {
+                pixel_intensity_msg.data = sum_values_to_calculate_mean / nb_pixels;
+            }
+            else
+            {
+                pixel_intensity_msg.data = sum_values_to_calculate_mean / nb_non_saturated_pixels;
+            }
         }
 
         // Echos
-        if(pixel_intensity_echo_)
+        if(pixel_intensity_echo_ && std::count(echoed_pixel_intensities_.begin(), echoed_pixel_intensities_.end(), camId))
         {
-            ROS_INFO_STREAM("--------------------------------------------------");
-            ROS_INFO_STREAM("nb_pixels: " << nb_pixels << " ; ratio_saturated_pixels: " << ratio_saturated_pixels << " ; pixel_intensity_msg.data: " << std::to_string(pixel_intensity_msg.data));
             ros::Duration elapsed_time = ros::Time::now() - start_time;
-            ROS_INFO_STREAM("Elapsed Time: " << std::to_string(elapsed_time.toSec()) << "s" << std::endl);
+            ROS_INFO_STREAM("camId: " << std::to_string(camId) << std::endl <<
+                                          " - Elapsed Time: " << std::to_string(elapsed_time.toSec()) << "s" << std::endl <<
+                                          " - nb_measured_pixels: " << std::to_string(nb_pixels) << std::endl <<
+                                          " - nb_total_pixels: " << std::to_string(size) << std::endl <<
+                                          " - ratio_saturated_pixels: " << std::to_string(ratio_saturated_pixels) << std::endl <<
+                                          " - pixel_intensity_msg.data: " << std::to_string(pixel_intensity_msg.data) << std::endl <<
+                                          "--------------------------------------");
         }
 
         return pixel_intensity_msg;
