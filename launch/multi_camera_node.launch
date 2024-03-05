@@ -229,7 +229,7 @@
     <param name="pixel_intensity_saturated_threshold"             value="$(arg pixel_intensity_saturated_threshold)"/>
     <param name="pixel_intensity_saturation_value"                value="$(arg pixel_intensity_saturation_value)"/>
     <param name="pixel_intensity_echo"                            value="$(arg pixel_intensity_echo)"/>
-    <rosparam param="echoed_pixel_intensities" subst_value="True">$(arg displayed_pixel_intensities)</rosparam>
+    <rosparam param="echoed_pixel_intensities" subst_value="True">$(arg echoed_pixel_intensities)</rosparam>
 
     <!-- Debug Image Parameters -->
     <param name="debug_image"                                     value="$(arg debug_image)"/>
