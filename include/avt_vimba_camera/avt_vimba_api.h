@@ -70,6 +70,10 @@ public:
     double pixel_intensity_saturated_threshold_;    // The ratio of saturated pixels for which the image is considered saturated
     int pixel_intensity_saturation_value_;          // The value for which a pixel is considered saturated
     bool pixel_intensity_count_saturated_pixels_in_mean_;
+    bool pixel_intensity_use_moving_average_;
+    int pixel_intensity_moving_average_k_;
+    int cam_qty_;
+    std::vector<std::vector<VmbUint8_t >> vector_of_values_per_cam_for_moving_average;
     bool pixel_intensity_echo_;
     std::vector<int> echoed_pixel_intensities_;
     bool pixel_intensity_ = false ;
@@ -402,15 +406,22 @@ public:
    * @param pixel_intensity_saturated_threshold The ratio of saturated pixels for which the image is considered saturated
    * @param pixel_intensity_saturation_value The value for which a pixel is considered saturated
    * @param pixel_intensity_count_saturated_pixel_in_mean If true, the saturated pixels will be taken into account in the mean pixel intensity calculation
+   * @param pixel_intensity_use_moving_average If true, a moving average filter will be used on the pixel intensities values
+   * @param pixel_intensity_moving_average_k Number of values on which you want to do the moving average
+   * @param cam_qty The number of cam on the Scanner
    * @param pixel_intensity_echo If true, results of the calculation and computation time will be echo in terminal
    * @param echoed_pixel_intensities List of cameras id for which we want to echo values
    */
-    void setPixelIntensityParameters(int pixel_intensity_pixel_steps, double pixel_intensity_saturated_threshold, int pixel_intensity_saturation_value, bool pixel_intensity_count_saturated_pixels_in_mean, bool pixel_intensity_echo, std::vector<int> echoed_pixel_intensities)
+    void setPixelIntensityParameters(int pixel_intensity_pixel_steps, double pixel_intensity_saturated_threshold, int pixel_intensity_saturation_value, bool pixel_intensity_count_saturated_pixels_in_mean, bool pixel_intensity_use_moving_average, int pixel_intensity_moving_average_k, int cam_qty, bool pixel_intensity_echo, std::vector<int> echoed_pixel_intensities)
     {
         pixel_intensity_pixel_steps_ = pixel_intensity_pixel_steps;
         pixel_intensity_saturated_threshold_ = pixel_intensity_saturated_threshold;
         pixel_intensity_saturation_value_ = pixel_intensity_saturation_value;
         pixel_intensity_count_saturated_pixels_in_mean_ = pixel_intensity_count_saturated_pixels_in_mean;
+        pixel_intensity_use_moving_average_ = pixel_intensity_use_moving_average;
+        pixel_intensity_moving_average_k_ = pixel_intensity_moving_average_k;
+        cam_qty_ = cam_qty;
+        vector_of_values_per_cam_for_moving_average.resize(cam_qty_);
         pixel_intensity_echo_ = pixel_intensity_echo;
         echoed_pixel_intensities_ = echoed_pixel_intensities;
         pixel_intensity_ = true ;
@@ -595,27 +606,55 @@ private:
             nb_pixels++;
         }
 
-        // Message definition
-        std_msgs::UInt8 pixel_intensity_msg;
-
         // If too many pixels are saturated, the value '255' is published so the lights_intensities node know it has to quickly reduce the light intensity
         // If pixel_intensity_saturated_threshold_ < 0.0, it means we don't use this threshold
+        VmbUint8_t pixel_intensity_measured;
         float ratio_saturated_pixels = (float)nb_saturated_pixels / (float)nb_pixels;
         if(pixel_intensity_saturated_threshold_ > 0.0 && ratio_saturated_pixels > pixel_intensity_saturated_threshold_)
         {
-            pixel_intensity_msg.data = 255;
+            pixel_intensity_measured = 255;
         }
         // Else, we calculate the mean intensity value
         else
         {
             if(pixel_intensity_count_saturated_pixels_in_mean_)
             {
-                pixel_intensity_msg.data = sum_values_to_calculate_mean / nb_pixels;
+                pixel_intensity_measured = sum_values_to_calculate_mean / nb_pixels;
             }
             else
             {
-                pixel_intensity_msg.data = sum_values_to_calculate_mean / nb_non_saturated_pixels;
+                pixel_intensity_measured = sum_values_to_calculate_mean / nb_non_saturated_pixels;
             }
+        }
+
+        // Message definition
+        std_msgs::UInt8 pixel_intensity_msg;
+
+        // Moving Average
+        if(pixel_intensity_use_moving_average_)
+        {
+            // Manage vector of intensities
+            if(vector_of_values_per_cam_for_moving_average[camId].size() < pixel_intensity_moving_average_k_)
+            {
+                vector_of_values_per_cam_for_moving_average[camId].push_back(pixel_intensity_measured);
+            }
+            else
+            {
+                vector_of_values_per_cam_for_moving_average[camId].erase(vector_of_values_per_cam_for_moving_average[camId].begin());
+                vector_of_values_per_cam_for_moving_average[camId].push_back(pixel_intensity_measured);
+            }
+
+            // Mean
+            int sum_pixel_intensities = 0;
+            for(int i = 0 ; i < vector_of_values_per_cam_for_moving_average.size() ; i++)
+            {
+                sum_pixel_intensities += vector_of_values_per_cam_for_moving_average[camId][i];
+            }
+            pixel_intensity_msg.data = (VmbUint8_t)(sum_pixel_intensities / vector_of_values_per_cam_for_moving_average.size());
+        }
+        else
+        {
+            pixel_intensity_msg.data = pixel_intensity_measured;
         }
 
         // Echos
@@ -625,8 +664,8 @@ private:
             ROS_INFO_STREAM("camId: " << std::to_string(camId) << std::endl <<
                                           " - Elapsed Time: " << std::to_string(elapsed_time.toSec()) << "s" << std::endl <<
                                           " - nb_measured_pixels: " << std::to_string(nb_pixels) << std::endl <<
-                                          " - nb_total_pixels: " << std::to_string(size) << std::endl <<
                                           " - ratio_saturated_pixels: " << std::to_string(ratio_saturated_pixels) << std::endl <<
+                                          " - pixel_intensity_measured: " << std::to_string(pixel_intensity_measured) << std::endl <<
                                           " - pixel_intensity_msg.data: " << std::to_string(pixel_intensity_msg.data) << std::endl <<
                                           "--------------------------------------");
         }
