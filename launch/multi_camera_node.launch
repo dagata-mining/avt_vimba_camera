@@ -229,7 +229,10 @@
     <param name="calculate_pixel_intensity"                       value="$(arg calculate_pixel_intensity)"/>
     <param name="pixel_intensity_pixel_steps"                     value="$(arg pixel_intensity_pixel_steps)"/>
     <param name="pixel_intensity_saturated_threshold"             value="$(arg pixel_intensity_saturated_threshold)"/>
+    <param name="pixel_intensity_count_saturated_pixels_in_mean"  value="$(arg pixel_intensity_count_saturated_pixels_in_mean)"/>
     <param name="pixel_intensity_saturation_value"                value="$(arg pixel_intensity_saturation_value)"/>
+    <param name="pixel_intensity_use_moving_average"              value="$(arg pixel_intensity_use_moving_average)"/>
+    <param name="pixel_intensity_moving_average_k"                value="$(arg pixel_intensity_moving_average_k)"/>
     <param name="pixel_intensity_echo"                            value="$(arg pixel_intensity_echo)"/>
     <rosparam param="echoed_pixel_intensities" subst_value="True">$(arg echoed_pixel_intensities)</rosparam>
 
