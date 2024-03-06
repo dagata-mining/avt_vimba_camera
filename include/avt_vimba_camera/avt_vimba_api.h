@@ -646,11 +646,11 @@ private:
 
             // Mean
             int sum_pixel_intensities = 0;
-            for(int i = 0 ; i < vector_of_values_per_cam_for_moving_average.size() ; i++)
+            for(int i = 0 ; i < vector_of_values_per_cam_for_moving_average[camId].size() ; i++)
             {
                 sum_pixel_intensities += vector_of_values_per_cam_for_moving_average[camId][i];
             }
-            pixel_intensity_msg.data = (VmbUint8_t)(sum_pixel_intensities / vector_of_values_per_cam_for_moving_average.size());
+            pixel_intensity_msg.data = (VmbUint8_t)(sum_pixel_intensities / vector_of_values_per_cam_for_moving_average[camId].size());
         }
         else
         {

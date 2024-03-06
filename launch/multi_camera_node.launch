@@ -114,7 +114,7 @@
   <arg name="pixel_intensity_saturated_threshold"               default="-1.0"/>      <!-- (float ; [0.0 ; 1.0] ; -1.0 to not use it) The ratio of saturated pixels for which the image is considered saturated. -->
   <arg name="pixel_intensity_count_saturated_pixels_in_mean"    default="true"/>      <!-- (bool) If true, the saturated pixels will be taken into account in the mean pixel intensity calculation -->
   <arg name="pixel_intensity_saturation_value"                  default="255"/>       <!-- (int ; [0 ; 255]) The value for which a pixel is considered saturated. -->
-  <arg name="pixel_intensity_use_moving_average"                default="true"/>      <!-- (bool) True if you want to apply a moving average filter to the pixel intensities values -->
+  <arg name="pixel_intensity_use_moving_average"                default="false"/>     <!-- (bool) True if you want to apply a moving average filter to the pixel intensities values -->
   <arg name="pixel_intensity_moving_average_k"                  default="5"/>         <!-- (int > 0) Number of values on which you want to do the moving average -->
   <arg name="pixel_intensity_echo"                              default="false"/>     <!-- (bool) If true, results of the calculation and computation time will be echo in terminal. -->
   <arg name="echoed_pixel_intensities"                          default="[0]"/>       <!-- (array of int > 0) The id of the cameras for which you want some echoes -->
