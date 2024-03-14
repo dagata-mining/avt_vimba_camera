@@ -90,6 +90,12 @@ function(add_dependencies_and_linkings arg)
   endif()
 endfunction(add_dependencies_and_linkings)
 
+# Nodelets
+add_library(avt_camera_nodelets
+        src/avt_vimba_camera.cpp
+        src/frame_observer.cpp
+)
+add_dependencies_and_linkings(avt_camera_nodelets)
 
 add_executable(trigger_node
   src/nodes/trigger_node.cpp
@@ -107,12 +113,7 @@ add_executable(multi_camera_node
         )
 add_dependencies_and_linkings(multi_camera_node)
 
-# Nodelets
-add_library(avt_camera_nodelets
-  src/avt_vimba_camera.cpp
-  src/frame_observer.cpp
-)
-#add_dependencies_and_linkings(avt_camera_nodelets)
+
 
 #############
 ## Install ##
