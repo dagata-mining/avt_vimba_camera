@@ -101,19 +101,25 @@ Even if multiple launch exist in */RosScan/Projects/avt_vimba_camera/launch*. On
 You will have to configure the IDs of your cameras in the **cameras_ids.yaml** config file specific for your system. Without this configuration, the node will not be able to find and operate your cameras:
 1. In **config** directory, create a copy of **cameras_ids_example.yaml**, named **cameras_ids.yaml**.
 2. Plug your cameras into you computer using the USB ports.
-3. Open **cameras_ids.yaml**, and change the **0** by your number of cameras in:
+3. Open **cameras_ids.yaml**, and change the **0** by your number of cameras you have:
 ```
 camera_qty: 0
 ```
 4. Open the **Vimba Viewer** by double-clicking the link on your desktop. 
 5. You should see all your cameras under **Detected Cameras**. 
-6. Click once on your first camera. Wait for a new window to open. 
-7. In the new window, go to the black window at the bottom, and copy the **ID** (it must look like DEV_XXXXXXXXXXXX). 
-8. Paste this **ID** to replace "DEV_XXXXXXXXXXXX" in **cameras_ids.yaml**, for **guid_0**:
+6. Click once on your first camera. Wait for a new window to open.
+7. Click on the **play** button at the top left of the window. The image capture should start. You can read the FPS under the image. If the image capture starts, go to step 10 directly. If not, follow the next steps.
+8. If the image stays black, and the FPS counter stays to zero, it can be because your camera is in triggering mode (if you already used the ROS node with it, it will be the case). 
+9. You will need to go back to continuous mode. Stop the acquisition with the **play** button. In the params to the right, go to **Trigger IO** and under **Trigger Input/Trigger**, change **Mode** to **Off**. Press **play** again. The acquisition should start. 
+10. Observe the image to find which camera of the Scanner you just opened. You can position an object in front of each camera until it appears in the center of the image. 
+11. Once you found the right camera, take note of the number written on the Scanner, next to the lentil of the camera. The **X** value of the **guid_X** of the camera will be this number, minus 1.
+12. In the Viewer, go to the black window at the bottom, and copy the **ID** of the camera (it must look like DEV_XXXXXXXXXXXX).
+13. Paste this **ID** to replace "DEV_XXXXXXXXXXXX" in **cameras_ids.yaml**, for the right **guid_X**:
 ```
 guid_0: "DEV_XXXXXXXXXXXX"
 ```
-9. Repeat step 6. to 8. for each one of your cameras, to fill **guid_1**, **guid_2** and so on.
+14. **Example:** if the number written on the Scanner next to the camera's lentil is **1**, then you have to replace the "DEV_XXXXXXXXXXXX" of the **guid_0** (1 - 1 = 0) by the **ID** you copied from the black window.
+15. Close the window and repeat the steps 6. to 13. for each one of your cameras, to fill **guid_1**, **guid_2** and so on.
 
 The **cameras_ids.yaml** will be called in **multi_camera_node.launch** using the lines:
 ```
