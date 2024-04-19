@@ -1,0 +1,10 @@
+<!-- publish_jpg_to_images_topics.launch -->
+<!-- Subscribe to a list of topics in jpg, and republish the images in a new topic in order to visualise them -->
+
+<launch>
+    <arg name="topics_to_publish_file"   default="$(find avt_vimba_camera)/config/topics_to_publish.yaml" />
+
+    <node name="publish_jpg_to_images_topics" pkg="avt_vimba_camera" type="publish_jpg_to_images_topics" output="screen">
+        <rosparam command="load"                file="$(arg topics_to_publish_file)" />
+    </node>
+</launch>

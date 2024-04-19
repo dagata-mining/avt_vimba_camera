@@ -113,6 +113,12 @@ add_executable(multi_camera_node
         )
 add_dependencies_and_linkings(multi_camera_node)
 
+# Node added by pointlaz
+add_executable(publish_jpg_to_images_topics
+        src/nodes/publish_jpg_to_images_topics.cpp
+)
+add_dependencies_and_linkings(publish_jpg_to_images_topics)
+
 
 
 #############

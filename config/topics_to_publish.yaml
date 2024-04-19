@@ -1,0 +1,14 @@
+# topics_to_publish.yaml
+# Used by "publish_jpg_to_images_topics.launch"
+# Fill the topics in jpg you want to re-publish
+
+nb_topics: 1
+topics:
+  topic0: /multi_camera/image_raw_0
+
+# Example:
+#
+# nb_topics: 2
+# topics:
+#   topic0: /topic0
+#   topic1: /topic1
