@@ -13,13 +13,20 @@ void callbackJPGTopic(const sensor_msgs::Image::ConstPtr& imageJPG, const ros::P
     const cv::Mat_<uchar> in(1, imageJPG->data.size(), const_cast<uchar *>(&imageJPG->data[0]));
     const cv::Mat rgb_a = cv::imdecode(in, cv::IMREAD_UNCHANGED);
     sensor_msgs::Image imageRGB;
-    if(sensor_msgs::fillImage(imageRGB, sensor_msgs::image_encodings::RGB8, rgb_a.rows, rgb_a.cols, rgb_a.step, rgb_a.data))
+    if(imageJPG->encoding == "jpg")
     {
-        pub.publish(imageRGB);
+        if(sensor_msgs::fillImage(imageRGB, sensor_msgs::image_encodings::RGB8, rgb_a.rows, rgb_a.cols, rgb_a.step, rgb_a.data))
+        {
+            pub.publish(imageRGB);
+        }
+        else
+        {
+            ROS_ERROR_STREAM("[callbackJPGTopic] Error while trying to fill msg for " << pub.getTopic() << " topic");
+        }
     }
     else
     {
-        ROS_ERROR_STREAM("[callbackJPGTopic] Error while trying to fill msg for " << pub.getTopic() << " topic");
+        ROS_ERROR_STREAM("[callbackJPGTopic] " << pub.getTopic() << " encoding: " << imageJPG);
     }
 }
 
