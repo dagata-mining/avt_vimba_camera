@@ -6,6 +6,9 @@
   <!-- multi_camera_node parameters, these parameters define the cameras parameters -->
   <!-- Change these parameters using the quantity and ID of your cameras -->
 
+  <!-- Update compression_type parameter -->
+  <arg name="compression_type"               default="jpeg"/>
+
   <!-- Cameras IDs config file -->
   <arg name="cameras_ids_config_file"   default="$(find avt_vimba_camera)/config/cameras_ids.yaml" />
   <!-- Camera 0 -->
@@ -101,36 +104,34 @@
   <!-- USB GPIO -->
   <arg name="line_selector"             default="Line0"/>
   <arg name="line_mode"                 default="Input"/>
-  <!-- Compression parameters -->       <!-- See parameters description at http://wiki.ros.org/compressed_image_transport -->
-  <arg name="compression_jpeg_vimba"                   default="true"/>
-  <arg name="compression_jetraw_vimba"                 default="false"/>
-  <arg name="compression_jpeg_imageTransport"          default="false"/>
 
-  <arg name="compression_format"                    default="jpeg"/>
+  <!-- Jpeg compression quality -->
   <arg name="compression_jpeg_quality"              default="90"/>
-  <arg name="compression_jpeg_progressive"          default="false"/>
-  <arg name="compression_jpeg_optimize"             default="false"/>
-  <arg name="compression_jpeg_restart_interval"     default="0"/>
-  <arg name="compression_png_level"                 default="9"/>
 
   <!-- Pixel Intensity parameters -->
-  <arg name="calculate_pixel_intensity"                 default="true"/>    <!-- (bool) If true, the pixel intensity will be calculated for every camera and published in topics. -->
-  <arg name="pixel_intensity_pixel_steps"               default="10"/>      <!-- (int) A pixel will be taken every 'pixel_intensity_pixel_steps' to do the pixel intensity calculation. -->
-  <arg name="pixel_intensity_saturated_threshold"       default="0.1"/>     <!-- (float ; [0.0 ; 1.0]) The ratio of saturated pixels for which the image is considered saturated. -->
-  <arg name="pixel_intensity_saturation_value"          default="255"/>     <!-- (int ; [0 ; 255]) The value for which a pixel is considered saturated. -->
-  <arg name="pixel_intensity_echo"                      default="false"/>    <!-- (bool) If true, results of the calculation and computation time will be echo in terminal. -->
+  <arg name="calculate_pixel_intensity"                         default="true"/>      <!-- (bool) If true, the pixel intensity will be calculated for every camera and published in topics. -->
+  <arg name="pixel_intensity_pixel_steps"                       default="10"/>        <!-- (int) A pixel will be taken every 'pixel_intensity_pixel_steps' to do the pixel intensity calculation. -->
+  <arg name="pixel_intensity_saturated_threshold"               default="-1.0"/>      <!-- (float ; [0.0 ; 1.0] ; -1.0 to not use it) The ratio of saturated pixels for which the image is considered saturated. -->
+  <arg name="pixel_intensity_count_saturated_pixels_in_mean"    default="true"/>      <!-- (bool) If true, the saturated pixels will be taken into account in the mean pixel intensity calculation -->
+  <arg name="pixel_intensity_saturation_value"                  default="255"/>       <!-- (int ; [0 ; 255]) The value for which a pixel is considered saturated. -->
+  <arg name="pixel_intensity_use_moving_average"                default="false"/>     <!-- (bool) True if you want to apply a moving average filter to the pixel intensities values -->
+  <arg name="pixel_intensity_moving_average_k"                  default="5"/>         <!-- (int > 0) Number of values on which you want to do the moving average -->
+  <arg name="pixel_intensity_echo"                              default="false"/>     <!-- (bool) If true, results of the calculation and computation time will be echo in terminal. -->
+  <arg name="echoed_pixel_intensities"                          default="[0]"/>       <!-- (array of int > 0) The id of the cameras for which you want some echoes -->
 
   <!-- Debug image to be published in a readable way for RQT, test compression algorithms -->
   <arg name="debug_image"                 default="false"/>
-  <arg name="compress_info"                 default="false"/>
+  <arg name="compress_info"               default="false"/>
 
-  <group if="$(arg image_proc)" ns="$(arg name)">
+  <group if="$(arg image_proc)" ns="multi_camera">
     <node name="image_proc" pkg="image_proc" type="image_proc"/>
   </group>
 
 
   <!-- Run the multi_camera_node -->
   <node name="multi_camera" pkg="avt_vimba_camera" type="multi_camera_node" output="screen">
+    <param name="compression_type"                    value="$(arg compression_type)"/>
+
     <!-- Cameras IDs config file -->
     <rosparam command="load"                file="$(arg cameras_ids_config_file)" />
     <!-- Camera 0 -->
@@ -221,135 +222,96 @@
     <param name="line_selector"             value="$(arg line_selector)"/>
     <param name="line_mode"                 value="$(arg line_mode)"/>
 
+    <!-- Jpeg compression quality -->
+    <param name="compress_jpeg_quality"                             value="$(arg compression_jpeg_quality)"/>
+
     <!-- Pixel Intensity parameters -->
     <param name="calculate_pixel_intensity"                       value="$(arg calculate_pixel_intensity)"/>
     <param name="pixel_intensity_pixel_steps"                     value="$(arg pixel_intensity_pixel_steps)"/>
     <param name="pixel_intensity_saturated_threshold"             value="$(arg pixel_intensity_saturated_threshold)"/>
+    <param name="pixel_intensity_count_saturated_pixels_in_mean"  value="$(arg pixel_intensity_count_saturated_pixels_in_mean)"/>
     <param name="pixel_intensity_saturation_value"                value="$(arg pixel_intensity_saturation_value)"/>
+    <param name="pixel_intensity_use_moving_average"              value="$(arg pixel_intensity_use_moving_average)"/>
+    <param name="pixel_intensity_moving_average_k"                value="$(arg pixel_intensity_moving_average_k)"/>
     <param name="pixel_intensity_echo"                            value="$(arg pixel_intensity_echo)"/>
-
-    <param name="compress_jpeg_quality"                           value="$(arg compression_jpeg_quality)"/>
-    <param name="compress_jpeg_vimba"                             value="$(arg compression_jpeg_vimba)"/>
-    <param name="compress_jetraw_vimba"                           value="$(arg compression_jetraw_vimba)"/>
+    <rosparam param="echoed_pixel_intensities" subst_value="True">$(arg echoed_pixel_intensities)</rosparam>
 
     <!-- Debug Image Parameters -->
     <param name="debug_image"                                     value="$(arg debug_image)"/>
-    <param name="compress_info"                                     value="$(arg compress_info)"/>
-
-    <!-- Camera 0 -->
-    <param name="image_raw_0/compressed/format"                     value="$(arg compression_format)"/>
-    <param name="image_raw_0/compressed/jpeg_quality"               value="$(arg compression_jpeg_quality)"/>
-    <param name="image_raw_0/compressed/jpeg_progressive"           value="$(arg compression_jpeg_progressive)"/>
-    <param name="image_raw_0/compressed/jpeg_optimize"              value="$(arg compression_jpeg_optimize)"/>
-    <param name="image_raw_0/compressed/jpeg_restart_interval"      value="$(arg compression_jpeg_restart_interval)"/>
-    <param name="image_raw_0/compressed/png_level"                  value="$(arg compression_png_level)"/>
-    <!-- Camera 1 -->
-    <param name="image_raw_1/compressed/format"                     value="$(arg compression_format)"/>
-    <param name="image_raw_1/compressed/jpeg_quality"               value="$(arg compression_jpeg_quality)"/>
-    <param name="image_raw_1/compressed/jpeg_progressive"           value="$(arg compression_jpeg_progressive)"/>
-    <param name="image_raw_1/compressed/jpeg_optimize"              value="$(arg compression_jpeg_optimize)"/>
-    <param name="image_raw_1/compressed/jpeg_restart_interval"      value="$(arg compression_jpeg_restart_interval)"/>
-    <param name="image_raw_1/compressed/png_level"                  value="$(arg compression_png_level)"/>
-    <!-- Camera 2 -->
-    <param name="image_raw_2/compressed/format"                     value="$(arg compression_format)"/>
-    <param name="image_raw_2/compressed/jpeg_quality"               value="$(arg compression_jpeg_quality)"/>
-    <param name="image_raw_2/compressed/jpeg_progressive"           value="$(arg compression_jpeg_progressive)"/>
-    <param name="image_raw_2/compressed/jpeg_optimize"              value="$(arg compression_jpeg_optimize)"/>
-    <param name="image_raw_2/compressed/jpeg_restart_interval"      value="$(arg compression_jpeg_restart_interval)"/>
-    <param name="image_raw_2/compressed/png_level"                  value="$(arg compression_png_level)"/>
-    <!-- Camera 3 -->
-    <param name="image_raw_3/compressed/format"                     value="$(arg compression_format)"/>
-    <param name="image_raw_3/compressed/jpeg_quality"               value="$(arg compression_jpeg_quality)"/>
-    <param name="image_raw_3/compressed/jpeg_progressive"           value="$(arg compression_jpeg_progressive)"/>
-    <param name="image_raw_3/compressed/jpeg_optimize"              value="$(arg compression_jpeg_optimize)"/>
-    <param name="image_raw_3/compressed/jpeg_restart_interval"      value="$(arg compression_jpeg_restart_interval)"/>
-    <param name="image_raw_3/compressed/png_level"                  value="$(arg compression_png_level)"/>
-    <!-- Camera 4 -->
-    <param name="image_raw_4/compressed/format"                     value="$(arg compression_format)"/>
-    <param name="image_raw_4/compressed/jpeg_quality"               value="$(arg compression_jpeg_quality)"/>
-    <param name="image_raw_4/compressed/jpeg_progressive"           value="$(arg compression_jpeg_progressive)"/>
-    <param name="image_raw_4/compressed/jpeg_optimize"              value="$(arg compression_jpeg_optimize)"/>
-    <param name="image_raw_4/compressed/jpeg_restart_interval"      value="$(arg compression_jpeg_restart_interval)"/>
-    <param name="image_raw_4/compressed/png_level"                  value="$(arg compression_png_level)"/>
-    <!-- Camera 5 -->
-    <param name="image_raw_5/compressed/format"                     value="$(arg compression_format)"/>
-    <param name="image_raw_5/compressed/jpeg_quality"               value="$(arg compression_jpeg_quality)"/>
-    <param name="image_raw_5/compressed/jpeg_progressive"           value="$(arg compression_jpeg_progressive)"/>
-    <param name="image_raw_5/compressed/jpeg_optimize"              value="$(arg compression_jpeg_optimize)"/>
-    <param name="image_raw_5/compressed/jpeg_restart_interval"      value="$(arg compression_jpeg_restart_interval)"/>
-    <param name="image_raw_5/compressed/png_level"                  value="$(arg compression_png_level)"/>
-    <!-- Camera 6 -->
-    <param name="image_raw_6/compressed/format"                     value="$(arg compression_format)"/>
-    <param name="image_raw_6/compressed/jpeg_quality"               value="$(arg compression_jpeg_quality)"/>
-    <param name="image_raw_6/compressed/jpeg_progressive"           value="$(arg compression_jpeg_progressive)"/>
-    <param name="image_raw_6/compressed/jpeg_optimize"              value="$(arg compression_jpeg_optimize)"/>
-    <param name="image_raw_6/compressed/jpeg_restart_interval"      value="$(arg compression_jpeg_restart_interval)"/>
-    <param name="image_raw_6/compressed/png_level"                  value="$(arg compression_png_level)"/>
+    <param name="compress_info"                                   value="$(arg compress_info)"/>
 
   </node>
 
   <!-- Prevent to compress data with image transport -->
-  <!-- Prevent to compress data with image transport -->
-  <group if="$(eval (compression_jpeg_vimba) or (not (compression_jpeg_imageTransport) or  (compression_jetraw_vimba)))">
-    <!-- Prevent image_raw_transport from exporting to jpeg using imageTransport-->
-    <rosparam ns="/multi_camera/image_raw_0" param="disable_pub_plugins" >
-      - 'image_transport/compressed'
-      - 'image_transport/compressedDepth'
-    </rosparam>
-    <rosparam ns="/multi_camera/image_raw_1" param="disable_pub_plugins" >
-      - 'image_transport/compressed'
-      - 'image_transport/compressedDepth'
-    </rosparam>
-    <rosparam ns="/multi_camera/image_raw_2" param="disable_pub_plugins" >
-      - 'image_transport/compressed'
-      - 'image_transport/compressedDepth'
-    </rosparam>
-    <rosparam ns="/multi_camera/image_raw_3" param="disable_pub_plugins" >
-      - 'image_transport/compressed'
-      - 'image_transport/compressedDepth'
-    </rosparam>
-    <rosparam ns="/multi_camera/image_raw_4" param="disable_pub_plugins" >
-      - 'image_transport/compressed'
-      - 'image_transport/compressedDepth'
-    </rosparam>
-    <rosparam ns="/multi_camera/image_raw_5" param="disable_pub_plugins" >
-      - 'image_transport/compressed'
-      - 'image_transport/compressedDepth'
-    </rosparam>
-    <rosparam ns="/multi_camera/image_raw_6" param="disable_pub_plugins" >
-      - 'image_transport/compressed'
-      - 'image_transport/compressedDepth'
-    </rosparam>
-
-    <rosparam ns="/multi_camera/image_raw_0_debug" param="disable_pub_plugins" >
-      - 'image_transport/compressed'
-      - 'image_transport/compressedDepth'
-    </rosparam>
-    <rosparam ns="/multi_camera/image_raw_1_debug" param="disable_pub_plugins" >
-      - 'image_transport/compressed'
-      - 'image_transport/compressedDepth'
-    </rosparam>
-    <rosparam ns="/multi_camera/image_raw_2_debug" param="disable_pub_plugins" >
-      - 'image_transport/compressed'
-      - 'image_transport/compressedDepth'
-    </rosparam>
-    <rosparam ns="/multi_camera/image_raw_3_debug" param="disable_pub_plugins" >
-      - 'image_transport/compressed'
-      - 'image_transport/compressedDepth'
-    </rosparam>
-    <rosparam ns="/multi_camera/image_raw_4_debug" param="disable_pub_plugins" >
-      - 'image_transport/compressed'
-      - 'image_transport/compressedDepth'
-    </rosparam>
-    <rosparam ns="/multi_camera/image_raw_5_debug" param="disable_pub_plugins" >
-      - 'image_transport/compressed'
-      - 'image_transport/compressedDepth'
-    </rosparam>
-    <rosparam ns="/multi_camera/image_raw_6_debug" param="disable_pub_plugins" >
-      - 'image_transport/compressed'
-      - 'image_transport/compressedDepth'
-    </rosparam>
-
-  </group>
+  <rosparam ns="/multi_camera/image_raw_0" param="disable_pub_plugins" >
+    - 'image_transport/compressed'
+    - 'image_transport/compressedDepth'
+    - 'image_transport/theora'
+  </rosparam>
+  <rosparam ns="/multi_camera/image_raw_1" param="disable_pub_plugins" >
+    - 'image_transport/compressed'
+    - 'image_transport/compressedDepth'
+    - 'image_transport/theora'
+  </rosparam>
+  <rosparam ns="/multi_camera/image_raw_2" param="disable_pub_plugins" >
+    - 'image_transport/compressed'
+    - 'image_transport/compressedDepth'
+    - 'image_transport/theora'
+  </rosparam>
+  <rosparam ns="/multi_camera/image_raw_3" param="disable_pub_plugins" >
+    - 'image_transport/compressed'
+    - 'image_transport/compressedDepth'
+    - 'image_transport/theora'
+  </rosparam>
+  <rosparam ns="/multi_camera/image_raw_4" param="disable_pub_plugins" >
+    - 'image_transport/compressed'
+    - 'image_transport/compressedDepth'
+    - 'image_transport/theora'
+  </rosparam>
+  <rosparam ns="/multi_camera/image_raw_5" param="disable_pub_plugins" >
+    - 'image_transport/compressed'
+    - 'image_transport/compressedDepth'
+    - 'image_transport/theora'
+  </rosparam>
+  <rosparam ns="/multi_camera/image_raw_6" param="disable_pub_plugins" >
+    - 'image_transport/compressed'
+    - 'image_transport/compressedDepth'
+    - 'image_transport/theora'
+  </rosparam>
+  <rosparam ns="/multi_camera/image_raw_0_debug" param="disable_pub_plugins" >
+    - 'image_transport/compressed'
+    - 'image_transport/compressedDepth'
+    - 'image_transport/theora'
+  </rosparam>
+  <rosparam ns="/multi_camera/image_raw_1_debug" param="disable_pub_plugins" >
+    - 'image_transport/compressed'
+    - 'image_transport/compressedDepth'
+    - 'image_transport/theora'
+  </rosparam>
+  <rosparam ns="/multi_camera/image_raw_2_debug" param="disable_pub_plugins" >
+    - 'image_transport/compressed'
+    - 'image_transport/compressedDepth'
+    - 'image_transport/theora'
+  </rosparam>
+  <rosparam ns="/multi_camera/image_raw_3_debug" param="disable_pub_plugins" >
+    - 'image_transport/compressed'
+    - 'image_transport/compressedDepth'
+    - 'image_transport/theora'
+  </rosparam>
+  <rosparam ns="/multi_camera/image_raw_4_debug" param="disable_pub_plugins" >
+    - 'image_transport/compressed'
+    - 'image_transport/compressedDepth'
+    - 'image_transport/theora'
+  </rosparam>
+  <rosparam ns="/multi_camera/image_raw_5_debug" param="disable_pub_plugins" >
+    - 'image_transport/compressed'
+    - 'image_transport/compressedDepth'
+    - 'image_transport/theora'
+  </rosparam>
+  <rosparam ns="/multi_camera/image_raw_6_debug" param="disable_pub_plugins" >
+    - 'image_transport/compressed'
+    - 'image_transport/compressedDepth'
+    - 'image_transport/theora'
+  </rosparam>
 
 </launch>
