@@ -822,7 +822,28 @@ void AvtVimbaCamera::updateAcquisitionConfig(Config& config)
   }
   if (config.acquisition_rate != config_.acquisition_rate || on_init_)
   {
-    configureFeature("AcquisitionFrameRateAbs", static_cast<float>(config.acquisition_rate), config.acquisition_rate);
+    bool isAcquisitionFrameRateEnable;
+    getFeatureValue("AcquisitionFrameRateEnable", isAcquisitionFrameRateEnable);
+    std::string actualTriggerMode;
+    getFeatureValue("TriggerMode", actualTriggerMode);
+
+    if (config.trigger_mode == "Off")
+    {
+      if (actualTriggerMode == "On")
+      {
+        setFeatureValue("TriggerMode", "Off");
+      }
+      setFeatureValue("AcquisitionFrameRateEnable", true);
+      ROS_INFO(" - AcquisitionFrameRateEnable set to true");
+      configureFeature("AcquisitionFrameRate", static_cast<float>(config.acquisition_rate), config.acquisition_rate);
+    } else
+    {
+      if (isAcquisitionFrameRateEnable)
+      {
+        setFeatureValue("AcquisitionFrameRateEnable", false);
+        ROS_INFO(" - AcquisitionFrameRateEnable set to false");
+      }
+    }
   }
   if (config.trigger_mode != config_.trigger_mode || on_init_)
   {
