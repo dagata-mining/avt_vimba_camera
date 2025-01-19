@@ -22,22 +22,24 @@ namespace avt_vimba_camera
         nhp_.param<std::string>("compression_type", compressionType, "jpeg");
         if (compressionType == "jpeg")
         {
-            compressJPG_ = true;
-            compressJetraw_ = false;
+            compressionType_ = CompressionType::Jpeg;
+        }
+        if (compressionType == "jpegTurbo")
+        {
+          api_->setJpegTurboHandlers();
+          compressionType_ = CompressionType::JpegTurbo;
         }
         else if (compressionType == "jetraw")
         {
-            compressJPG_ = false;
-            compressJetraw_ = true;
+          compressionType_ = CompressionType::Jetraw;
         }
         else if (compressionType == "none")
         {
-            compressJPG_ = false;
-            compressJetraw_ = false;
+          compressionType_ = CompressionType::None;
         }
         else
         {
-            ROS_WARN_STREAM("compression_type = '" << compressionType << "' bad value. Must be 'jpeg', 'jetraw' or 'none'. Set to default value 'jpeg'");
+            ROS_WARN_STREAM("compression_type = '" << compressionType << "' bad value. Must be 'jpeg', 'jpegTurbo', 'jetraw' or 'none'. Set to default value 'jpeg'");
         }
 
         std::string topicName = "image_raw_";
@@ -45,8 +47,6 @@ namespace avt_vimba_camera
         // Get Pixel Intensity params
         nhp_.param("calculate_pixel_intensity", calculate_pixel_intensity_,true);
 
-        ROS_INFO_STREAM("JPEG STATUS " << compressJPG_);
-        ROS_INFO_STREAM("JETRAW STATUS " << compressJetraw_);
 
         //Debug Image
         nhp_.param("debug_image", debugImage_,false);
@@ -77,26 +77,24 @@ namespace avt_vimba_camera
             pixel_intensity_pub_.resize(camQty_);
         }
 
-        if (compressJetraw_)
+        if (compressionType_ == CompressionType::Jetraw)
         {
             auto res = dpcore_init();
             ROS_INFO_STREAM("JETRAW------------ INIT STATUS " << std::to_string(res));
             if (res <= 1)
             {
-                api_->activateJetraw();
                 ROS_INFO("JETRAW------------ACTIVATED");
             }
             else
             {
                 ROS_WARN("JETRAW------------INIT FAILED FALL BACK TO JPG");
-                compressJPG_ = true;
-                compressJetraw_ = false;
+                compressionType_ = CompressionType::Jpeg;
             }
         }
-        if (compressJPG_) {
-            api_->compressJPG_ = true;
+        if (compressionType_ == CompressionType::Jpeg || compressionType_ == CompressionType::JpegTurbo) {
             api_->qualityJPG_ = qualityJPG_;
         }
+        api_->compressionType_ = compressionType_;
 
         if (debugImage_)
         {

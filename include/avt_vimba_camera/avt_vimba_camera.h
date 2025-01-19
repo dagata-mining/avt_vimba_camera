@@ -68,6 +68,7 @@ enum CameraState
   OK
 };
 
+
 class AvtVimbaCamera
 {
 public:
@@ -86,8 +87,7 @@ public:
 
 
   //Compressing
-  bool compressJPG_ = false;
-  bool compressJetraw_ = true;
+  CompressionType compressionType_ = CompressionType::Jpeg;
   int qualityJPG_ = 90;
   void setPixelIntensityPublisher(std::shared_ptr<ros::Publisher> pub) {if(pub) pixel_intensity_pub_ = pub;}
 

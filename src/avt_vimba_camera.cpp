@@ -294,12 +294,6 @@ void AvtVimbaCamera::frameCallback(const FramePtr vimba_frame_ptr)
   camera_state_ = OK;
   // Call the callback implemented by other classes
   compress(vimba_frame_ptr);
-
-//    std::thread currentThread = std::thread(
-//        &AvtVimbaCamera::compress, this,
-//        vimba_frame_ptr); // Modified by pointlaz (camId parameter added)
-//    currentThread.join();
-
 }
 
 void AvtVimbaCamera::compress(const FramePtr& vimba_frame_ptr)

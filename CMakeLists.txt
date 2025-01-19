@@ -14,6 +14,10 @@ find_package(catkin REQUIRED COMPONENTS
   nodelet
 )
 
+set(CMAKE_PREFIX_PATH "/opt/libjpeg-turbo/lib64/cmake/libjpeg-turbo/")
+find_package(libjpeg-turbo REQUIRED)
+
+
 set(THREADPOOL_INCLUDE_DIR " ${CMAKE_CURRENT_SOURCE_DIR}/include/thread_pool/include")
 
 set(JETRAW_INCLUDE_DIR " ${CMAKE_CURRENT_SOURCE_DIR}/JetrawWithDPCore-22.02.16.1/include")
@@ -43,8 +47,9 @@ catkin_package(
 ###########
 ## Build ##
 ###########
+message(STATUS "=====================${libjpeg-turbo}")
 
-include_directories(
+        include_directories(
   ${THREADPOOL_INCLUDE_DIR}
   ${catkin_INCLUDE_DIRS}
   ${JETRAW_INCLUDE_DIR}
@@ -72,6 +77,7 @@ function(add_dependencies_and_linkings arg)
     target_link_libraries(${arg}
       ${catkin_LIBRARIES}
       ${JETRAW_LIBS}
+      libjpeg-turbo::turbojpeg
       ${CMAKE_CURRENT_SOURCE_DIR}/lib/64bit/libVimbaC.so
       ${CMAKE_CURRENT_SOURCE_DIR}/lib/64bit/libVimbaCPP.so
       ${CMAKE_CURRENT_SOURCE_DIR}/lib/64bit/libVimbaImageTransform.so
@@ -113,6 +119,7 @@ add_executable(multi_camera_node
         src/avt_vimba_camera.cpp
         src/frame_observer.cpp
         src/jetraw.cpp
+        src/jpegTurbo.cpp
         )
 add_dependencies_and_linkings(multi_camera_node)
 
