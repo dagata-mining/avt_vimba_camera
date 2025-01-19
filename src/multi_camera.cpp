@@ -1,6 +1,7 @@
 /// Created by pointlaz
 
 #include <avt_vimba_camera/multi_camera.h>
+#include "BS_thread_pool.hpp"
 
 #define DEBUG_PRINTS 1
 
@@ -9,11 +10,14 @@ namespace avt_vimba_camera
     MultiCamera::MultiCamera(ros::NodeHandle& nh, ros::NodeHandle& nhp)
             : nh_(nh), nhp_(nhp), it_(nhp)
     {
-        api_.reset(new AvtVimbaApi);
-        api_->start();
+
 
         // Set the params
         nhp_.param("camera_qty", camQty_, 1);
+        std::shared_ptr<BS::thread_pool<>>  pool = std::make_shared<BS::thread_pool<>>(camQty_ * 2);
+        api_ = std::make_shared<AvtVimbaApi>(pool);
+        api_->start();
+
         std::string compressionType;
         nhp_.param<std::string>("compression_type", compressionType, "jpeg");
         if (compressionType == "jpeg")

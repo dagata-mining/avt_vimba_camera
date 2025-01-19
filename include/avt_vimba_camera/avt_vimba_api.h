@@ -49,6 +49,7 @@
 #include <cv_bridge/cv_bridge.h>
 #include <thread>
 #include <opencv2/opencv.hpp>
+#include "BS_thread_pool.hpp"
 
 using AVT::VmbAPI::CameraPtr;
 using AVT::VmbAPI::FramePtr;
@@ -59,7 +60,10 @@ namespace avt_vimba_camera
 class AvtVimbaApi
 {
 public:
-  AvtVimbaApi() : vs(VimbaSystem::GetInstance())
+  AvtVimbaApi(
+              const std::shared_ptr<BS::thread_pool<>> &threadPool = nullptr)
+      : vs(VimbaSystem::GetInstance())
+        ,threadPool_(threadPool)
   {
   }
 
@@ -84,6 +88,9 @@ public:
     //Debug image
     bool debugImage_ = false;
     bool compressInfo_ = false;
+
+    //pool
+    std::shared_ptr<BS::thread_pool<>> threadPool_;
 
   void start()
   {
@@ -398,6 +405,23 @@ public:
     }
     return res;
   }
+
+  bool frameToImagePool(const FramePtr vimba_frame_ptr, sensor_msgs::Image& image, sensor_msgs::Image& debugImage, std_msgs::UInt8 &pixel_intensity_msg, int camId)
+  {
+    if (threadPool_)
+    {
+      std::future<bool>future = threadPool_->submit_task([this,&vimba_frame_ptr,&image,&debugImage,&pixel_intensity_msg, camId]
+                                                          {
+                                                            return this->frameToImage(vimba_frame_ptr,image,debugImage,pixel_intensity_msg,camId);
+                                                          }) ;
+      return future.get();
+    }
+    else
+    {
+      return frameToImage(vimba_frame_ptr,image,debugImage,pixel_intensity_msg,camId);
+    }
+  }
+
 
     /**
    * @brief Set Pixel Intensity Calculation Parameters

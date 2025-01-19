@@ -76,7 +76,8 @@ public:
 
   AvtVimbaCamera();
   AvtVimbaCamera(const std::string& name, const int camId = 0, std::shared_ptr<AvtVimbaApi> api = nullptr,
-                 std::shared_ptr<image_transport::CameraPublisher> pub = nullptr);         // Modified by pointlaz. camId as parameter
+                 std::shared_ptr<image_transport::CameraPublisher> pub = nullptr
+                 );         // Modified by pointlaz. camId as parameter
 
  //Publishers
   std::shared_ptr<image_transport::CameraPublisher> pub_;
@@ -141,8 +142,6 @@ public:
 
     Config config_;
 private:
-
-
   std::shared_ptr<AvtVimbaApi> api_;
   // IFrame Observer
   SP_DECL(FrameObserver) frame_obs_ptr_;
