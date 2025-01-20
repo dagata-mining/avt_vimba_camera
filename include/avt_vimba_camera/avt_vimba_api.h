@@ -428,9 +428,9 @@ public:
         if (debugImage_)
         {
           std::vector<VmbUchar_t> decompressedData;
-          res = decompressJpegTurbo(getJpegTurboHandler(poolIndex),image,decompressedData,encoding);
+          res = decompressJpegTurbo(getJpegTurboHandler(poolIndex),image,decompressedData,sensor_msgs::image_encodings::BGR8);
           VmbUint32_t step = decompressedData.size() / height;
-          res = sensor_msgs::fillImage(debugImage,  sensor_msgs::image_encodings::RGB8, image.height, image.width, step, decompressedData.data());
+          res = sensor_msgs::fillImage(debugImage,  sensor_msgs::image_encodings::BGR8, image.height, image.width, step, decompressedData.data());
         }
       }
       else
